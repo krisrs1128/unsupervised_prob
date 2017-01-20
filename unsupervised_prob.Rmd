@@ -1,0 +1,46 @@
+title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
+author: "Kris Sankaran"
+---
+
+The purpose of this work is not to propose a new method for microbiome analysis.
+Rather, it is to motivate a general, iterative and model-based way of thinking
+about the microbiome, visiting several classes of probabilistic models along the
+way. Further, we aim to compare and contrast these techniques, to provide
+guidelines for when to use which. Finally, we share the model fitting and output
+visualization code with the hope that it can serve as a template for future
+researchers.
+
+The essential motivation for this work is simple -- microbiome data analysis
+remains a challenging exercise, in spite of the wide popularity of microbiome
+data collection, often taking on the order of weeks or months to complete.
+Partially, this is due to the relative paucity of microbiome-specific
+statistical tools, though there are some exceptions \cite{ren2016bayesian,
+shafiei2015biomico} . In particular, many of the exploratory and inferential
+techniques common in microbiome analysis are not native to the microbiome
+setting, having instead originated in classical or genomic settings, consider 
+for example PCA or DESeq2 \cite{turnbaugh006obesity, love2014moderated}. The
+effective application of these techniques to microbiome data typically requires
+heuristic adaptations, like changing dispersion estimation in DESeq2 or
+transforming to truncated rankings in PCA \cite{hawinkel2015evaluation,
+callahan2016bioconductor}.
+
+The lack of a standardized approach to microbiome data analysis means that the
+work remains something of an art form, requiring many decisions that can be
+difficult for non-specialists. The goal of this chapter is to propose a
+principled approach to microbiome data analysis, based on probabilisitc
+modeling, along with some critical assessment of alternative techniques, to
+equip the microbiome analyst with an efficient workflow and guide associated
+decisions.
+
+To this end, we first summarize the core questions frequently encountered across
+studies. We then provide a basic survey of probabilistic models we believe to be
+useful building-blocks when investigating these questions, focusing on Latent
+Dirichlet Allocation and Nonnegative Matrix Factorization, along with their
+time-series and zero-inflated variants. To build intuition about the merits and
+limitations for some of these models, we provide a simulation study. Finally, we
+provide template applications to real data, originally published in
+\cite{dethlefsenrelman}.
+
+# Context #
+
+# Simulation Studies #
