@@ -1,46 +1,186 @@
-title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
-author: "Kris Sankaran"
 ---
-
-The purpose of this work is not to propose a new method for microbiome analysis.
-Rather, it is to motivate a general, iterative and model-based way of thinking
-about the microbiome, visiting several classes of probabilistic models along the
-way. Further, we aim to compare and contrast these techniques, to provide
-guidelines for when to use which. Finally, we share the model fitting and output
-visualization code with the hope that it can serve as a template for future
-researchers.
-
-The essential motivation for this work is simple -- microbiome data analysis
-remains a challenging exercise, in spite of the wide popularity of microbiome
-data collection, often taking on the order of weeks or months to complete.
-Partially, this is due to the relative paucity of microbiome-specific
-statistical tools, though there are some exceptions \cite{ren2016bayesian,
-shafiei2015biomico} . In particular, many of the exploratory and inferential
-techniques common in microbiome analysis are not native to the microbiome
-setting, having instead originated in classical or genomic settings, consider 
-for example PCA or DESeq2 \cite{turnbaugh006obesity, love2014moderated}. The
-effective application of these techniques to microbiome data typically requires
-heuristic adaptations, like changing dispersion estimation in DESeq2 or
-transforming to truncated rankings in PCA \cite{hawinkel2015evaluation,
-callahan2016bioconductor}.
-
-The lack of a standardized approach to microbiome data analysis means that the
-work remains something of an art form, requiring many decisions that can be
-difficult for non-specialists. The goal of this chapter is to propose a
-principled approach to microbiome data analysis, based on probabilisitc
-modeling, along with some critical assessment of alternative techniques, to
-equip the microbiome analyst with an efficient workflow and guide associated
-decisions.
-
-To this end, we first summarize the core questions frequently encountered across
-studies. We then provide a basic survey of probabilistic models we believe to be
-useful building-blocks when investigating these questions, focusing on Latent
-Dirichlet Allocation and Nonnegative Matrix Factorization, along with their
-time-series and zero-inflated variants. To build intuition about the merits and
-limitations for some of these models, we provide a simulation study. Finally, we
-provide template applications to real data, originally published in
-\cite{dethlefsenrelman}.
+title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
+date: "`r Sys.Date()`"
+bibliography: "unsupervised_prob.bib"
+output:
+  bookdown::pdf_book:
+    includes:
+      in_header: preamble.tex
+---
 
 # Context #
 
-# Simulation Studies #
+Generally, microbiome studies attempt to characterize variation in microbial
+abundance profiles across different experimental conditions
+[@human2012structure] For example, it can be scientifically meaningful to
+describe differences in microbial communities between treatment and control
+groups. Alternatively, a study may attempt to describe changes in microbial
+abundances after deliberately induced perturbations
+[@dethlefsen2011incomplete].
+
+In the process, there tend to be two complementary difficulties. First, the data
+are often high dimensional, measured over several hundreds or thousands of
+microbes. Studying patterns at the level of individual microbes is typically
+infeasible. Second, it can be important to study microbial abundances in context
+of known biological information. For example, if a collection of evolutionarily
+related microbes all change in sync with each other, the scientific conclusion
+would be different compared to if those microbes were not related to one
+another. Further, metagenomic or proteomic data can often supplement raw
+microbial abundance data, providing functional context.
+
+## Data Description ## 
+
+In this study, we focus on 16S sequencing data, one of the original approaches
+to quantifying microbial abundances, and still one of the most common protocols
+for describing microbial ecology. Briefly, this procedure relies on the fact
+that the 16S gene is conserved across most bacterial species, but is variable 
+enough to differ across different strains. Hence, by counting number of
+occurrences of different versions of this gene, it is possible to measure the
+numbers of different species present in a sample, without attempting the
+difficult problem of assembling genomes from the mixtures present in complex
+environmental samples.
+
+After preprocessing, the resulting data are a samples by species counts matrix;
+this is the fundamental object for exploration and inference. Some frequently
+encountered characteristics of these type of data are worth noting. First, the
+data are often very heavy tailed, with samples dominated by a relatively small
+number of very abundant microbes. To address this, it is common to transform the
+data, using variance stabilizing transformations or replacing with ranks, for
+example, or dividing analysis between a "core" central component and a
+peripheral collection of less abundant species. Second, these data are typically
+zero-inflated, which is often accounted for by filtering\footnote{Using variance or
+k-over-A filtering, for example.}. Third, at the sample level, there is
+typically variation in sequencing depth. Hence, there is often better precision
+in the estimates for some samples than for others. This difference is often
+explicitly modeled [@mcmurdie2014waste, @love2014differential, @ren2016bayesian]
+
+## Statistical Background ##
+
+We now review a few of the statistical modeling techniques that we believe can
+be useful building blocks when performing microbiome analysis. Many of these
+techniques have been borrowed from text analysis, thinking of the samples by
+microbes matrix as a biological analog of the usual document-term matrix. The
+idea of transferring these techniques to the microbiome is not new, but the
+methods have still yet to be widely adopted [@shafiei2015biomico,
+@chen2012estimating, @holmes2012dirichlet,  @chen2013variable]
+
+### Latent Dirichlet Allocation ###
+
+Latent Dirichlet Allocation (LDA) is a generalization of multinomial mixture
+modeling applicable to count matrices. We adopt the usual topic modeling
+terminology, where each document is summarized by a vector of term counts.
+Suppose there are $D$ documents across $V$ terms, and that these documents are
+assumed mixtures of $K$ underlying topics, where a topic is defined as a
+distribution over words. Then, LDA supposes the generative mechanism,
+\begin{itemize}
+\item For each word in the current document, draw a topic associated with that
+word, with proportions determined by the document's fixed topic-mixture
+probabilities.
+\item Given the topics for each word in the document, draw a term associated
+with it, according to the distribution for the topic to which that word is
+assigned.
+\end{itemize}
+
+The specification is completed by defining priors for the document-topic and
+topic-term distributions. We can formalize this process as follows. Let
+$\theta_{d} \in \simplex^{K}$ represent the $d^{th}$ topic's mixture over the
+$K$ underlying topics. Represent the term in the $n_{th}$ word of this document
+by $w_{dn}$, and the associated topic by $z_{dn}$. Suppose the $k^{th}$ topic 
+places weight $\beta_{vk}$ on the $v^{th}$ term, so that $\beta_{\cdot k} \in
+\simplex^{V}$. Then, the generative mechanism is
+
+\begin{align*}
+w_{dn} \vert \left(\beta_{\cdot k}\right)_{k = 1}^{K}, z_{dn} &\sim \Cat\left(\beta_{\cdot z_{dn}}\right) \\
+z_{dn} \vert \theta_{d} &\sim \Cat\left(\theta_{d}\right) \\
+\theta_{d} &\sim \Dir\left(\alpha\right) \\
+\beta_{\cdot k} &\sim \Dir\left(\gamma\right).
+\end{align*}
+The interpretation is that each word in the document is assigned a topic
+$z_{dn}$ according to the mixture weights $\theta_{i}$, and the actual terms are
+only drawn afterwards, using the topic distributions $\beta_{\cdot k}$. In a standard
+multinomial mixture model, each document can only belong to one topic, so there
+would only be one value for $z_{dn}$ across all words.
+
+In the microbiome application, we will find a formulation that marginalizes over
+the $z_{dn}$ more convenient. Indeed, a strict analogy between text modeling and
+microbiome analysis would consider each living microbe a word $w_{dn}$, while
+what we are more interested in are counts of species across samples. That is,
+we care more about $n_{dv} = \sum_{n = 1}^{N_{d}} \indic{w_{dn} = v}$ for each
+sample $d$ and microbe $v$. Now, $n_{d\cdot} = \begin{pmatrix} n_{d1} \\ \vdots \\
+n_{dV} \end{pmatrix} \in \naturals^{V}$ is a sum of $\Cat\left(\beta \theta_{d}
+\right)$ variables, because $\Parg{w_{dn} = v} = \sum_{k = 1}^{K} \Parg{w_{dn} =
+v \vert z_{dn} = k}\Parg{z_{dn} = k} = \beta_{v\cdot}^{T}\theta_{d}$. Hence, we
+can write the marginal distribution as
+
+\begin{align*}
+n_{d\cdot} \vert \left(\beta_{k}\right)_{1}^{K} &\sim \Mult\left(n_{d\ast}, \beta \theta_{d}\right) \\
+\beta_{\cdot k} &\sim \Dir\left(\gamma\right), k = 1, \dots, K \\
+\theta_{d} &\sim \Dir\left(\alpha\right), d = 1, \dots D
+\end{align*}
+where $n_{d\ast} := \sum_{v = 1}^{V} n_{dv}$. Interpreting this model, we
+imagine we think of each document $d$ as a mixture $\theta_{d}$ across $K$
+topics.
+
+The underlying model can be interpreted geometrically by identifying each topic
+$\beta_{\cdot k}$ with a point on the $V$-dimensional simplex. Then the
+expectation of the distribution over terms for the $d^{th}$ document, $\beta
+\theta_{d}$ is a new point between the different $\beta_{\cdot k}$, with more
+attraction towards those $\beta_{\cdot k}$ where $\theta_{dk}$ are large. See
+Figure \ref{fig:simplex_lda}. That is, a collection of samples are modeled as
+points lying anywhere between the $K$ latent topics. This is in contrast to
+multinomial mixture modeling, which identifies each sample with one of the $K$
+points $\beta_{\cdot k}$, but similar in spirit to Correspondence Analysis,
+which also tries to focus interest on subsets of $\simplex^{V}$
+\cite{greenacre1987geometric}.
+
+\begin{figure}
+\centering
+\includegraphics[width=7.5cm]{figure/lda_simplex_view}
+\caption{The simplex view of Latent Dirichlet Allocation.}
+\label{fig:simplex_lda}
+\end{figure}
+
+## Nonnegative Matrix Factorization ##
+
+Consider the samples by microbe matrix, $N \in \reals^{D \times V}$ made from
+counts $n_{dv}$. In LDA, these counts are modeled by sampling from a
+multinomials with total counts coming from the total number of words in each
+document and probabilities coming from the rows of $\Theta B^{T}$ where $\Theta
+= \begin{pmatrix}\theta_{1} \\ \vdots \\ \theta_{D} \end{pmatrix} \in
+\left(\simplex^{K - 1}\right)_{\downarrow \times D}$ and $B = \begin{pmatrix}
+\beta_{\cdot 1} \dots \beta_{\cdot K} \end{pmatrix} \in \left(\simplex^{V -
+1}\right)_{\rightarrow \times K}$ are $D \times K$ and $V \times K$ matrices
+representing document and topic distributions, respectively.
+
+This has the flavor of factor analysis with $K$ factors, but endowed with
+specific multinomial structure. To generalize without devolving into ordinary
+factor analysis, which doesn't respect any of the count structure in the data,
+it is natural to consider nonnegative matrix factorization, which approximates
+the nonnegative matrix $N$ by the product of low rank matrices, $N \approx
+\Theta B^{T}$, where now the only constraints on $\Theta$ and $B$ are that
+$\Theta \in \reals_{+}^{D \times K}$ and $B \in \reals_{+}^{V \times K}$. This
+is the starting point for a variety of algorithms in the Nonnegative Matrix
+Factorization (NMF) literature \cite{wang2013nonnegative, berry2007algorithms,
+lee2001algorithms}.
+
+Here, we will consider a Gamma-Poisson factorization model (GaP)
+\cite{kucukelbir2015automatic, canny2004gap}, which is proposes the hierarchical
+model
+\begin{align*}
+N &\sim \Pois\left(\Theta B^{T}\right) \\
+\Theta &\sim \Gam\left(a_{0} 1_{D \times K}\right, b_{0} 1_{D \times K}) \\
+B &\sim \Gam\left(c_{0} 1_{V \times K}, d_{0} 1_{V \times K} \right),
+\end{align*}
+where mean that each entry in these matrices is sampled independently, with
+parameters given by the corresponding entry in the parameter matrix.
+
+Unlike LDA, GaP models the total number of appearances of each topic implicitly
+via the gamma prior on $\Theta$. When the shape parameter is small, this prior
+is quite skewed -- this reflects the suspicion that most samples will be
+dominated by only a few of the $\beta_{\cdot k}$. Further, when the shape
+parameter is large, the gamma converges to a normal distribution, and so the GaP
+model then reduces to ordinary factor analysis.
+
+We can modify this model to reflect zero-inflation.
+
+# Simulation Studies # 
