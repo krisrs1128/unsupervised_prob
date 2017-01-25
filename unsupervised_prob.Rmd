@@ -1,11 +1,15 @@
 ---
+documentclass: report
 title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
 date: "`r Sys.Date()`"
-bibliography: "unsupervised_prob.bib"
+keep-tex: true
 output:
   bookdown::pdf_book:
+    keep_tex: yes
     includes:
       in_header: preamble.tex
+bibliography: ["unsupervised_prob.bib"]
+link-citations: yes
 ---
 
 # Context #
@@ -52,7 +56,7 @@ zero-inflated, which is often accounted for by filtering\footnote{Using variance
 k-over-A filtering, for example.}. Third, at the sample level, there is
 typically variation in sequencing depth. Hence, there is often better precision
 in the estimates for some samples than for others. This difference is often
-explicitly modeled [@mcmurdie2014waste, @love2014differential, @ren2016bayesian]
+explicitly modeled [@mcmurdie2014waste; @love2014differential; @ren2016bayesian]
 
 ## Statistical Background ##
 
@@ -61,8 +65,13 @@ be useful building blocks when performing microbiome analysis. Many of these
 techniques have been borrowed from text analysis, thinking of the samples by
 microbes matrix as a biological analog of the usual document-term matrix. The
 idea of transferring these techniques to the microbiome is not new, but the
-methods have still yet to be widely adopted [@shafiei2015biomico,
-@chen2012estimating, @holmes2012dirichlet,  @chen2013variable]
+methods have still yet to be widely adopted [@shafiei2015biomico;
+@chen2012estimating; @holmes2012dirichlet;  @chen2013variable]. 
+
+We include this review because we hope for this text to be self-contained.
+Further, we expect these methods to only be the starting point for more
+sophisticated analysis -- in fact, the extensibility and modularity of these
+methods are some of their most attractive features.
 
 ### Latent Dirichlet Allocation ###
 
@@ -131,14 +140,36 @@ points lying anywhere between the $K$ latent topics. This is in contrast to
 multinomial mixture modeling, which identifies each sample with one of the $K$
 points $\beta_{\cdot k}$, but similar in spirit to Correspondence Analysis,
 which also tries to focus interest on subsets of $\simplex^{V}$
-\cite{greenacre1987geometric}.
+[@greenacre1987geometric].
 
 \begin{figure}
 \centering
 \includegraphics[width=7.5cm]{figure/lda_simplex_view}
-\caption{The simplex view of Latent Dirichlet Allocation.}
+\caption{The simplex view of Latent Dirichlet Allocation. Figure from [@blei2003latent].}
 \label{fig:simplex_lda}
 \end{figure}
+
+## Dynamic Unigrams ##
+
+LDA can be adapted to incorporate more specific structure. In light of the
+longitudinal nature of many modern microbiome studies, one of the most
+intriguing of these variants is called the Dynamic Topic Model
+[@blei2006dynamic; @wang2012continuous]. This is discussed in section
+\@ref(sec:dtm) -- here, we describe a related, simpler model, called the Dynamic
+Unigram model, which was also investigated in [@blei2006dynamic].
+
+The basic idea in the unigram model is to adapt the geometric view of LDA to the
+time-series setting. In more detail, while LDA imagines samples being mixtures
+of fundamental topics on the $V$-dimensional simplex, the Dynamic Unigrams Model
+identifies a sequence of samples over time with a curve along this simplex. That
+is, suppose $n_{d\left(t\right) \cdot}$ is a document at time $t$. Then, we
+imagine $n_{d\left(t\right)} \sim \Mult\left(\pi_{t}\right)$, where $\pi_{t}$
+are topic probabilities gradually evolving along the simplex.
+
+## Dynamic Topic Models {#sec:dtm}
+
+LDA is an elementary count data modeling technique, and it has been adapted to a
+variety of situations with more specific structure.
 
 ## Nonnegative Matrix Factorization ##
 
@@ -160,15 +191,15 @@ the nonnegative matrix $N$ by the product of low rank matrices, $N \approx
 \Theta B^{T}$, where now the only constraints on $\Theta$ and $B$ are that
 $\Theta \in \reals_{+}^{D \times K}$ and $B \in \reals_{+}^{V \times K}$. This
 is the starting point for a variety of algorithms in the Nonnegative Matrix
-Factorization (NMF) literature \cite{wang2013nonnegative, berry2007algorithms,
-lee2001algorithms}.
+Factorization (NMF) literature [@wang2013nonnegative; @berry2007algorithms,
+@lee2001algorithms].
 
 Here, we will consider a Gamma-Poisson factorization model (GaP)
-\cite{kucukelbir2015automatic, canny2004gap}, which is proposes the hierarchical
+[@kucukelbir2015automatic; @canny2004gap], which is proposes the hierarchical
 model
 \begin{align*}
-N &\sim \Pois\left(\Theta B^{T}\right) \\
-\Theta &\sim \Gam\left(a_{0} 1_{D \times K}\right, b_{0} 1_{D \times K}) \\
+N &\sim \Poi\left(\Theta B^{T}\right) \\
+\Theta &\sim \Gam\left(a_{0} 1_{D \times K}, b_{0} 1_{D \times K}\right) \\
 B &\sim \Gam\left(c_{0} 1_{V \times K}, d_{0} 1_{V \times K} \right),
 \end{align*}
 where mean that each entry in these matrices is sampled independently, with
