@@ -20,6 +20,18 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 ## ---- plot-utils ---
+#' Get Score Means
+#'
+#' This groups the main scores matrix by sample index, and average posterior
+#' samples.
+#'
+#' @param scores 
+score_means <- function(scores, grouping_vars) {
+  scores %>%
+    group_by_(.dots = grouping_vars) %>%
+    summarise(mean_1 = mean(value_1), mean_2 = mean(value_2), truth_1 = truth_1[1], truth_2 = truth_2[1])
+}
+
 #' Plot Contours and Associated Coordinate
 #'
 #' This is a wrapper of ggcontours in the ggscaffold package that shows the
@@ -34,9 +46,7 @@ options(mc.cores = parallel::detectCores())
 scores_contours <- function(plot_data, plot_opts) {
   p1 <- ggcontours(plot_data, plot_opts) +
     geom_text(
-      data = plot_data %>%
-        group_by_(.dots = c(plot_opts$group, plot_opts$facet_terms)) %>%
-        summarise(mean_1 = mean(value_1), mean_2 = mean(value_2)),
+      data = score_means(plot_data, c(plot_opts$group, plot_opts$facet_terms)),
       aes_string(x = "mean_1", y = "mean_2", label = plot_opts$group),
       col = plot_opts$mean_col,
       size = plot_opts$text_size
@@ -46,8 +56,8 @@ scores_contours <- function(plot_data, plot_opts) {
       aes_string(x = "truth_1", y = "truth_2", label = plot_opts$group),
       size = plot_opts$text_size
     ) +
-    scale_x_continuous(limits = plot_opts$x_lim, expand = c(0, 0)) +
-    scale_y_continuous(limits = plot_opts$y_lim, expand = c(0, 0))
+    scale_x_sqrt(limits = plot_opts$x_lim, expand = c(0, 0)) +
+    scale_y_sqrt(limits = plot_opts$y_lim, expand = c(0, 0))
   p2 <- p1 +
     facet_wrap(formula(paste0("~", plot_opts$group)))
   list("grouped" = p1, "coordinates" = p2)
