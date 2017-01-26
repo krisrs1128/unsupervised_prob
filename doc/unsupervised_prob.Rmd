@@ -12,6 +12,12 @@ bibliography: ["unsupervised_prob.bib"]
 link-citations: yes
 ---
 
+```{r}
+library("knitr")
+opts_chunk$set(fig.width = 7, fig.height = 5, cache = TRUE)
+sapply(list.files("src"), function(x) { read_chunk(x) })
+```
+
 # Context #
 
 Generally, microbiome studies attempt to characterize variation in microbial
@@ -187,12 +193,16 @@ where $S$ is the multilogit link
 This is just a reparameterization, allowing us to work with
 $S\left(\mu_{t}\right)$ instead of directly with $\beta_{t}$. Note that the only
 tuning parameter here is $\sigma^{2}$, which governs the smoothness of
-transitions in term distributions over time. The estimated $\hat{\beta}_{tv}$ can
-be thought of as a smoothing of the raw proportions $\hat{p}_{tv}:=
-\frac{\sum_{d : t\left(d\right) = t}n_{dv}}{\sum_{d : t\left(d\right) =
-t}\sum_{v^{\prime}} n_{dv^{\prime}}}$. That is, while LDA can be thought of a
-modification of latent factor modeling to counts, the dynamic unigrams model can
-be thought of as the corresponding variant of nonparametric smoothing.
+transitions in term distributions over time. There is no particular reason to
+choose a random walk instead of any more general ARMA process for the prior
+$\left(\mu_{t}\right)$, except simplicity of presentation.
+
+The estimated $\hat{\beta}_{tv}$ can be thought of as a smoothing of the raw
+proportions $\hat{p}_{tv}:= \frac{\sum_{d : t\left(d\right) =
+t}n_{dv}}{\sum_{d : t\left(d\right) = t}\sum_{v^{\prime}} n_{dv^{\prime}}}$.
+That is, while LDA can be thought of a modification of latent factor modeling to
+counts, the dynamic unigrams model can be thought of as the corresponding
+variant of nonparametric smoothing.
 
 ## Dynamic Topic Models {#sec:dtm}
 
@@ -209,11 +219,20 @@ similar among documents closer to each other in time.
 
 This is formulated more precisely as 
 \begin{align*}
-n_{d\cdot} \vert \mu_{t\left(d\right)}, \alpha_{\left(d\right)} &\sim \Mult\left(\sum_{v} n_{dv}, \sum_{k = 1}^{K} S\left(\alpha_{t\left(d\right)}\right) S\left(\mu_{t\left(d\right)}\right)\right)
+n_{d\cdot} \vert \mu_{t\left(d\right)}, \alpha_{\left(d\right)} &\sim \Mult\left(\sum_{v} n_{dv}, \sum_{k = 1}^{K} S\left(\alpha_{t\left(d\right)}\right) S\left(\mu_{t\left(d\right)}\right)\right) \\
+\alpha_{t} \vert \alpha_{t - 1} &\sim \Gsn\left(\alpha_{t - 1}, \delta^{2}I_{K}\right) \\
+\mu_{t} \vert \mu_{t - 1} &\sim \Gsn\left(\mu_{t - 1}, \sigma^{2}I_{v}\right) \\
+\alpha_{0} &\sim \Gsn\left(0, \delta^{2}I_{K}\right) \\
+\mu_{0} &\sim \Gsn\left(0, \sigma^{2}I_{K}\right)
 \end{align*}
 
-Here, we identify $S\left(\mu_{tk}\right)$ and $S\left(\alpha_{t}\right)$ with
-$\beta_{tk}$ and $\theta_{t}$, respectively.
+Here, we think of $S\left(\mu_{tk}\right)$ and $S\left(\alpha_{t}\right)$ as
+parameterizing $\beta_{tk}$ and $\theta_{t}$, respectively. Here, $\delta^{2}$
+and $\sigma^{2}$ govern the rate at which mixture probabilities and topics can
+evolve. A smaller $\frac{\delta}{\sigma}$ ratio bring us closer to dynamic
+unigrams, because the documents mixing proportions are closer to being fixed
+while the topics evolve. Conversely, large ratios $\frac{\delta}{\sigma}$ bring
+us closer to LDA, with samples mixing across more or less fixed topics.
 
 ## Nonnegative Matrix Factorization ##
 
@@ -254,8 +273,68 @@ via the gamma prior on $\Theta$. When the shape parameter is small, this prior
 is quite skewed -- this reflects the suspicion that most samples will be
 dominated by only a few of the $\beta_{\cdot k}$. Further, when the shape
 parameter is large, the gamma converges to a normal distribution, and so the GaP
-model then reduces to ordinary factor analysis.
+model then reduces to ordinary factor analysis. Finally, the gamma prior induces
+overdispersion in draws from the model, paralleling the usual interpretation of
+the negative binomial distribution as the result of marginalizing a gamma prior
+in a Poisson model.
 
-We can modify this model to reflect zero-inflation.
+We can introduce an extra layer into this model to reflect zero-inflation, which
+is a common feature of many microbiome data sets [@xu2015assessment;
+@mcmurdie2014waste]. The change in the model is minor -- with some probability
+$p$ entries in $Y$ are sent to zero. That is, instead of of the Poisson
+likelihood,
+\begin{align*}
+\Parg{Y_{ij} = y_{ij} \vert \theta_{i}, \beta_{j \cdot}} = \frac{\exp{-\theta_{i}^{T}\beta_{j \cdot}} \left(\theta_{i}^{T}\beta_{j}\right)^{y_{ij}}}{y_{ij}!}, 
+\end{align*}
+we have
+\begin{align*}
+\Parg{Y_{ij} = y_{ij} \vert p, \theta_{i}, \beta_{j \cdot}} = \begin{cases}
+p + \exp{-\theta_{i}^{T}\beta_{j\cdot}} &\text{ for } y_{ij} = 0 \\
+\left(1 - p\right)
+\frac{\exp{-\theta_{i}^{T}\beta_{j
+\cdot}}\left(\theta_{i}^{T}\beta_{j}\right)^{y_{ij}}}{y_{ij}!} &\text{ for }
+y_{ij} > 0.
+\end{cases}
+\end{align*}
+
+## Probabilistic Programming ## 
+
+Probabilistic programming tools provide generic interfaces to constructing
+Bayesian samplers [@plummer2003jags, @carpenter2016stan,
+@kucukelbir2015automatic]. These tools simplify the process of specifying
+complex likelihoods by providing an interface to a set of fundamental sampling
+statements. Once the model is described, standard MCMC can be
+applied\footnote{This step usually means only models with continuous parameter
+spaces can be implemented, since Bayesian inference with discrete parameters is
+less amenable to general solutions.}
+
+For example, the NMF model can be implemented using essentially only the STAN
+code below\footnote{The complete code is available at
+\url{https://github.com/krisrs1128/readings/blob/master/nmf/src/nmf_gamma_poisson.stan}}.
+```stan
+model{
+  for(i in 1:D) {
+    theta[i] ~ gamma(a,b); // componentwise gamma
+  }
+
+  for (j in 1:V) {
+    beta[j] ~ gamma(c,d);//componentwise gamma
+  }
+
+  for (i in 1:D) {
+    for (j in 1:V) {
+      y[i, j] ~ poisson(theta[i]' * beta[j]);
+    }
+  }
+}
+```
+The sampling statements `~ gamma` and `~ poisson` tell STAN to increment the
+loglikelihood used to construct samplers.
+
+Access to this interface for doing Bayesian inference simplifies the process of
+exploring alternative probabilistic models. Indeed, implementing samplers ``by-hand'' 
+can be a time-consuming and error-prone process. All simulation and data
+analysis results described in this report have been implemented in STAN and are
+available at (todo: central repo).
 
 # Simulation Studies #
