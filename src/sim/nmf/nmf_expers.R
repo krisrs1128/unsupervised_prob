@@ -11,14 +11,14 @@
 ## ---- libraries ----
 library("jsonlite")
 library("SLURMHelpers")
-base_dir <- "/scratch/users/kriss1/programming/readings/nmf"
-source(file.path(base_dir, "src", "nmf_utils.R"))
+base_dir <- "../src/sim/nmf"
+source(file.path(base_dir, "nmf_utils.R"))
 
 ## ---- configuration ----
 ## create the configuration JSON file
+config_path <- file.path(base_dir, "config.json")
 batch_dir <- file.path(base_dir, "batch")
 dir.create(batch_dir)
-config_path <- file.path(batch_dir, "config.json")
 
 sim_factors <- list(
   "N" = c(100),
@@ -28,8 +28,8 @@ sim_factors <- list(
 model_factors <- list(
   "inference" = c("gibbs", "vb"),
   "method" = c(
-    file.path(base_dir, "src", "nmf_gamma_poisson.stan"),
-    file.path(base_dir, "src", "nmf_gamma_poisson_zero.stan")
+    file.path(base_dir, "..", ".." "stan", "nmf_gamma_poisson.stan"),
+    file.path(base_dir, "..", "..",  "stan", "nmf_gamma_poisson_zero.stan")
   )
 )
 
