@@ -12,10 +12,9 @@ bibliography: ["unsupervised_prob.bib"]
 link-citations: yes
 ---
 
-```{r}
+```{r knitr}
 library("knitr")
-opts_chunk$set(fig.width = 7, fig.height = 5, cache = TRUE)
-sapply(list.files("src"), function(x) { read_chunk(x) })
+opts_chunk$set(fig.width = 7, fig.height = 5, cache = FALSE, size = "footnotesize", warning = FALSE)
 ```
 
 # Context #
@@ -338,3 +337,23 @@ analysis results described in this report have been implemented in STAN and are
 available at (todo: central repo).
 
 # Simulation Studies #
+
+## NMF ##
+```{r read-nmf}
+read_chunk("../src/sim/nmf/nmf_expers.R")
+```
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r libraries}
+```
+
+```{r configuration}
+```
+
+```{r submit-jobs }
+```
+\endgroup
+
+## Zero-inflated NMF ##
