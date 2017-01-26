@@ -8,14 +8,14 @@
 ## author: kriss1@stanford.edu
 
 ## ---- libraries ----
-library("plyr")
-library("dplyr")
-library("reshape2")
-library("ggplot2")
-library("ggscaffold")
-library("jsonlite")
-library("rstan")
-library("stringr")
+suppressMessages(library("plyr"))
+suppressMessages(library("dplyr"))
+suppressMessages(library("reshape2"))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("ggscaffold"))
+suppressMessages(library("jsonlite"))
+suppressMessages(library("rstan"))
+suppressMessages(library("stringr"))
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 

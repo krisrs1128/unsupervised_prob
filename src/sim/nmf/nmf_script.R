@@ -8,7 +8,7 @@
 ## author: kriss1@stanford.edu
 
 ## ---- libraries ----
-library("jsonlite")
+suppressMessage(library("jsonlite"))
 source("/scratch/users/kriss1/programming/readings/nmf/src/nmf_utils.R")
 
 ## ---- parse-args ----
@@ -22,6 +22,7 @@ for (i in seq_along(expers)) {
   output_path <- file.path(expers[[i]]$output_dir, paste0("fit-", i, ".rda"))
   if (file.exists(output_path)) {
     warning(paste("File", output_path, "exists, not overwriting."))
+    next
   }
 
   cur_data <- nmf_sim(expers[[i]]$sim_opts)
