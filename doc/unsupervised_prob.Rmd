@@ -1,12 +1,22 @@
 ---
+documentclass: report
 title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
 date: "`r Sys.Date()`"
-bibliography: "unsupervised_prob.bib"
+keep-tex: true
 output:
   bookdown::pdf_book:
+    keep_tex: yes
     includes:
       in_header: preamble.tex
+bibliography: ["unsupervised_prob.bib"]
+link-citations: yes
 ---
+
+```{r}
+library("knitr")
+opts_chunk$set(fig.width = 7, fig.height = 5, cache = TRUE)
+sapply(list.files("src"), function(x) { read_chunk(x) })
+```
 
 # Context #
 
@@ -28,12 +38,12 @@ would be different compared to if those microbes were not related to one
 another. Further, metagenomic or proteomic data can often supplement raw
 microbial abundance data, providing functional context.
 
-## Data Description ## 
+## Data Description ##
 
 In this study, we focus on 16S sequencing data, one of the original approaches
 to quantifying microbial abundances, and still one of the most common protocols
 for describing microbial ecology. Briefly, this procedure relies on the fact
-that the 16S gene is conserved across most bacterial species, but is variable 
+that the 16S gene is conserved across most bacterial species, but is variable
 enough to differ across different strains. Hence, by counting number of
 occurrences of different versions of this gene, it is possible to measure the
 numbers of different species present in a sample, without attempting the
@@ -52,7 +62,7 @@ zero-inflated, which is often accounted for by filtering\footnote{Using variance
 k-over-A filtering, for example.}. Third, at the sample level, there is
 typically variation in sequencing depth. Hence, there is often better precision
 in the estimates for some samples than for others. This difference is often
-explicitly modeled [@mcmurdie2014waste, @love2014differential, @ren2016bayesian]
+explicitly modeled [@mcmurdie2014waste; @love2014differential; @ren2016bayesian]
 
 ## Statistical Background ##
 
@@ -61,8 +71,13 @@ be useful building blocks when performing microbiome analysis. Many of these
 techniques have been borrowed from text analysis, thinking of the samples by
 microbes matrix as a biological analog of the usual document-term matrix. The
 idea of transferring these techniques to the microbiome is not new, but the
-methods have still yet to be widely adopted [@shafiei2015biomico,
-@chen2012estimating, @holmes2012dirichlet,  @chen2013variable]
+methods have still yet to be widely adopted [@shafiei2015biomico;
+@chen2012estimating; @holmes2012dirichlet;  @chen2013variable].
+
+We include this review because we hope for this text to be self-contained.
+Further, we expect these methods to only be the starting point for more
+sophisticated analysis -- in fact, the extensibility and modularity of these
+methods are some of their most attractive features.
 
 ### Latent Dirichlet Allocation ###
 
@@ -85,7 +100,7 @@ The specification is completed by defining priors for the document-topic and
 topic-term distributions. We can formalize this process as follows. Let
 $\theta_{d} \in \simplex^{K}$ represent the $d^{th}$ topic's mixture over the
 $K$ underlying topics. Represent the term in the $n_{th}$ word of this document
-by $w_{dn}$, and the associated topic by $z_{dn}$. Suppose the $k^{th}$ topic 
+by $w_{dn}$, and the associated topic by $z_{dn}$. Suppose the $k^{th}$ topic
 places weight $\beta_{vk}$ on the $v^{th}$ term, so that $\beta_{\cdot k} \in
 \simplex^{V}$. Then, the generative mechanism is
 
@@ -131,14 +146,93 @@ points lying anywhere between the $K$ latent topics. This is in contrast to
 multinomial mixture modeling, which identifies each sample with one of the $K$
 points $\beta_{\cdot k}$, but similar in spirit to Correspondence Analysis,
 which also tries to focus interest on subsets of $\simplex^{V}$
-\cite{greenacre1987geometric}.
+[@greenacre1987geometric].
 
 \begin{figure}
 \centering
 \includegraphics[width=7.5cm]{figure/lda_simplex_view}
-\caption{The simplex view of Latent Dirichlet Allocation.}
+\caption{The simplex view of Latent Dirichlet Allocation. Figure from [@blei2003latent].}
 \label{fig:simplex_lda}
 \end{figure}
+
+## Dynamic Unigrams ##
+
+LDA can be adapted to incorporate more specific structure. In light of the
+longitudinal nature of many modern microbiome studies, one of the most
+intriguing of these variants is called the Dynamic Topic Model
+[@blei2006dynamic; @wang2012continuous]. This is discussed in section
+\@ref(sec:dtm) -- here, we describe a related, simpler model, called the Dynamic
+Unigram model, which was also investigated in [@blei2006dynamic].
+
+The basic idea in the unigram model is to adapt the geometric view of LDA to the
+time-series setting. In more detail, while LDA imagines samples being mixtures
+of fundamental topics on the $V$-dimensional simplex, the Dynamic Unigrams Model
+identifies a sequence of samples over time with a curve along this simplex. That
+is, suppose $n_{d \cdot}$ is a document at time $t\left(d\right)$. Then, we
+imagine $n_{d \cdot} \sim \Mult\left(\beta_{t\left(d\right)}\right)$, where $\beta_{t}$
+are topic probabilities smoothly evolving along the simplex\footnote{We are
+overloading notation in writing $t$ both as a time index for the underlying
+probabilities $\beta_{t}$ and as a mapping from a document $d$ to the time that it
+was observed, $t\left(d\right)$}.
+
+A complication arises that it is not obvious how to define a prior on $\beta_{t}$
+so that they trace out a curve on the simplex -- it is no longer enough to set
+$\beta_{t} \sim \Dir\left(\alpha\right)$. An alternative is to link a gaussian
+random walk to the simplex using a logit-normal prior. That is, define
+
+\begin{align*}
+n_{d\cdot} \vert \mu_{t\left(d\right)}  &\sim \Mult\left(\sum_{v} n_{dv}, S\left(\mu_{t\left(d\right)}\right)\right) \\
+\mu_{t} \vert \mu_{t - 1} &\sim \Gsn\left(\mu_{t - 1}, \sigma^{2}I_{V}\right) \\
+\mu_{0} &\sim \Gsn\left(0, \sigma^{2}I_{v}\right).
+\end{align*}
+where $S$ is the multilogit link
+\begin{align*}
+\left[S\left(\mu\right)\right]_{v} = \frac{\exp{mu_{v}}}{\sum_{v^{\prime}} \exp{\mu_{v^{\prime}}}}.
+\end{align*}
+
+This is just a reparameterization, allowing us to work with
+$S\left(\mu_{t}\right)$ instead of directly with $\beta_{t}$. Note that the only
+tuning parameter here is $\sigma^{2}$, which governs the smoothness of
+transitions in term distributions over time. There is no particular reason to
+choose a random walk instead of any more general ARMA process for the prior
+$\left(\mu_{t}\right)$, except simplicity of presentation.
+
+The estimated $\hat{\beta}_{tv}$ can be thought of as a smoothing of the raw
+proportions $\hat{p}_{tv}:= \frac{\sum_{d : t\left(d\right) =
+t}n_{dv}}{\sum_{d : t\left(d\right) = t}\sum_{v^{\prime}} n_{dv^{\prime}}}$.
+That is, while LDA can be thought of a modification of latent factor modeling to
+counts, the dynamic unigrams model can be thought of as the corresponding
+variant of nonparametric smoothing.
+
+## Dynamic Topic Models {#sec:dtm}
+
+Unlike LDA, there is no notion of underlying topics in the Dynamic Unigrams
+Model, but blending the two modeling ideas leads straightforwardsly to the
+Dynamic Topic Model [@blei2006dynamic, @wang2012continuous]. Here, like LDA,
+documents are modeled as mixtures latent topics. However, both the topics and
+the mixture probabilities are modeled to evolve gradually over time.
+Geometrically, the points $\beta_{\cdot k}$ within which all documents lie are
+thought to shift over time. Further, the document mixtures $\theta_{d}$ aren't
+scattered in the simplex without regard to time. Instead, the mixing
+probabilities $\theta_{d}$ are also thought to exhibit some inertia, being more
+similar among documents closer to each other in time.
+
+This is formulated more precisely as 
+\begin{align*}
+n_{d\cdot} \vert \mu_{t\left(d\right)}, \alpha_{\left(d\right)} &\sim \Mult\left(\sum_{v} n_{dv}, \sum_{k = 1}^{K} S\left(\alpha_{t\left(d\right)}\right) S\left(\mu_{t\left(d\right)}\right)\right) \\
+\alpha_{t} \vert \alpha_{t - 1} &\sim \Gsn\left(\alpha_{t - 1}, \delta^{2}I_{K}\right) \\
+\mu_{t} \vert \mu_{t - 1} &\sim \Gsn\left(\mu_{t - 1}, \sigma^{2}I_{v}\right) \\
+\alpha_{0} &\sim \Gsn\left(0, \delta^{2}I_{K}\right) \\
+\mu_{0} &\sim \Gsn\left(0, \sigma^{2}I_{K}\right)
+\end{align*}
+
+Here, we think of $S\left(\mu_{tk}\right)$ and $S\left(\alpha_{t}\right)$ as
+parameterizing $\beta_{tk}$ and $\theta_{t}$, respectively. Here, $\delta^{2}$
+and $\sigma^{2}$ govern the rate at which mixture probabilities and topics can
+evolve. A smaller $\frac{\delta}{\sigma}$ ratio bring us closer to dynamic
+unigrams, because the documents mixing proportions are closer to being fixed
+while the topics evolve. Conversely, large ratios $\frac{\delta}{\sigma}$ bring
+us closer to LDA, with samples mixing across more or less fixed topics.
 
 ## Nonnegative Matrix Factorization ##
 
@@ -160,15 +254,15 @@ the nonnegative matrix $N$ by the product of low rank matrices, $N \approx
 \Theta B^{T}$, where now the only constraints on $\Theta$ and $B$ are that
 $\Theta \in \reals_{+}^{D \times K}$ and $B \in \reals_{+}^{V \times K}$. This
 is the starting point for a variety of algorithms in the Nonnegative Matrix
-Factorization (NMF) literature \cite{wang2013nonnegative, berry2007algorithms,
-lee2001algorithms}.
+Factorization (NMF) literature [@wang2013nonnegative; @berry2007algorithms,
+@lee2001algorithms].
 
 Here, we will consider a Gamma-Poisson factorization model (GaP)
-\cite{kucukelbir2015automatic, canny2004gap}, which is proposes the hierarchical
+[@kucukelbir2015automatic; @canny2004gap], which is proposes the hierarchical
 model
 \begin{align*}
-N &\sim \Pois\left(\Theta B^{T}\right) \\
-\Theta &\sim \Gam\left(a_{0} 1_{D \times K}\right, b_{0} 1_{D \times K}) \\
+N &\sim \Poi\left(\Theta B^{T}\right) \\
+\Theta &\sim \Gam\left(a_{0} 1_{D \times K}, b_{0} 1_{D \times K}\right) \\
 B &\sim \Gam\left(c_{0} 1_{V \times K}, d_{0} 1_{V \times K} \right),
 \end{align*}
 where mean that each entry in these matrices is sampled independently, with
@@ -179,8 +273,68 @@ via the gamma prior on $\Theta$. When the shape parameter is small, this prior
 is quite skewed -- this reflects the suspicion that most samples will be
 dominated by only a few of the $\beta_{\cdot k}$. Further, when the shape
 parameter is large, the gamma converges to a normal distribution, and so the GaP
-model then reduces to ordinary factor analysis.
+model then reduces to ordinary factor analysis. Finally, the gamma prior induces
+overdispersion in draws from the model, paralleling the usual interpretation of
+the negative binomial distribution as the result of marginalizing a gamma prior
+in a Poisson model.
 
-We can modify this model to reflect zero-inflation.
+We can introduce an extra layer into this model to reflect zero-inflation, which
+is a common feature of many microbiome data sets [@xu2015assessment;
+@mcmurdie2014waste]. The change in the model is minor -- with some probability
+$p$ entries in $Y$ are sent to zero. That is, instead of of the Poisson
+likelihood,
+\begin{align*}
+\Parg{Y_{ij} = y_{ij} \vert \theta_{i}, \beta_{j \cdot}} = \frac{\exp{-\theta_{i}^{T}\beta_{j \cdot}} \left(\theta_{i}^{T}\beta_{j}\right)^{y_{ij}}}{y_{ij}!}, 
+\end{align*}
+we have
+\begin{align*}
+\Parg{Y_{ij} = y_{ij} \vert p, \theta_{i}, \beta_{j \cdot}} = \begin{cases}
+p + \exp{-\theta_{i}^{T}\beta_{j\cdot}} &\text{ for } y_{ij} = 0 \\
+\left(1 - p\right)
+\frac{\exp{-\theta_{i}^{T}\beta_{j
+\cdot}}\left(\theta_{i}^{T}\beta_{j}\right)^{y_{ij}}}{y_{ij}!} &\text{ for }
+y_{ij} > 0.
+\end{cases}
+\end{align*}
 
-# Simulation Studies # 
+## Probabilistic Programming ## 
+
+Probabilistic programming tools provide generic interfaces to constructing
+Bayesian samplers [@plummer2003jags, @carpenter2016stan,
+@kucukelbir2015automatic]. These tools simplify the process of specifying
+complex likelihoods by providing an interface to a set of fundamental sampling
+statements. Once the model is described, standard MCMC can be
+applied\footnote{This step usually means only models with continuous parameter
+spaces can be implemented, since Bayesian inference with discrete parameters is
+less amenable to general solutions.}
+
+For example, the NMF model can be implemented using essentially only the STAN
+code below\footnote{The complete code is available at
+\url{https://github.com/krisrs1128/readings/blob/master/nmf/src/nmf_gamma_poisson.stan}}.
+```stan
+model{
+  for(i in 1:D) {
+    theta[i] ~ gamma(a,b); // componentwise gamma
+  }
+
+  for (j in 1:V) {
+    beta[j] ~ gamma(c,d);//componentwise gamma
+  }
+
+  for (i in 1:D) {
+    for (j in 1:V) {
+      y[i, j] ~ poisson(theta[i]' * beta[j]);
+    }
+  }
+}
+```
+The sampling statements `~ gamma` and `~ poisson` tell STAN to increment the
+loglikelihood used to construct samplers.
+
+Access to this interface for doing Bayesian inference simplifies the process of
+exploring alternative probabilistic models. Indeed, implementing samplers ``by-hand'' 
+can be a time-consuming and error-prone process. All simulation and data
+analysis results described in this report have been implemented in STAN and are
+available at (todo: central repo).
+
+# Simulation Studies #
