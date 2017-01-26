@@ -14,7 +14,16 @@ link-citations: yes
 
 ```{r knitr}
 library("knitr")
-opts_chunk$set(fig.width = 7, fig.height = 5, cache = FALSE, size = "footnotesize", warning = FALSE)
+chunk_opts <- list(
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center",
+  cache = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+
+opts_chunk$set(chunk_opts)
 ```
 
 # Context #
@@ -355,5 +364,20 @@ read_chunk("../src/sim/nmf/nmf_expers.R")
 ```{r submit-jobs }
 ```
 \endgroup
+
+now visualize...
+
+```{r read-vis}
+read_chunk("../src/sim/nmf/nmf_vis.R")
+````
+
+```{r libraries}
+````
+
+```{r theta-reshape}
+```
+
+```{r visualize-thetas, fig.height = 9}
+```
 
 ## Zero-inflated NMF ##
