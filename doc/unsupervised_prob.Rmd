@@ -15,8 +15,8 @@ link-citations: yes
 ```{r knitr}
 library("knitr")
 chunk_opts <- list(
-  fig.width = 7,
-  fig.height = 5,
+  fig.width = 5,
+  fig.height = 3,
   fig.align = "center",
   cache = FALSE,
   warning = FALSE,
@@ -348,36 +348,127 @@ available at (todo: central repo).
 # Simulation Studies #
 
 ## NMF ##
+
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r read-nmf}
 read_chunk("../src/sim/nmf/nmf_expers.R")
 ```
+\endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r libraries}
 ```
+\endgroup
 
+We specify our experiment using a JSON file whose elements provide simulation
+and model fitting parameters. We fix the total number of samples at 100 and
+latent factors at 2. We set the dimension to either 75 or 125. We alternate
+fitting using Gibbs sampling and Variational Bayes. We vary the zero inflation
+probability across $\{0, 0.2\}$, and fit using either the zero-inflation
+likelihood with known zero inflation probability or using the GaP model which is
+unaware of zero-inflation. In all, there are 16 configurations. These simulation
+parameters are set up in the configuration \texttt{data.frame} below, which is
+output to \texttt{config.json} so that it can be read by the batch script, which
+is used to parallelize the simulation.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r configuration}
 ```
+\endgroup
 
+Now that the simulation settings have been set, we send them off to our computer
+cluster, and wait for the results to get written. The code below creates the
+batch scripts that run subsets of the experimental configurations.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r submit-jobs }
 ```
 \endgroup
 
-now visualize...
+Once the experiments complete, we can visually assess the quality of the fits.
+First, we read in the fitted parameters across experiments and merge them into a
+single object, suitable for plotting. 
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r read-vis}
 read_chunk("../src/sim/nmf/nmf_vis.R")
 ````
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r libraries}
 ````
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r theta-reshape}
 ```
+\endgroup
 
-```{r visualize-thetas, fig.height = 9}
+Figures \@ref(fig:visualizethetas) and \@ref(fig:visualizebetas) display raw
+experimental results obtained when working with the non-zero-inflated data. In
+Figure \@ref(Fig:visualizethetas), each panel represents the underlying sample
+scores $\theta_{i}$. Black labels give the true positions of the latent scores
+for the associated sample, while red labels give the average across all
+posterior samples for that data point. The blue-green clouds are the contours
+along posterior samples -- they give a sense of the variability of the estimated
+scores. Note that the $x$ and $y$-axes are displayed on a square-root scale.
+
+In the grid of plots, the columns vary over underlying data dimension $V$ while
+rows vary over fitting algorithm (Gibbs Sampling and Variational Bayes) as well
+as number of samples $D$. In particular, the true scores (black numbers) are in
+the same positiion for every unique $\left(D, V\right)$ combination.
+
+A few general patterns are suggested. First, the approximate posteriors from
+Variational Bayes seems less spread out than those from Gibbs sampling. In
+particular, the samples tend to avoid $\theta_{i}$'s with very uneven values
+between the two coordinates. This effect is especially prominent in the
+low-dimensional setting, when there is less data available for inference of each
+individual $\theta_{i}$, and where there are quite a few true $\theta_{i}$'s
+that fail to fall into any of the posterior clouds.
+
+Second, we note that the high-dimensional regime does have somewhat more
+concentrated posteriors, as indicated by the brighter green shade. This effect
+is small but consistent, especially in Gibbs Sampling.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizethetas-prep}
 ```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizethetas, fig.height = 6, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```
+\endgroup
+
+While useful in gauging the global properties of NMF inference across regimes,
+it is difficult to assess the accuracy of the estimates by comparing red and
+black labels. An alternative view compares the true latent score value to each sampled value. In this spirit, 
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizethetashist, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```
+\endgroup
 
 ## Zero-inflated NMF ##
