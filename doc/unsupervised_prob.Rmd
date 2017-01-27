@@ -8,7 +8,7 @@ output:
     keep_tex: yes
     includes:
       in_header: preamble.tex
-bibliography: ["unsupervised_prob.bib"]
+bibliography: "unsupervised_prob.bib"
 link-citations: yes
 ---
 
@@ -347,8 +347,25 @@ available at (todo: central repo).
 
 # Simulation Studies #
 
-## NMF ##
+It can be liberating to have easy access to such a variety of modeling
+strategies for any given data analysis problem. However, with this increased
+flexibility comes the difficulty of knowing which methods to use when. Perhaps
+more unsettlingly, it is sometimes unclear whether or not the results of a model
+can be trusted at all -- there may be issues about parametric assumptions or
+sample size, for example.
 
+To build some intuition about estimation accuracy across combinations of data
+settings and model types, we conduct some simulation studies. These are meant to
+complement the model-checking that should follow paramtric analysis -- since we
+know the truth in simulations, it is easier to develop more definitive
+guidelines.
+
+The difficulty wth simulations, of course, is that it is hard to for them to
+reflect the diversity of data analysis settings that arise in practice. We
+choose a few situations we find interesting, but there are many other situations
+worth investigating.
+
+## NMF ##
 
 \begingroup
 \setstretch{1}
@@ -361,7 +378,7 @@ read_chunk("../src/sim/nmf/nmf_expers.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r libraries}
+```{r libraries-nmf-expers}
 ```
 \endgroup
 
@@ -403,14 +420,14 @@ single object, suitable for plotting.
 \fontsize{8pt}{8pt}
 ```{r read-vis}
 read_chunk("../src/sim/nmf/nmf_vis.R")
-````
+```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r libraries}
-````
+```{r libraries-nmf-vis}
+```
 \endgroup
 
 \begingroup
@@ -449,14 +466,14 @@ is small but consistent, especially in Gibbs Sampling.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas-prep}
+```{r visualizethetas-prep, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas, fig.height = 6, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```{r visualizethetas, fig.height = 6, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation.", eval = FALSE}
 ```
 \endgroup
 
@@ -464,9 +481,9 @@ While useful in gauging the global properties of NMF inference across regimes,
 it is difficult to assess the accuracy of the estimates by comparing red and
 black labels. An alternative view compares the true latent score to each sampled
 from the posterior. A histogram of these differences is displayed in Figure
-\@ref(visthetashist). Each panel has the same meaning as before. Each histogram
-are of errors $\hat{\theta}_{ik} - \theta_{ik}$; orange is for $k = 1$ and
-purple is for $k = 2$, though the error distributions for the two factor
+\@ref(fig:visthetashist). Each panel has the same meaning as before. Each
+histogram are of errors $\hat{\theta}_{ik} - \theta_{ik}$; orange is for $k = 1$
+and purple is for $k = 2$, though the error distributions for the two factor
 dimensions are quite similar and so mix into a burgundy. The fact that each
 sample $i$ has its own error distribution is visible in the way the histograms
 look like mixtures.
@@ -476,13 +493,79 @@ more readily apparent. Further, the superiority of gibbs sampling in the
 lower-dimensional ($V = 75$) case is still noticeable in the fact that the gibbs
 histogram is somewhat narrower in the center. However, while there seems to be
 less mass in the tails for the Gibbs histogram, the tails themselves are just as
-wide as in the Variational Bayes histogram.
+wide as in the Variational Bayes histogram. Further, the fact that these
+histograms are not centered around zero reflects bias in the estimators -- they
+seem to be systematically too large.
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetashist, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```{r visualizethetashist, eval = FALSE, fig.cap = "Histograms of the differences between posterior sampled scores and their true values."}
+```
+\endgroup
+
+Our approach to analyzing the posteriors on $\beta_{\cdot k}$ parallels that for
+studying the $\theta_{i}$. Figure \@ref(fig:visbeta) is interpreted similarly to
+Figure \@ref(fig:visthtea) before, but now each point is coordinate
+$\beta_{v\cdot}$. Note that when $V$ increases, the number of such points
+increases.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizebetas, eval = FALSE, fig.height = 6, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+```
+\endgroup
+
+Again, Variational Bayes seems to underestimate the posterior variances of each
+estimate and generally avoids placing mass on $\beta_{v\cdot}$s near the axes.
+This seems to be true in both lower and higher-dimensional regimes, though the
+fact that the number of points changes across columns makes them difficult to
+compare. The Gibbs sampling estimates seem more accurately, generally, but we
+transition to the error histogram view to establish this more firmly.
+
+Figure \@ref(fig:visbetahist) is the analog of \@ref(fig:visthetahist) for the
+$\beta_{v\cdot}$s. The posterior seems more concetrated around the truth in the
+high-dimensional case, in spite of the fact that each $\beta_{v\cdot}$ has
+access to the same number of samples across regimes.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizebetashist, eval = FALSE, fig.cap = "Histograms of the differences between posterior sampled factors and their true values."}
 ```
 \endgroup
 
 ## Zero-inflated NMF ##
+
+Now we examine the effect of zero inflation on estimation of the $\theta_{i}$
+and $\beta_{v}$. Our interest revolves around two questions,
+
+* In the case that it is known that zero-inflation is present and the
+  appropriate model, with known zero inflation probability, is used, how quickly
+  do estimates deterioriate as more and more entries are sent to zero?
+* What are the consequences for estimating latent scores and factors, in the
+  case that zero-inflation exists but is not accounted for?
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize-zinf-thetas-prep}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfthetas, fig.height = 8, fig.width = 8}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfthetashist}
+```
+\endgroup
+
+# References #
