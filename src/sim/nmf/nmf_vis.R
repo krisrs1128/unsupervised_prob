@@ -6,9 +6,10 @@
 ##
 ## author: kriss1@stanford.edu
 
-## ---- libraries ----
+## ---- libraries-nmf-vis ----
 ## assumed running from NMF directory
 library("data.table")
+library("ggplot2")
 base_dir <- file.path("..", "src", "sim", "nmf")
 source(file.path(base_dir, "nmf_utils.R"))
 
@@ -28,6 +29,13 @@ theta_fits <- reshape_all_samples(
   c("i", "k")
 )
 theta_fits$method <- basename(as.character(theta_fits$method))
+theta_fits$method <- theta_fits$method %>%
+  revalue(
+    c(
+    "nmf_gamma_poisson.stan" = "GaP",
+    "nmf_gamma_poisson_zero.stan" = "Z-GaP"
+    )
+  )
 
 ## ---- visualizethetas-prep -----
 ## Visualize the fitted thetas, according to a few different simulation properties
@@ -49,7 +57,7 @@ plot_opts <- list(
 
 ## first, visualization in the non-zero-inflated case
 gamma_pois_data <- theta_fits %>%
-  filter(zero_inf_prob == 0, method == "nmf_gamma_poisson.stan")
+  filter(zero_inf_prob == 0, method == "GaP")
 
 theta_plots <- scores_contours(gamma_pois_data, plot_opts)
 
@@ -64,33 +72,63 @@ theta_plots$grouped +
 mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
 error_histograms(mgamma_pois_data, plot_opts$facet_terms)
 
-## ---- visualize-zinf-thetas ----
-zinf_data <- theta_fits %>%
-  filter(zero_inf_prob != 0, P == 75, N == 100)
-plot_opts$facet_terms <- c("zero_inf_prob", "inference", "method")
-theta_plots <- scores_contours(zinf_data, plot_opts)
-##theta_plots$grouped
-
-## ---- visualize-betas ----
+## ---- visualizebetas ----
 beta_fits <- reshape_all_samples(
   fits,
-  file.path("batch", "config.json"),
+  file.path(base_dir, "config.json"),
   "beta",
   c("v", "k")
 )
 beta_fits$method <- basename(as.character(beta_fits$method))
+beta_fits$method <- beta_fits$method %>%
+  revalue(
+    c(
+      "nmf_gamma_poisson.stan" = "GaP",
+      "nmf_gamma_poisson_zero.stan" = "Z-GaP"
+    )
+  )
+
 
 plot_opts$facet_terms <- c("N", "inference", "P")
 plot_opts$group <- "v"
 
 gamma_pois_data <- beta_fits %>%
-  filter(zero_inf_prob == 0, method == "nmf_gamma_poisson.stan")
+  filter(zero_inf_prob == 0, method == "GaP")
 
 beta_plots <- scores_contours(gamma_pois_data, plot_opts)
-ggsave("~/test.png", beta_plots$grouped)
+beta_plots$grouped +
+  labs(
+    "x" = expression(beta[1]),
+    "y" = expression(beta[2])
+  )
 
-zinf_data <- beta_fits %>%
-  filter(zero_inf_prob != 0, P == 75, N == 100)
+## ---- visualizebetashist ----
+mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
+error_histograms(mgamma_pois_data, plot_opts$facet_terms)
+
+## ---- visualize-zinf-thetas-prep ----
+zinf_data <- theta_fits %>%
+  filter(P == 75, N == 100)
 plot_opts$facet_terms <- c("zero_inf_prob", "inference", "method")
+plot_opts$group <- "i"
+
+## ---- visualizezinfthetas ----
+theta_plots <- scores_contours(zinf_data, plot_opts)
+theta_plots$grouped +
+  facet_grid(inference ~ zero_inf_prob + method) +
+  labs(
+    "x" = expression(theta[1]),
+    "y" = expression(theta[2])
+  )
+
+## ---- visualizezinfthetashist ----
+mzinf_data <- melt_reshaped_samples(zinf_data)
+error_histograms(mzinf_data, plot_opts$facet_terms) +
+  facet_grid(inference ~ zero_inf_prob + method)
+
+## ---- vis-zinf-betas ----
+zinf_data <- beta_fits %>%
+  filter(P == 75, N == 100)
+plot_opts$group <- "v"
 theta_plots <- scores_contours(zinf_data, plot_opts)
 ##theta_plots$grouped
