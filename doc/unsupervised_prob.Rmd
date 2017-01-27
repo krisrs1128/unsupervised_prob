@@ -1,6 +1,6 @@
 ---
 documentclass: report
-title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
+title: "Evalfuating Unsupervised Probabilistic Models of the Microbiome"
 date: "`r Sys.Date()`"
 keep-tex: true
 output:
@@ -12,6 +12,9 @@ bibliography: "unsupervised_prob.bib"
 link-citations: yes
 ---
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r knitr}
 library("knitr")
 chunk_opts <- list(
@@ -25,6 +28,7 @@ chunk_opts <- list(
 
 opts_chunk$set(chunk_opts)
 ```
+\endgroup
 
 # Context #
 
@@ -319,7 +323,8 @@ less amenable to general solutions.}
 For example, the NMF model can be implemented using essentially only the STAN
 code below\footnote{The complete code is available at
 \url{https://github.com/krisrs1128/readings/blob/master/nmf/src/nmf_gamma_poisson.stan}}.
-```stan
+
+```python
 model{
   for(i in 1:D) {
     theta[i] ~ gamma(a,b); // componentwise gamma
@@ -466,14 +471,14 @@ is small but consistent, especially in Gibbs Sampling.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas-prep, eval = TRUE}
+```{r visualizethetas-prep}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas, fig.height = 6, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation.", eval = FALSE}
+```{r visualizethetas, fig.height = 6, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
 ```
 \endgroup
 
@@ -500,7 +505,7 @@ seem to be systematically too large.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetashist, eval = FALSE, fig.cap = "Histograms of the differences between posterior sampled scores and their true values."}
+```{r visualizethetashist, fig.cap = "Histograms of the differences between posterior sampled scores and their true values."}
 ```
 \endgroup
 
@@ -513,7 +518,7 @@ increases.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetas, eval = FALSE, fig.height = 6, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+```{r visualizebetas, fig.height = 6, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
 ```
 \endgroup
 
@@ -532,7 +537,7 @@ access to the same number of samples across regimes.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetashist, eval = FALSE, fig.cap = "Histograms of the differences between posterior sampled factors and their true values."}
+```{r visualizebetashist, fig.cap = "Histograms of the differences between posterior sampled factors and their true values."}
 ```
 \endgroup
 
@@ -541,11 +546,19 @@ access to the same number of samples across regimes.
 Now we examine the effect of zero inflation on estimation of the $\theta_{i}$
 and $\beta_{v}$. Our interest revolves around two questions,
 
-* In the case that it is known that zero-inflation is present and the
-  appropriate model, with known zero inflation probability, is used, how quickly
-  do estimates deterioriate as more and more entries are sent to zero?
+* In the case that zero-inflation is present and the appropriate model, with
+  known zero inflation probability, is used, how quickly do estimates
+  deterioriate as more and more entries are sent to zero? 
 * What are the consequences for estimating latent scores and factors, in the
   case that zero-inflation exists but is not accounted for?
+
+To this end, we focus on the data in the lower-dimensional regime ($P = 75$) and
+compare variation in model estimates across zero-inflation probabilities and
+fitting procedures. Figure \@ref(fig:visualizezinfthetas) displays the
+posteriors for the $\theta_{i}$ across such configurations. As before, the two
+rows of plots distinguish between inference by Gibbs sampling and Variational
+Bayes. Columns indicate whether or not zero-inflation was accounted for in
+modeling (Z-GaP vs. GaP) and the underlying zero inflation probability.
 
 \begingroup
 \setstretch{1}
@@ -557,14 +570,48 @@ and $\beta_{v}$. Our interest revolves around two questions,
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfthetas, fig.height = 8, fig.width = 8}
+```{r visualizezinfthetas, fig.height = 8, fig.width = 8, fig.cap = "Each panel displays the estimated scores for a different simulation setting, with a focus on the effect of zero inflation. Columns distinguish between different zero-inflation probabilities and modeling techniques."}
+```
+\endgroup
+
+While the differences observed between Gibbs Sampling and Variational Bayes
+continue to be clear, it is not obvious from these figures whether there is any
+difference in estimation accuracy across columns. To study this more precisely,
+we again consider the error histograms associated with each panel; this is given
+in Figure \@ref(fig:visualizezinfthetashist).
+
+The most noticeable difference across these panels is that Variational Bayes
+seems to perform substantially worse when zero-inflation is present, especially
+when zero-inflation is not taken into account. Surprisingly, Gibbs Sampling
+seems only slightly worse in this situation. Even more oddly, the case in which
+zero-inflation is not explicitly modeled does not seem to do worse than the case
+it is.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfthetashist, fig.cap = "For each simulation setting, we can compute the true estimation errors across samples."}
+```
+\endgroup
+
+Figures \@ref(fig:visualizezinfbetas) and \@ref(fig:visualizezinfbetashist) are
+the corresponding views of the latent factors $\beta_{v\cdot}$. Both figures
+reinforce the findings from those based on the estimated scores $\theta_{i}$,
+namely, Variational Bayes deterioriates more rapidly upon introduction
+zero-inflation, and Gibbs Sampling results seem comparable under both GaP or
+Z-GaP models.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfbetas, fig.height = 8, fig.width = 8, fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfthetashist}
+```{r visualizezinfbetashist, fig.cap = "Across settings, we can explicitly compute estimation errors."}
 ```
 \endgroup
 

@@ -126,9 +126,21 @@ mzinf_data <- melt_reshaped_samples(zinf_data)
 error_histograms(mzinf_data, plot_opts$facet_terms) +
   facet_grid(inference ~ zero_inf_prob + method)
 
-## ---- vis-zinf-betas ----
+## ---- vis-zinf-betas-prep ----
 zinf_data <- beta_fits %>%
   filter(P == 75, N == 100)
 plot_opts$group <- "v"
+
+## ---- visualizezinfbetas ----
 theta_plots <- scores_contours(zinf_data, plot_opts)
-##theta_plots$grouped
+theta_plots$grouped  + 
+  facet_grid(inference ~ zero_inf_prob + method) +
+  labs(
+    "x" = expression(beta[1]),
+    "y" = expression(beta[2])
+  )
+
+## ---- visualizezinfbetashist ----
+mzinf_data <- melt_reshaped_samples(zinf_data)
+error_histograms(mzinf_data, plot_opts$facet_terms) +
+  facet_grid(inference ~ zero_inf_prob + method)
