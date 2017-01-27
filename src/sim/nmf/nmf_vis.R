@@ -54,33 +54,15 @@ gamma_pois_data <- theta_fits %>%
 theta_plots <- scores_contours(gamma_pois_data, plot_opts)
 
 ## ---- visualizethetas ----
-#theta_plots$grouped +
+theta_plots$grouped +
   labs(
     "x" = expression(theta[1]),
     "y" = expression(theta[2])
   )
 
 ## ---- visualizethetashist ----
-theme_set(min_theme(list(border_size = 0.5)))
-mgamma_pois_data <- gamma_pois_data %>%
-  melt(
-    variable.name = "dimension",
-    value.name = "estimate",
-    measure.vars = c("value_1", "value_2")
-  ) %>%
-  melt(
-    variable.name = "truth_dimension",
-    measure.vars = c("truth_1", "truth_2"),
-    value.name = "truth"
-  )
-
-ggplot(mgamma_pois_data) +
-  geom_histogram(
-    aes(x = sqrt(truth) - sqrt(estimate), fill = dimension),
-    position = "identity", alpha = 0.7, bins = 75
-  ) +
-  facet_grid(formula(paste(plot_opts$facet_terms, collapse = "~"))) +
-  scale_fill_manual(values = c("#d95f02", "#7570b3"))
+mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
+error_histograms(mgamma_pois_data, plot_opts$facet_terms)
 
 ## ---- visualize-zinf-thetas ----
 zinf_data <- theta_fits %>%

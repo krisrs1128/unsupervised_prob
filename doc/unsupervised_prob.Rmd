@@ -462,7 +462,21 @@ is small but consistent, especially in Gibbs Sampling.
 
 While useful in gauging the global properties of NMF inference across regimes,
 it is difficult to assess the accuracy of the estimates by comparing red and
-black labels. An alternative view compares the true latent score value to each sampled value. In this spirit, 
+black labels. An alternative view compares the true latent score to each sampled
+from the posterior. A histogram of these differences is displayed in Figure
+\@ref(visthetashist). Each panel has the same meaning as before. Each histogram
+are of errors $\hat{\theta}_{ik} - \theta_{ik}$; orange is for $k = 1$ and
+purple is for $k = 2$, though the error distributions for the two factor
+dimensions are quite similar and so mix into a burgundy. The fact that each
+sample $i$ has its own error distribution is visible in the way the histograms
+look like mixtures.
+
+Here, the improved concentration in the high-dimensional ($V = 125$) regime is
+more readily apparent. Further, the superiority of gibbs sampling in the
+lower-dimensional ($V = 75$) case is still noticeable in the fact that the gibbs
+histogram is somewhat narrower in the center. However, while there seems to be
+less mass in the tails for the Gibbs histogram, the tails themselves are just as
+wide as in the Variational Bayes histogram.
 
 \begingroup
 \setstretch{1}
