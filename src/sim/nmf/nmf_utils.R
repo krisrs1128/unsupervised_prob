@@ -8,18 +8,30 @@
 ## author: kriss1@stanford.edu
 
 ## ---- libraries ----
-library("plyr")
-library("dplyr")
-library("reshape2")
-library("ggplot2")
-library("ggscaffold")
-library("jsonlite")
-library("rstan")
-library("stringr")
+suppressMessages(library("plyr"))
+suppressMessages(library("dplyr"))
+suppressMessages(library("reshape2"))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("ggscaffold"))
+suppressMessages(library("jsonlite"))
+suppressMessages(library("rstan"))
+suppressMessages(library("stringr"))
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 ## ---- plot-utils ---
+#' Get Score Means
+#'
+#' This groups the main scores matrix by sample index, and average posterior
+#' samples.
+#'
+#' @param scores 
+score_means <- function(scores, grouping_vars) {
+  scores %>%
+    group_by_(.dots = grouping_vars) %>%
+    summarise(mean_1 = mean(value_1), mean_2 = mean(value_2), truth_1 = truth_1[1], truth_2 = truth_2[1])
+}
+
 #' Plot Contours and Associated Coordinate
 #'
 #' This is a wrapper of ggcontours in the ggscaffold package that shows the
@@ -34,9 +46,7 @@ options(mc.cores = parallel::detectCores())
 scores_contours <- function(plot_data, plot_opts) {
   p1 <- ggcontours(plot_data, plot_opts) +
     geom_text(
-      data = plot_data %>%
-        group_by_(.dots = c(plot_opts$group, plot_opts$facet_terms)) %>%
-        summarise(mean_1 = mean(value_1), mean_2 = mean(value_2)),
+      data = score_means(plot_data, c(plot_opts$group, plot_opts$facet_terms)),
       aes_string(x = "mean_1", y = "mean_2", label = plot_opts$group),
       col = plot_opts$mean_col,
       size = plot_opts$text_size
@@ -46,8 +56,8 @@ scores_contours <- function(plot_data, plot_opts) {
       aes_string(x = "truth_1", y = "truth_2", label = plot_opts$group),
       size = plot_opts$text_size
     ) +
-    scale_x_continuous(limits = plot_opts$x_lim, expand = c(0, 0)) +
-    scale_y_continuous(limits = plot_opts$y_lim, expand = c(0, 0))
+    scale_x_sqrt(limits = plot_opts$x_lim, expand = c(0, 0)) +
+    scale_y_sqrt(limits = plot_opts$y_lim, expand = c(0, 0))
   p2 <- p1 +
     facet_wrap(formula(paste0("~", plot_opts$group)))
   list("grouped" = p1, "coordinates" = p2)
@@ -199,6 +209,70 @@ reshape_all_samples <- function(fits,
 
   rbindlist(samples)
 }
+
+#' Melt reshaped samples
+#'
+#' While for the scatter / contours figures, it's useful to have the dimensions
+#' as separate columns, we'll also want to the melted data when computing
+#' explicit errors. This takes the output of reshaped_... and melts it so that
+#' it's appropriate for histogramming the errors.
+#'
+#' @param samples [data.frame] The wide samples data, usually the output of
+#'   reshape_all_samples.
+#' @return melted_samples [data.frame] The same data as samples, but with
+#'   different factor dimensions all stacked.
+#' @export
+melt_reshaped_samples <- function(samples) {
+  melted_samples <- samples %>%
+    melt(
+      variable.name = "dimension",
+      value.name = "estimate",
+      measure.vars = c("value_1", "value_2")
+    ) %>%
+    melt(
+      variable.name = "truth_dimension",
+      measure.vars = c("truth_1", "truth_2"),
+      value.name = "truth"
+    )
+
+  melted_samples$truth_dimension <- NULL
+  melted_samples$dimension <- gsub("value_", "k=", melted_samples$dimension)
+  melted_samples
+}
+
+#' Errors histogram
+#'
+#' Plot the histograms of errors associated with the scatterplots from the NMF fits.
+#'
+#' @param plot_data [data.frame] The data used to plot the error between truth
+#'   vs. estimate across all dimensions. See the output of
+#'   melt_reshaped_samples().
+#' @param facet_terms [character vector] The columns on which to facet_grid the
+#'   plot.
+#' @param n_bins [int] The number of bins in each histogram panel. Defaults to 75.
+#' @param alpha [numeric] The alpha transparency for the different factors.
+#' @param colors [character vector] The colors to use for each factor.
+#' @return hist_plot [ggplot] The ggplot object showing error histograms across
+#'   factors and simulation configurations.
+error_histograms <- function(plot_data,
+                             facet_terms = NULL,
+                             n_bins = 75,
+                             alpha = 0.7,
+                             colors = c("#d95f02", "#7570b3")) {
+  ggplot(plot_data) +
+    geom_histogram(
+      aes(x = sqrt(estimate) - sqrt(truth), fill = dimension, y = ..density..),
+      position = "identity", alpha = alpha, bins = n_bins
+    ) +
+    facet_grid(formula(paste(facet_terms, collapse = "~"))) +
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    scale_fill_manual(values = colors) +
+    min_theme() +
+    theme(
+      legend.position = "bottom"
+    )
+}
+
 
 ## ---- simulation-helpers ----
 #' Merge Default NMF options

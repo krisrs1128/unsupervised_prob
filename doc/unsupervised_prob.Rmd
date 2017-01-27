@@ -1,6 +1,6 @@
 ---
 documentclass: report
-title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
+title: "Evalfuating Unsupervised Probabilistic Models of the Microbiome"
 date: "`r Sys.Date()`"
 keep-tex: true
 output:
@@ -8,15 +8,27 @@ output:
     keep_tex: yes
     includes:
       in_header: preamble.tex
-bibliography: ["unsupervised_prob.bib"]
+bibliography: "unsupervised_prob.bib"
 link-citations: yes
 ---
 
-```{r}
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r knitr}
 library("knitr")
-opts_chunk$set(fig.width = 7, fig.height = 5, cache = TRUE)
-sapply(list.files("src"), function(x) { read_chunk(x) })
+chunk_opts <- list(
+  fig.width = 5,
+  fig.height = 3,
+  fig.align = "center",
+  cache = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+
+opts_chunk$set(chunk_opts)
 ```
+\endgroup
 
 # Context #
 
@@ -311,7 +323,8 @@ less amenable to general solutions.}
 For example, the NMF model can be implemented using essentially only the STAN
 code below\footnote{The complete code is available at
 \url{https://github.com/krisrs1128/readings/blob/master/nmf/src/nmf_gamma_poisson.stan}}.
-```stan
+
+```python
 model{
   for(i in 1:D) {
     theta[i] ~ gamma(a,b); // componentwise gamma
@@ -338,3 +351,268 @@ analysis results described in this report have been implemented in STAN and are
 available at (todo: central repo).
 
 # Simulation Studies #
+
+It can be liberating to have easy access to such a variety of modeling
+strategies for any given data analysis problem. However, with this increased
+flexibility comes the difficulty of knowing which methods to use when. Perhaps
+more unsettlingly, it is sometimes unclear whether or not the results of a model
+can be trusted at all -- there may be issues about parametric assumptions or
+sample size, for example.
+
+To build some intuition about estimation accuracy across combinations of data
+settings and model types, we conduct some simulation studies. These are meant to
+complement the model-checking that should follow paramtric analysis -- since we
+know the truth in simulations, it is easier to develop more definitive
+guidelines.
+
+The difficulty wth simulations, of course, is that it is hard to for them to
+reflect the diversity of data analysis settings that arise in practice. We
+choose a few situations we find interesting, but there are many other situations
+worth investigating.
+
+## NMF ##
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r read-nmf}
+read_chunk("../src/sim/nmf/nmf_expers.R")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r libraries-nmf-expers}
+```
+\endgroup
+
+We specify our experiment using a JSON file whose elements provide simulation
+and model fitting parameters. We fix the total number of samples at 100 and
+latent factors at 2. We set the dimension to either 75 or 125. We alternate
+fitting using Gibbs sampling and Variational Bayes. We vary the zero inflation
+probability across $\{0, 0.2\}$, and fit using either the zero-inflation
+likelihood with known zero inflation probability or using the GaP model which is
+unaware of zero-inflation. In all, there are 16 configurations. These simulation
+parameters are set up in the configuration \texttt{data.frame} below, which is
+output to \texttt{config.json} so that it can be read by the batch script, which
+is used to parallelize the simulation.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r configuration}
+```
+\endgroup
+
+Now that the simulation settings have been set, we send them off to our computer
+cluster, and wait for the results to get written. The code below creates the
+batch scripts that run subsets of the experimental configurations.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r submit-jobs }
+```
+\endgroup
+
+Once the experiments complete, we can visually assess the quality of the fits.
+First, we read in the fitted parameters across experiments and merge them into a
+single object, suitable for plotting. 
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r read-vis}
+read_chunk("../src/sim/nmf/nmf_vis.R")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r libraries-nmf-vis}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r theta-reshape}
+```
+\endgroup
+
+Figures \@ref(fig:visualizethetas) and \@ref(fig:visualizebetas) display raw
+experimental results obtained when working with the non-zero-inflated data. In
+Figure \@ref(Fig:visualizethetas), each panel represents the underlying sample
+scores $\theta_{i}$. Black labels give the true positions of the latent scores
+for the associated sample, while red labels give the average across all
+posterior samples for that data point. The blue-green clouds are the contours
+along posterior samples -- they give a sense of the variability of the estimated
+scores. Note that the $x$ and $y$-axes are displayed on a square-root scale.
+
+In the grid of plots, the columns vary over underlying data dimension $V$ while
+rows vary over fitting algorithm (Gibbs Sampling and Variational Bayes) as well
+as number of samples $D$. In particular, the true scores (black numbers) are in
+the same positiion for every unique $\left(D, V\right)$ combination.
+
+A few general patterns are suggested. First, the approximate posteriors from
+Variational Bayes seems less spread out than those from Gibbs sampling. In
+particular, the samples tend to avoid $\theta_{i}$'s with very uneven values
+between the two coordinates. This effect is especially prominent in the
+low-dimensional setting, when there is less data available for inference of each
+individual $\theta_{i}$, and where there are quite a few true $\theta_{i}$'s
+that fail to fall into any of the posterior clouds.
+
+Second, we note that the high-dimensional regime does have somewhat more
+concentrated posteriors, as indicated by the brighter green shade. This effect
+is small but consistent, especially in Gibbs Sampling.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizethetas-prep}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizethetas, fig.height = 6, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```
+\endgroup
+
+While useful in gauging the global properties of NMF inference across regimes,
+it is difficult to assess the accuracy of the estimates by comparing red and
+black labels. An alternative view compares the true latent score to each sampled
+from the posterior. A histogram of these differences is displayed in Figure
+\@ref(fig:visthetashist). Each panel has the same meaning as before. Each
+histogram are of errors $\hat{\theta}_{ik} - \theta_{ik}$; orange is for $k = 1$
+and purple is for $k = 2$, though the error distributions for the two factor
+dimensions are quite similar and so mix into a burgundy. The fact that each
+sample $i$ has its own error distribution is visible in the way the histograms
+look like mixtures.
+
+Here, the improved concentration in the high-dimensional ($V = 125$) regime is
+more readily apparent. Further, the superiority of gibbs sampling in the
+lower-dimensional ($V = 75$) case is still noticeable in the fact that the gibbs
+histogram is somewhat narrower in the center. However, while there seems to be
+less mass in the tails for the Gibbs histogram, the tails themselves are just as
+wide as in the Variational Bayes histogram. Further, the fact that these
+histograms are not centered around zero reflects bias in the estimators -- they
+seem to be systematically too large.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizethetashist, fig.cap = "Histograms of the differences between posterior sampled scores and their true values."}
+```
+\endgroup
+
+Our approach to analyzing the posteriors on $\beta_{\cdot k}$ parallels that for
+studying the $\theta_{i}$. Figure \@ref(fig:visbeta) is interpreted similarly to
+Figure \@ref(fig:visthtea) before, but now each point is coordinate
+$\beta_{v\cdot}$. Note that when $V$ increases, the number of such points
+increases.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizebetas, fig.height = 6, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+```
+\endgroup
+
+Again, Variational Bayes seems to underestimate the posterior variances of each
+estimate and generally avoids placing mass on $\beta_{v\cdot}$s near the axes.
+This seems to be true in both lower and higher-dimensional regimes, though the
+fact that the number of points changes across columns makes them difficult to
+compare. The Gibbs sampling estimates seem more accurately, generally, but we
+transition to the error histogram view to establish this more firmly.
+
+Figure \@ref(fig:visbetahist) is the analog of \@ref(fig:visthetahist) for the
+$\beta_{v\cdot}$s. The posterior seems more concetrated around the truth in the
+high-dimensional case, in spite of the fact that each $\beta_{v\cdot}$ has
+access to the same number of samples across regimes.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizebetashist, fig.cap = "Histograms of the differences between posterior sampled factors and their true values."}
+```
+\endgroup
+
+## Zero-inflated NMF ##
+
+Now we examine the effect of zero inflation on estimation of the $\theta_{i}$
+and $\beta_{v}$. Our interest revolves around two questions,
+
+* In the case that zero-inflation is present and the appropriate model, with
+  known zero inflation probability, is used, how quickly do estimates
+  deterioriate as more and more entries are sent to zero? 
+* What are the consequences for estimating latent scores and factors, in the
+  case that zero-inflation exists but is not accounted for?
+
+To this end, we focus on the data in the lower-dimensional regime ($P = 75$) and
+compare variation in model estimates across zero-inflation probabilities and
+fitting procedures. Figure \@ref(fig:visualizezinfthetas) displays the
+posteriors for the $\theta_{i}$ across such configurations. As before, the two
+rows of plots distinguish between inference by Gibbs sampling and Variational
+Bayes. Columns indicate whether or not zero-inflation was accounted for in
+modeling (Z-GaP vs. GaP) and the underlying zero inflation probability.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize-zinf-thetas-prep}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfthetas, fig.height = 8, fig.width = 8, fig.cap = "Each panel displays the estimated scores for a different simulation setting, with a focus on the effect of zero inflation. Columns distinguish between different zero-inflation probabilities and modeling techniques."}
+```
+\endgroup
+
+While the differences observed between Gibbs Sampling and Variational Bayes
+continue to be clear, it is not obvious from these figures whether there is any
+difference in estimation accuracy across columns. To study this more precisely,
+we again consider the error histograms associated with each panel; this is given
+in Figure \@ref(fig:visualizezinfthetashist).
+
+The most noticeable difference across these panels is that Variational Bayes
+seems to perform substantially worse when zero-inflation is present, especially
+when zero-inflation is not taken into account. Surprisingly, Gibbs Sampling
+seems only slightly worse in this situation. Even more oddly, the case in which
+zero-inflation is not explicitly modeled does not seem to do worse than the case
+it is.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfthetashist, fig.cap = "For each simulation setting, we can compute the true estimation errors across samples."}
+```
+\endgroup
+
+Figures \@ref(fig:visualizezinfbetas) and \@ref(fig:visualizezinfbetashist) are
+the corresponding views of the latent factors $\beta_{v\cdot}$. Both figures
+reinforce the findings from those based on the estimated scores $\theta_{i}$,
+namely, Variational Bayes deterioriates more rapidly upon introduction
+zero-inflation, and Gibbs Sampling results seem comparable under both GaP or
+Z-GaP models.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfbetas, fig.height = 8, fig.width = 8, fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfbetashist, fig.cap = "Across settings, we can explicitly compute estimation errors."}
+```
+\endgroup
+
+# References #
