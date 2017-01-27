@@ -8,7 +8,7 @@
 ##
 ## author: kriss1@stanford.edu
 
-## ---- libraries ----
+## ---- libraries-nmf-expers ----
 suppressMessages(library("jsonlite"))
 suppressMessages(library("SLURMHelpers"))
 base_dir <- "../src/sim/nmf"
