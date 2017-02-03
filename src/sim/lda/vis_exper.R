@@ -45,13 +45,26 @@ combined <- mcombined %>%
   unite(temp, type, dimension) %>%
   spread(temp, value)
 
-## ---- beta-boxplots ----
-experiment_boxplots(mcombined)
+## ---- beta-boxplots-object ----
+unique_V <- unique(mcombined$V)
+p <- list()
+for (i in seq_along(unique_V)) {
+  p[[i]] <- experiment_boxplots(
+    mcombined %>%
+    filter_(sprintf("V == %s", unique_V[i]))
+  )
+}
 
-## ---- beta-contours ----
+## ---- betaboxplot1 ----
+p[[1]]
+
+## ---- betaboxplot2 ----
+p[[2]]
+
+## ---- betacontours ----
 experiment_contours(combined)
 
-## ---- beta-histograms ----
+## ---- betahistograms ----
 error_histograms(mcombined, c("method + N", "V + D"))
 
 ## ---- theta-samples ----

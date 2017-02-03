@@ -310,7 +310,7 @@ experiment_boxplots <- function(mcombined) {
     "y" = "sqrt(estimate)",
     "fill" = "method",
     "linetype" = "as.factor(N)",
-    "theme_opts" = list("border_size" = .4)
+    "theme_opts" = list("border_size" = 0)
   )
 
   ggboxplot(mcombined, plot_opts) +
@@ -319,8 +319,18 @@ experiment_boxplots <- function(mcombined) {
       aes(yintercept = sqrt(truth)),
       alpha = 0.5, size = 0.5
     ) +
+    geom_hline(
+      aes(yintercept = 0),
+      alpha = 0.0, size = 0.3
+    ) +
     scale_x_discrete(drop = F) +
-    facet_grid(D + dimension ~ V + variable, scales = "free_x", space = "free_x")
+    facet_grid(
+      D + dimension ~ variable,
+      scale = "free_x"
+    ) +
+    theme(
+      strip.text.x = element_blank()
+    )
 }
 
 #' Contour plots across topic components
