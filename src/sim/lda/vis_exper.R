@@ -22,8 +22,7 @@ source("../src/sim/lda/vis_utils.R")
 ## ---- paths ----
 output_path <- "/scratch/users/kriss1/output/boot_expers"
 metadata <- fread(file.path(output_path, "metadata.csv")) %>%
-  unique() %>%
-  head(25)
+  unique() 
 
 ## ---- beta-samples ----
 beta <- get_truth_data(metadata, "beta") %>%
@@ -61,11 +60,23 @@ p[[1]]
 ## ---- betaboxplot2 ----
 p[[2]]
 
-## ---- betacontours ----
-experiment_contours(combined)
+## ---- beta-contours-object ----
+p <- list()
+for (i in seq_along(unique_V)) {
+  p[[i]] <- experiment_contours(
+    combined %>%
+    filter_(sprintf("V == %s", unique_V[i]))
+  )
+}
+
+## ---- betacontours1 ----
+p[[1]]
+
+## ---- betacontours2 ----
+p[[2]]
 
 ## ---- betahistograms ----
-error_histograms(mcombined, c("method + N", "V + D"))
+error_histograms(mcombined, c("method + V", "D + N"))
 
 ## ---- theta-samples ----
 theta <- get_truth_data(metadata, "theta", "i")
