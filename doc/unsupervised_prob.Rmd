@@ -23,7 +23,8 @@ chunk_opts <- list(
   fig.align = "center",
   cache = FALSE,
   warning = FALSE,
-  message = FALSE
+  message = FALSE,
+  eval = FALSE
 )
 
 opts_chunk$set(chunk_opts)
@@ -612,6 +613,73 @@ Z-GaP models.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualizezinfbetashist, fig.cap = "Across settings, we can explicitly compute estimation errors."}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r read-boot-expers, eval = TRUE}
+read_chunk("../src/sim/lda/vis_exper.R")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r libraries-boot-expers, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r paths, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r beta-samples, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r beta-alignment, eval = TRUE}
+```
+\endgroup
+
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betacontours, fig.width = 7, fig.height = 7, eval = TRUE}
+```
+\endgroup
+
+```{r beta-boxplots-object}
+```
+
+```{r betaboxplot1, fig.width = 8, fig.height = 4.5, eval = TRUE}
+```
+
+```{r betaboxplot2, fig.width = 8, fig.height = 2, eval = TRUE}
+```
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betahistograms, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r theta-samples, eval = FALSE}
 ```
 \endgroup
 
