@@ -329,7 +329,9 @@ experiment_boxplots <- function(mcombined) {
       scale = "free_x"
     ) +
     theme(
-      strip.text.x = element_blank()
+      strip.text.x = element_blank(),
+      panel.border = element_blank(),
+      panel.margin = unit(0, "line")
     )
 }
 
@@ -352,13 +354,13 @@ experiment_contours <- function(combined) {
     geom_text(
       data = combined %>% filter(iteration == 1),
       aes(x = sqrt(truth_1), y = sqrt(truth_2), label = variable),
-      size = 1.5
+      size = 2
     ) +
     geom_text(
       data = combined %>%
         group_by(variable, D, V, N, K, method) %>%
         summarise(estimate_mean_1 = mean(estimate_1), estimate_mean_2 = mean(estimate_2)),
       aes(x = sqrt(estimate_mean_1), y = sqrt(estimate_mean_2), label = variable),
-      size = 1.5, col = "#fc8d62" ) +
-    facet_grid(method + N ~ V + D)
+      size = 2, col = "#fc8d62" ) +
+  facet_grid(method ~ D + N)
 }
