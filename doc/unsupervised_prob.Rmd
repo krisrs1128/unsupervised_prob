@@ -24,7 +24,7 @@ chunk_opts <- list(
   cache = FALSE,
   warning = FALSE,
   message = FALSE,
-  eval = FALSE
+  eval = TRUE
 )
 
 opts_chunk$set(chunk_opts)
@@ -652,27 +652,31 @@ read_chunk("../src/sim/lda/vis_exper.R")
 ```
 \endgroup
 
+```{r beta-contours-object, eval = TRUE}
+```
+
+```{r betacontours1, fig.width = 7, fig.height = 4, eval = TRUE}
+```
+
+```{r betacontours2, fig.width = 7, fig.height = 4, eval = TRUE}
+```
+
+```{r beta-boxplots-object, eval = TRUE}
+```
+\blandscape
+```{r betaboxplot1, fig.width = 10, fig.height = 4.5, eval = TRUE}
+```
+\elandscape
+
+\blandscape
+```{r betaboxplot2, fig.width = 10, fig.height = 4.5, eval = TRUE}
+```
+\elandscape
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours, fig.width = 7, fig.height = 7, eval = TRUE}
-```
-\endgroup
-
-```{r beta-boxplots-object}
-```
-
-```{r betaboxplot1, fig.width = 8, fig.height = 4.5, eval = TRUE}
-```
-
-```{r betaboxplot2, fig.width = 8, fig.height = 2, eval = TRUE}
-```
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r betahistograms, eval = TRUE}
+```{r betahistograms, eval = TRUE, fig.height = 6}
 ```
 \endgroup
 
