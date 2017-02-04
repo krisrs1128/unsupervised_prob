@@ -616,6 +616,42 @@ Z-GaP models.
 ```
 \endgroup
 
+## LDA ##
+
+Here, we consider an analogous experiment to evaluate inference in the LDA
+model. We again consider several data generation regimes, varying
+
+* $D$: The number of samples.
+* $V$: The number of features.
+* $N$: The total count within each sample.
+
+We do not vary the total number of topics or the Dirichlet hyperparameter
+strength. Further, we always assume the model is corretly specified before doing
+inference. Nonetheless, even in this relatively restricted setting, we find
+certain observations worth sharing.
+
+In addition to comparing MCMC sampling with VB inference, we consider a
+parametric bootstrap approach to generating confidence sets. In this approach,
+we perform an initial VB fit to obtain posterior mean \$\hat{\theta}$ and
+$\hat{\beta}$. Then, $B$ samples are simulated from an LDA model with these
+parameters, and separate VB fits are computed for each of these. We consider
+this approach in light of the suspicion (confirmed in the simulation) that VB
+typically underestimates the variance of fits, but that MCMC sampling is harder
+to parallelize than bootstrapping. The hope then would be that bootstrapping
+offers the best of both world -- the speed of VB with the accuracy of MCMC. We
+discuss whether our simulation study substantiats this idea below.
+
+We take $D \in \{20, 100\}$, $V \in \{10, 50\}$ and $N \in \{20, 50, 100\}$ and
+then simulate under all 12 combinations of these three parameters. Throughout,
+we fix $alpha_{0} = \gamma_{0} = 1$ and $K = 2$. With these parameters, we aim
+to characterize performance of different inferential techniques under different
+signal-to-noise regimes, but avoid any investigation of robustness.
+
+### Implementation ###
+
+
+### Results ###
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
