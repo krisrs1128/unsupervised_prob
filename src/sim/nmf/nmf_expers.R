@@ -19,7 +19,7 @@ submit_batch <- FALSE ## so we can recompile the knitr document without submitti
 ## create the configuration JSON file
 config_path <- file.path(base_dir, "config.json")
 batch_dir <- file.path(base_dir, "batch")
-fits_dir = file.path(base_dir, "..", "..", "..", "data", "fits")
+fits_dir = file.path(base_dir, "..", "..", "..", "data", "fits", "nmf-sim")
 dir.create(batch_dir)
 dir.create(fits_dir)
 

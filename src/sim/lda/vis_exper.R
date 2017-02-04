@@ -18,11 +18,12 @@ library("rstan")
 library("ggplot2")
 library("ggscaffold")
 source("../src/sim/lda/vis_utils.R")
+base_dir <- "../src/sim/lda"
 
 ## ---- paths ----
-output_path <- "/scratch/users/kriss1/output/boot_expers"
+output_path <- file.path(base_dir, "..", "..", "..", "data", "fits", "lda-sim")
 metadata <- fread(file.path(output_path, "metadata.csv")) %>%
-  unique() 
+  unique()
 
 ## ---- beta-samples ----
 beta <- get_truth_data(metadata, "beta") %>%
