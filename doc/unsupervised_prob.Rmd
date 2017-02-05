@@ -1,6 +1,6 @@
 ---
 documentclass: report
-title: "Evalfuating Unsupervised Probabilistic Models of the Microbiome"
+title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
 date: "`r Sys.Date()`"
 keep-tex: true
 output:
@@ -632,7 +632,7 @@ certain observations worth sharing.
 
 In addition to comparing MCMC sampling with VB inference, we consider a
 parametric bootstrap approach to generating confidence sets. In this approach,
-we perform an initial VB fit to obtain posterior mean \$\hat{\theta}$ and
+we perform an initial VB fit to obtain posterior mean $\hat{\theta}$ and
 $\hat{\beta}$. Then, $B$ samples are simulated from an LDA model with these
 parameters, and separate VB fits are computed for each of these. We consider
 this approach in light of the suspicion (confirmed in the simulation) that VB
@@ -649,8 +649,61 @@ signal-to-noise regimes, but avoid any investigation of robustness.
 
 ### Implementation ###
 
+This section describes ideas used to streamline the practical implementation of
+the simulation study. The remaining sections, focusing more on statistical
+consequences of the simulation, can be read independently. We believe that some
+of the techniques used in this simulation could be useful in a more general
+context, however, and so ar worth discussing.
+
+The main source complexity in the simulation study are the dependencies between
+different data generation and fitting procedures. For example, the bootstrapping
+approach requires the initial VB fit for the given experimental configuration be
+available, which itself requires that data from the associated LDA model is
+already simulated. In addition to this dependence between simulation tasks, it
+is desirable to parallelize as much as possible. For example, different
+experimental configurations can be run independently. There are also
+intermediate cases, where some parts of the pipeline can be parallelized, but
+the rest cannot be -- consider simulating data from the same underlying
+$\theta_{i}$ and $\beta_{k}$, but with different numbers of words per document
+$N$.
+
+In data engineering, it is common to think of data processing and modeling
+pipelines with nontrivial structure as directed acyclic graphs. We adopt this
+point of view in our simulations, encoding the task depednence structure using
+the Luigi library [@leipzig2016review], which then manages parallelization and
+execution order of the necessary simulation tasks. The full graph is displayed
+in Figure \ref{fig:luigi_pipeline}.
+
+A further advantage of this framework is that new experiments can make use of
+simulation output from earlier ones. For example, new models can be run on
+previously generated data sets, without recreating them\footnote{By setting
+seeds at every potential source of randomness, resimulating data would not lead
+to any change in the resulting data set. The downside of this approach is lack
+of computational efficiency, not experimental validity.}
 
 ### Results ###
+
+The results of this simulation are summarized in Figures \@ref(betacontours1)
+through \@ref(betahistograms). Figure \@ref(betacountours1) displays the true
+and posterior $\beta_{k}$ for the experiments with $V = 10$ features, while
+other simulation characteristics are varied. As before, each panel represents a
+single experimental configuration, with two axes associated with the two
+underlying topics. Each black number $v$ is the true value of feature $v$ across
+topics: $\left(\beta_{v1}, \beta_{2}\right)$. The shaded clouds are sampled
+posteriors, while the orange labels give posterior means.
+
+Across rows, different inferential procedures are compared -- \texttt{bootstrap}
+refers to the bootstrap-after-variational bayes scheme, \texttt{gibbs} is MCMC
+sampling, and \texttt{vb} is variational bayes. Across columns we vary $D$, the
+total number of documents, and $N$, the number of words in each document. Figure
+\@ref(fig:betacontours2) is read in exactly the same way.
+
+A few comments are in order. As expected, when $D$ increases, i.e., more samples
+are made available, the posterior for $\beta$, whose dimension do not increase
+with $D$, begins to concentrate around its true value. When $V = 50$, this
+concentration is somewhat slower than when $V = 10$; however, the larger
+absolute sizes of the clouds in Figure \@ref(fig:betacontours2) is also a result
+of their being more parameters.
 
 \begingroup
 \setstretch{1}
@@ -691,10 +744,10 @@ read_chunk("../src/sim/lda/vis_exper.R")
 ```{r beta-contours-object, eval = TRUE}
 ```
 
-```{r betacontours1, fig.width = 7, fig.height = 4, eval = TRUE}
+```{r betacontours1, fig.width = 7, fig.height = 4, eval = TRUE, fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10$ features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
 ```
 
-```{r betacontours2, fig.width = 7, fig.height = 4, eval = TRUE}
+```{r betacontours2, fig.width = 7, fig.height = 4, eval = TRUE, fig.cap = "The analog of Figure \\@ref(fig:betacontours1), with distributions over $V = 50$ instead of 10 features."}
 ```
 
 ```{r beta-boxplots-object, eval = TRUE}
