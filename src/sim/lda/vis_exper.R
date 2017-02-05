@@ -45,23 +45,8 @@ combined <- mcombined %>%
   unite(temp, type, dimension) %>%
   spread(temp, value)
 
-## ---- beta-boxplots-object ----
-unique_V <- unique(mcombined$V)
-p <- list()
-for (i in seq_along(unique_V)) {
-  p[[i]] <- experiment_boxplots(
-    mcombined %>%
-    filter_(sprintf("V == %s", unique_V[i]))
-  )
-}
-
-## ---- betaboxplot1 ----
-p[[1]]
-
-## ---- betaboxplot2 ----
-p[[2]]
-
 ## ---- beta-contours-object ----
+unique_V <- unique(mcombined$V)
 p <- list()
 for (i in seq_along(unique_V)) {
   p[[i]] <- experiment_contours(
@@ -74,6 +59,21 @@ for (i in seq_along(unique_V)) {
 p[[1]]
 
 ## ---- betacontours2 ----
+p[[2]]
+
+## ---- beta-boxplots-object ----
+p <- list()
+for (i in seq_along(unique_V)) {
+  p[[i]] <- experiment_boxplots(
+    mcombined %>%
+    filter_(sprintf("V == %s", unique_V[i]))
+  )
+}
+
+## ---- betaboxplot1 ----
+p[[1]]
+
+## ---- betaboxplot2 ----
 p[[2]]
 
 ## ---- betahistograms ----
