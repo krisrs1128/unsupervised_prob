@@ -684,26 +684,49 @@ of computational efficiency, not experimental validity.}
 ### Results ###
 
 The results of this simulation are summarized in Figures \@ref(betacontours1)
-through \@ref(betahistograms). Figure \@ref(betacountours1) displays the true
-and posterior $\beta_{k}$ for the experiments with $V = 10$ features, while
-other simulation characteristics are varied. As before, each panel represents a
-single experimental configuration, with two axes associated with the two
-underlying topics. Each black number $v$ is the true value of feature $v$ across
-topics: $\left(\beta_{v1}, \beta_{2}\right)$. The shaded clouds are sampled
-posteriors, while the orange labels give posterior means.
+through \@ref(betahistograms). Note that topics have been heuristically aligned
+across all samples, to avoid the label-switching problem\footnote{Specifically,
+we take the correlation between fitted and true topic vectors, and first
+identify the fitted and true topic with highest correlation. Among the remaining
+topics, we align those with the next highest correlation, and so on.}. Figure
+\@ref(betacountours1) displays the true and posterior $\beta_{k}$ for the
+experiments with $V = 10$ features, while other simulation characteristics are
+varied. As before, each panel represents a single experimental configuration,
+with two axes associated with the two underlying topics. Each black number $v$
+is the true value of feature $v$ across topics: $\left(\beta_{v1},
+\beta_{v2}\right)$. The shaded clouds are sampled posteriors, while the orange
+labels give posterior means.
 
 Across rows, different inferential procedures are compared -- \texttt{bootstrap}
 refers to the bootstrap-after-variational bayes scheme, \texttt{gibbs} is MCMC
 sampling, and \texttt{vb} is variational bayes. Across columns we vary $D$, the
-total number of documents, and $N$, the number of words in each document. Figure
-\@ref(fig:betacontours2) is read in exactly the same way.
+total number of samples, and $N$, the total count within each sample. In
+particular, across the first and last three columns, the true $\beta_{vk}$
+values remain unchanged. Figure \@ref(fig:betacontours2) is read in exactly the
+same way.
 
 A few comments are in order. As expected, when $D$ increases, i.e., more samples
 are made available, the posterior for $\beta$, whose dimension do not increase
-with $D$, begins to concentrate around its true value. When $V = 50$, this
-concentration is somewhat slower than when $V = 10$; however, the larger
-absolute sizes of the clouds in Figure \@ref(fig:betacontours2) is also a result
-of their being more parameters.
+with $D$, begins to concentrate around its true value. It is unclear whether the
+rate of concentration when $V = 50$ is much different from the case where $V =
+10$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
+could result from their being more fitted parameter values being displayed in
+the same space, though see \@ref(fig:betahistograms) for more clarity on this
+point.
+
+Consistent with earlier findings, the VB posteriors are generally lower variance
+and more elliptical than the true MCMC sampled posteriors. The bootstrap samples
+seem somewhere between the VB and MCMC sampled distributions in terms of
+variablity within each feature. As the number of samples or number of words
+within samples increases, the three methods become indistinguishable.
+
+Interestingly, when $D$ and $N$ are small ($=20$), VB appears more accurate than
+either the MCMC or bootstrappign apparoches, whose posterior means all lie along
+the diagonal, corresponding to topics that both reflect the global marginal
+feature counts across samples. This effect is especially pronounced in the case
+$V = 50$. Here, even the $D = 20, N = 50$ configuration seems to lead to result
+in inference issues for the bootstrap.
+
 
 \begingroup
 \setstretch{1}
@@ -741,17 +764,33 @@ read_chunk("../src/sim/lda/vis_exper.R")
 ```
 \endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r beta-contours-object, eval = TRUE}
 ```
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r betacontours1, fig.width = 7, fig.height = 4, eval = TRUE, fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10$ features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
 ```
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r betacontours2, fig.width = 7, fig.height = 4, eval = TRUE, fig.cap = "The analog of Figure \\@ref(fig:betacontours1), with distributions over $V = 50$ instead of 10 features."}
 ```
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r beta-boxplots-object, eval = TRUE}
 ```
+\endgroup
 \blandscape
 ```{r betaboxplot1, fig.width = 10, fig.height = 4.5, eval = TRUE}
 ```
