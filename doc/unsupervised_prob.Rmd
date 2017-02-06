@@ -371,7 +371,7 @@ reflect the diversity of data analysis settings that arise in practice. We
 choose a few situations we find interesting, but there are many other situations
 worth investigating.
 
-## NMF ##
+## NMF {#sec:nmf_sim}
 
 \begingroup
 \setstretch{1}
@@ -479,7 +479,7 @@ is small but consistent, especially in Gibbs Sampling.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas, fig.height = 6, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```{r visualizethetas, fig.height = 4, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
 ```
 \endgroup
 
@@ -519,7 +519,7 @@ increases.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetas, fig.height = 6, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+```{r visualizebetas, fig.height = 4, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
 ```
 \endgroup
 
@@ -605,7 +605,7 @@ Z-GaP models.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfbetas, fig.height = 8, fig.width = 8, fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
+```{r visualizezinfbetas, fig.height = 6, fig.width = 6, fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
 ```
 \endgroup
 
@@ -681,52 +681,11 @@ seeds at every potential source of randomness, resimulating data would not lead
 to any change in the resulting data set. The downside of this approach is lack
 of computational efficiency, not experimental validity.}
 
-### Results ###
+### Recovered Topics ###
 
-The results of this simulation are summarized in Figures \@ref(betacontours1)
-through \@ref(betahistograms). Note that topics have been heuristically aligned
-across all samples, to avoid the label-switching problem\footnote{Specifically,
-we take the correlation between fitted and true topic vectors, and first
-identify the fitted and true topic with highest correlation. Among the remaining
-topics, we align those with the next highest correlation, and so on.}. Figure
-\@ref(betacountours1) displays the true and posterior $\beta_{k}$ for the
-experiments with $V = 10$ features, while other simulation characteristics are
-varied. As before, each panel represents a single experimental configuration,
-with two axes associated with the two underlying topics. Each black number $v$
-is the true value of feature $v$ across topics: $\left(\beta_{v1},
-\beta_{v2}\right)$. The shaded clouds are sampled posteriors, while the orange
-labels give posterior means.
+#### Setup ####
 
-Across rows, different inferential procedures are compared -- \texttt{bootstrap}
-refers to the bootstrap-after-variational bayes scheme, \texttt{gibbs} is MCMC
-sampling, and \texttt{vb} is variational bayes. Across columns we vary $D$, the
-total number of samples, and $N$, the total count within each sample. In
-particular, across the first and last three columns, the true $\beta_{vk}$
-values remain unchanged. Figure \@ref(fig:betacontours2) is read in exactly the
-same way.
-
-A few comments are in order. As expected, when $D$ increases, i.e., more samples
-are made available, the posterior for $\beta$, whose dimension do not increase
-with $D$, begins to concentrate around its true value. It is unclear whether the
-rate of concentration when $V = 50$ is much different from the case where $V =
-10$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
-could result from their being more fitted parameter values being displayed in
-the same space, though see \@ref(fig:betahistograms) for more clarity on this
-point.
-
-Consistent with earlier findings, the VB posteriors are generally lower variance
-and more elliptical than the true MCMC sampled posteriors. The bootstrap samples
-seem somewhere between the VB and MCMC sampled distributions in terms of
-variablity within each feature. As the number of samples or number of words
-within samples increases, the three methods become indistinguishable.
-
-Interestingly, when $D$ and $N$ are small ($=20$), VB appears more accurate than
-either the MCMC or bootstrappign apparoches, whose posterior means all lie along
-the diagonal, corresponding to topics that both reflect the global marginal
-feature counts across samples. This effect is especially pronounced in the case
-$V = 50$. Here, even the $D = 20, N = 50$ configuration seems to lead to result
-in inference issues for the bootstrap.
-
+The code below retrieves the output from the simulation experiments.
 
 \begingroup
 \setstretch{1}
@@ -750,6 +709,15 @@ read_chunk("../src/sim/lda/vis_exper.R")
 ```
 \endgroup
 
+#### Posterior Scatterplots ####
+
+The results of this simulation are summarized in Figures \@ref(betacontours1)
+through \@ref(betahistograms). Note that topics have been heuristically aligned
+across all samples, to avoid the label-switching problem\footnote{Specifically,
+we take the correlation between fitted and true topic vectors, and first
+identify the fitted and true topic with highest correlation. Among the remaining
+topics, we align those with the next highest correlation, and so on.}.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
@@ -763,6 +731,22 @@ read_chunk("../src/sim/lda/vis_exper.R")
 ```{r beta-alignment, eval = TRUE}
 ```
 \endgroup
+
+Figure \@ref(betacountours1) displays the true and posterior $\beta_{k}$ for the
+experiments with $V = 10$ features, while other simulation characteristics are
+varied. As before, each panel represents a single experimental configuration,
+with two axes associated with the two underlying topics. Each black number $v$
+is the true value of feature $v$ across topics: $\left(\beta_{v1},
+\beta_{v2}\right)$. The shaded clouds are sampled posteriors, while the orange
+labels give posterior means.
+
+Across rows, different inferential procedures are compared -- \texttt{bootstrap}
+refers to the bootstrap-after-variational bayes scheme, \texttt{gibbs} is MCMC
+sampling, and \texttt{vb} is variational bayes. Across columns we vary $D$, the
+total number of samples, and $N$, the total count within each sample. In
+particular, across the first and last three columns, the true $\beta_{vk}$
+values remain unchanged. Figure \@ref(fig:betacontours2) is read in exactly the
+same way.
 
 \begingroup
 \setstretch{1}
@@ -781,9 +765,74 @@ read_chunk("../src/sim/lda/vis_exper.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours2, fig.width = 7, fig.height = 4, eval = TRUE, fig.cap = "The analog of Figure \\@ref(fig:betacontours1), with distributions over $V = 50$ instead of 10 features."}
+```{r betacontours2, fig.width = 7, fig.height = 4, eval = TRUE, fig.cap = "The analogous figure , with distributions over $V = 50$ instead of 10 features."}
 ```
 \endgroup
+
+A few comments are in order. As expected, when $D$ increases, i.e., more samples
+are made available, the posterior for $\beta$, whose dimension do not increase
+with $D$, begins to concentrate around its true value. It is unclear whether the
+rate of concentration when $V = 50$ is much different from the case where $V =
+10$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
+could result from their being more fitted parameter values being displayed in
+the same space, though see \@ref(fig:betahistograms) for more clarity on this
+point.
+
+Consistent with earlier findings, the VB posteriors are generally lower variance
+and more elliptical than the true MCMC sampled posteriors. The bootstrap samples
+seem somewhere between the VB and MCMC sampled distributions in terms of
+variablity within each feature. As the number of samples or number of words
+within samples increases, the three methods become indistinguishable.
+
+Interestingly, when $D$ and $N$ are small ($N = D =20$), VB appears more
+accurate than either the MCMC or bootstrapping approaches, whose posterior means
+all lie along the diagonal, corresponding to topics that both reflect the global
+marginal feature counts across samples. This effect is especially pronounced in
+the case $V = 50$. Here, even the $D = 20, N = 50$ configuration seems to lead
+to result in inference issues for the bootstrap. We have no explanation for this
+phenomenon.
+
+#### Alternative Visualization ####
+
+The scatterplots presented above are informative in the case that $K = 2$, but
+for larger $K$, it becomes unwieldy to display all $K \choose 2$ pairs of
+topics as scatterplots. We provide two alternative visualizations that are
+better adapted to this situation: error histograms, like those in Section
+\@ref(sec:nmf_sim), and faceted boxplots.
+
+The error histograms are given in Figure \@ref(fig:betahistograms). In each
+panel, there are two overlapping histograms -- one orange and one purple --
+representing the errors, on a square-root scale, for the two topics. Rows
+index different fitting methods and numbers of features $V$, while columns index
+different $D$ (first row of labels) and $N$ (second row of labels).
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betahistograms, eval = TRUE, fig.height = 6, fig.cap = "Histograms of the difference between sampled topic parameters and their true values, across experimental configurations."}
+```
+\endgroup
+
+Compared to the NMF simulation, the histograms look less strongly like mixture
+distributions. Further, the tails seems somewhat lighter -- only MCMC with small
+sample sizes has large tails.
+
+As expected, for fixed $D$, as $N$ increases, the errors become more
+concentrated around 0, and when $D$ is larger, this concentration is apparent
+even for smaller $N$. All three methods seem equivalent in larger sample sizes.
+When fewer samples are available, the error distributions are widest for MCMC,
+though the bootstrap distributions are similarly shaped, only with lighter
+tails. The VB distributions are more irregularly shaped, not necessarily
+symmetric around zero, and with substantial lack of overlap between topic
+dimensions.
+
+An alternative view, which does not require looking only at errors, is given in
+Figures \@ref(fig:betaboxplot1) and \@ref(fig:betaboxplot2), which are the
+boxplot analogs of Figures \@ref(fig:betacontours1) and
+@\ref(fig:betacontours2), respectively. Within each panel, the posteriors for a
+single topic are represented by boxplots, with different colors corresponding to
+different inferential methods. Further, the true value for that parameter is
+given by a grey horizontal line.
 
 \begingroup
 \setstretch{1}
@@ -791,28 +840,52 @@ read_chunk("../src/sim/lda/vis_exper.R")
 ```{r beta-boxplots-object, eval = TRUE}
 ```
 \endgroup
+
 \blandscape
-```{r betaboxplot1, fig.width = 10, fig.height = 4.5, eval = TRUE}
+```{r betaboxplot1, fig.width = 10, fig.height = 6, eval = TRUE, fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$."}
 ```
 \elandscape
 
 \blandscape
-```{r betaboxplot2, fig.width = 10, fig.height = 4.5, eval = TRUE}
+```{r betaboxplot2, fig.width = 10, fig.height = 6, eval = TRUE, fig.cap = "Boxplots of posterior samles, when $V = 50$."}
 ```
 \elandscape
 
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r betahistograms, eval = TRUE, fig.height = 6}
-```
-\endgroup
+Different columns index different features -- in Figure \@ref(fig:betaboxplot1),
+$V = 10$, while in Figure \@ref(fig:betaboxplot2), $V = 50$. Rows index
+different topics and experimental configurations. From inside out, the $y$-axis
+facet labels give $K$, $N$, and $D$, respectively. Note that the true values are
+not the same across experimental configurations, due to the simulation setup.
+
+The takeaways from these views of the simulation experiment are consistent with
+all others so far. One pattern that is not obvious from the other displays is
+that MCMC sampling can lead to posteriors with high skewness in the case that a
+parameter is close to one of the endpoints of its domain (0 or 1, in this case). 
+
+### Recovered Mixing Proportions ###
+
+For completeness, we can perform a similar analyis on the recovered mixing
+proportions $\left(\theta_{i}\right)$.
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r theta-samples, eval = FALSE}
+```{r theta-samples, eval = TRUE}
 ```
 \endgroup
+
+# Data Analysis Case Studies #
+
+In applying probabilistic methods to practical microbiome data analysis, two
+questions immediately come to mind,
+
+1. Do these models fit well to the raw or preprocessed data, and what techniques
+are available for evaluating model fit?
+2. Supposing these models fit well, do they lend themselves to informative
+summaries of the original data?
+
+To begin to develop answers to these questions, we reanalyze the data of
+[@dethlefsen2011incomplete], a study of microbial dynamics in response to
+antibiotic treatment. Here, several patients were sampled for several weeks 
 
 # References #
