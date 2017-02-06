@@ -690,7 +690,7 @@ The code below retrieves the output from the simulation experiments.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r read-boot-expers, eval = TRUE}
+```{r read-boot-expers}
 read_chunk("../src/sim/lda/vis_exper.R")
 ```
 \endgroup
@@ -698,14 +698,14 @@ read_chunk("../src/sim/lda/vis_exper.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r libraries-boot-expers, eval = TRUE}
+```{r libraries-boot-expers}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r paths, eval = TRUE}
+```{r paths}
 ```
 \endgroup
 
@@ -721,14 +721,14 @@ topics, we align those with the next highest correlation, and so on.}.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-samples, eval = TRUE}
+```{r beta-samples}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-alignment, eval = TRUE}
+```{r beta-alignment}
 ```
 \endgroup
 
@@ -751,21 +751,21 @@ same way.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-contours-object, eval = TRUE}
+```{r beta-contours-object}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours1, fig.width = 7, fig.height = 4, eval = TRUE, fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10$ features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
+```{r betacontours1, fig.width = 7, fig.height = 4, fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10$ features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours2, fig.width = 7, fig.height = 4, eval = TRUE, fig.cap = "The analogous figure , with distributions over $V = 50$ instead of 10 features."}
+```{r betacontours2, fig.width = 7, fig.height = 4, fig.cap = "The analogous figure , with distributions over $V = 50$ instead of 10 features."}
 ```
 \endgroup
 
@@ -809,7 +809,7 @@ different $D$ (first row of labels) and $N$ (second row of labels).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betahistograms, eval = TRUE, fig.height = 6, fig.cap = "Histograms of the difference between sampled topic parameters and their true values, across experimental configurations."}
+```{r betahistograms, fig.height = 6, fig.cap = "Histograms of the difference between sampled topic parameters and their true values, across experimental configurations."}
 ```
 \endgroup
 
@@ -837,17 +837,17 @@ given by a grey horizontal line.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-boxplots-object, eval = TRUE}
+```{r beta-boxplots-object}
 ```
 \endgroup
 
 \blandscape
-```{r betaboxplot1, fig.width = 10, fig.height = 6, eval = TRUE, fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$."}
+```{r betaboxplot1, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$."}
 ```
 \elandscape
 
 \blandscape
-```{r betaboxplot2, fig.width = 10, fig.height = 6, eval = TRUE, fig.cap = "Boxplots of posterior samles, when $V = 50$."}
+```{r betaboxplot2, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samles, when $V = 50$."}
 ```
 \elandscape
 
@@ -867,10 +867,53 @@ parameter is close to one of the endpoints of its domain (0 or 1, in this case).
 For completeness, we can perform a similar analyis on the recovered mixing
 proportions $\left(\theta_{i}\right)$.
 
+#### Setup ####
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r theta-samples, eval = TRUE}
+```{r theta-samples}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r theta-alignment}
+```
+\endgroup
+
+#### Posterior Boxplots ####
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r theta-boxplot-object}
+```
+\endgroup
+
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetaboxplot1}
+```
+\endgroup
+\elandscape
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetaboxplot2}
+```
+\endgroup
+
+#### Error Histograms ####
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetahistograms}
 ```
 \endgroup
 
