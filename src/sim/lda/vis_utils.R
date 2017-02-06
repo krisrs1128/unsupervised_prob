@@ -325,11 +325,10 @@ experiment_boxplots <- function(mcombined) {
     ) +
     scale_x_discrete(drop = F) +
     facet_grid(
-      D + dimension ~ variable,
+      D + N + dimension ~ variable,
       scale = "free_x"
     ) +
     theme(
-      strip.text.x = element_blank(),
       panel.border = element_blank(),
       panel.margin = unit(0, "line")
     )
