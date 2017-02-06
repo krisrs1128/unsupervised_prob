@@ -117,3 +117,6 @@ p[[1]]
 
 ## ---- thetaboxplot2 ----
 p[[2]]
+
+## ---- thetahistograms ----
+error_histograms(mcombined, c("D + method", "V + N"))
