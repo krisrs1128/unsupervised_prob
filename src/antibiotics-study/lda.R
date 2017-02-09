@@ -15,26 +15,53 @@ library("dplyr")
 library("ggplot2")
 library("phyloseq")
 library("treelapse")
-library("ggsscaffold")
+library("ggscaffold")
 library("feather")
 set.seed(11242016)
 
 # Code Block -------------------------------------------------------------------
 ## ---- get-data ----
 data(abt)
-n_samples <- ncol(otu_table(abt))
 abt <- abt %>%
-  filter_taxa(function(x) sum(x != 0) > .4 * n_samples, prune = TRUE) %>%
+  filter_taxa(function(x) sum(x != 0) > .4 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "D")
-hist(colSums(otu_table(abt)), 15)
+
+## ---- histograms ---
+transformed_counts <- data.frame(
+  count = c(get_taxa(abt), asinh(get_taxa(abt))),
+  transformation = c(
+    rep("original", ntaxa(abt) * nsamples(abt)),
+    rep("asinh", ntaxa(abt) * nsamples(abt))
+  )
+)
+
+ggplot(transformed_counts) +
+  geom_histogram(aes(x = count)) +
+  facet_grid(. ~ transformation, scale = "free_x") +
+  min_theme(list(text_size = 8, subtitle_size = 12))
 
 ## ---- heatmaps ----
-heatmap(otu_table(abt))
-heatmap(asinh(otu_table(abt)))
+y_order <- names(sort(taxa_sums(abt)))
+x_order <- names(sort(sample_sums(abt)))
+ordered_map <- function(x) {
+  ggheatmap(
+    x %>%
+    melt(value.name = "fill", varnames = c("y", "x")),
+    list("x_order" = x_order, "y_order" = y_order)
+  ) +
+    min_theme(list(text_size = 0))
+}
+
+ggheatmap(
+  asinh(get_taxa(abt)) %>%
+  melt(value.name = "fill", varnames = c("y", "x")),
+  list("x_order" = x_order, "y_order" = y_order)
+) +
+  min_theme(list(text_size = 0))
 
 ## ----  lda ----
-m <- stan_model(file = "lda_counts.stan")
-X <- asinh(t(otu_table(abt)@.Data))
+m <- stan_model(file = "../src/stan/lda_counts.stan")
+X <- asinh(t(get_taxa(abt)))
 X[] <- as.integer(round(X, 2) * 100)
 
 stan_data <- list(
@@ -45,7 +72,7 @@ stan_data <- list(
   alpha = rep(1e-10, 4)
 )
 
-stan_fit <- vb(m, stan_data, eta = .1, adapt_engaged = FALSE, grad_samples = 1, iter = 2000)
+stan_fit <- sampling(m, stan_data, iter = 2000, chains = 1)
 samples <- rstan::extract(stan_fit)
 
 ## ---- extract_beta ----
@@ -66,30 +93,6 @@ sorted_taxa <- names(sort(table(beta_hat$Taxon_5), decreasing = TRUE))
 beta_hat$Taxon_5 <- factor(beta_hat$Taxon_5, levels = sorted_taxa)
 beta_hat$rsv <- factor(beta_hat$rsv, levels = taxa$rsv)
 
-## ---- visualize_beta ----
-# might want to set prior for more extreme decay
-plot_opts <- list(
-  "x" = "rsv",
-  "y" =  "beta",
-  "fill" = "Taxon_5",
-  "col" = "Taxon_5",
-  "facet_terms" = c("cluster", "Taxon_5"),
-  "facet_scales" = "free_x",
-  "facet_space" = "free_x",
-  "theme_opts" = list(border_size = 0)
-)
-p2 <- ggboxplot(
-  beta_hat %>%
-  data.frame() %>%
-  filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]),
-  plot_opts
-) +
-  labs(y = "beta", fill = "Family") +
-  theme(
-    axis.text.x = element_blank(),
-    strip.text.x = element_blank()
-  )
-
 ## ---- extract_theta ----
 theta_hat <- samples$theta %>%
   melt(
@@ -105,14 +108,40 @@ theta_hat$cluster <- paste("Cluster", theta_hat$cluster)
 theta_hat <- theta_hat %>%
   left_join(sample_info, by = "sample")
 
-## ---- visualize_theta ----
+## ---- visualize_beta ----
+# might want to set prior for more extreme decay
+plot_opts <- list(
+  "x" = "rsv",
+  "y" =  "beta",
+  "fill" = "Taxon_5",
+  "col" = "Taxon_5",
+  "facet_terms" = c("cluster", "Taxon_5"),
+  "facet_scales" = "free_x",
+  "facet_space" = "free_x",
+  "theme_opts" = list(border_size = 0)
+)
+ggboxplot(
+  beta_hat %>%
+  data.frame() %>%
+  filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]),
+  plot_opts
+) +
+  labs(y = "beta", fill = "Family") +
+  theme(
+    axis.text.x = element_blank(),
+    strip.text.x = element_blank(),
+    legend.position = "bottom"
+  )
+
+## ---- visualize_theta_heatmap ----
 plot_opts <- list(
   "x" = "time",
   "y" = "cluster",
   "fill" = "mean(theta)"
 )
-p1 <- ggheatmap(theta_hat, plot_opts)
+ggheatmap(theta_hat, plot_opts)
 
+## ---- visualize_theta_boxplot ----
 plot_opts <- list(
   "x" = "as.factor(time)",
   "y" = "theta",
@@ -123,7 +152,7 @@ plot_opts <- list(
   "facet_terms" = c("cluster", "."),
   "theme_opts" = list("panel_border" = 0.7)
 )
-p1 <- ggboxplot(data.frame(theta_hat), plot_opts) +
+p <- ggboxplot(data.frame(theta_hat), plot_opts) +
   labs(x = "Time") +
   theme(legend.position = "none")
 

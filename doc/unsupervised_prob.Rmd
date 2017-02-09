@@ -24,7 +24,7 @@ chunk_opts <- list(
   cache = FALSE,
   warning = FALSE,
   message = FALSE,
-  eval = TRUE
+  eval = FALSE
 )
 
 opts_chunk$set(chunk_opts)
@@ -984,5 +984,117 @@ summaries of the original data?
 To begin to develop answers to these questions, we reanalyze the data of
 [@dethlefsen2011incomplete], a study of microbial dynamics in response to
 antibiotic treatment. Here, several patients were sampled for several weeks 
+
+### Data Description ###
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r read_lda, eval = TRUE}
+read_chunk("../src/antibiotics-study/lda.R")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r setup, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r get-data, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r histograms, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r heatmaps, eval = TRUE}
+```
+\endgroup
+
+### LDA ###
+
+#### Estimation ####
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r lda, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r extract_beta, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r extract_theta, echo = FALSE, eval = TRUE}
+```
+\endgroup
+
+#### Diagnostics ####
+
+#### Visualization and Interpretation ####
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_beta, eval = TRUE, fig.width = 6.5, fig.height = 5}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_theta_heatmap, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_theta_boxplot, eval = TRUE}
+```
+\endgroup
+
+### Unigram Model ###
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram_setup}
+rm(list = ls())
+read_chunk("../src/antibiotic-study/unigram.R")
+```
+\endgroup
+
+### DTM ###
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm_setup}
+rm(list = ls())
+read_chunk("../src/antibiotic-study/dtm.R")
+```
+\endgroup
+
+### NMF ###
 
 ## References ##
