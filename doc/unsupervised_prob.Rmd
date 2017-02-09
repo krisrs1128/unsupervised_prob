@@ -172,7 +172,7 @@ which also tries to focus interest on subsets of $\simplex^{V}$
 
 LDA can be adapted to incorporate more specific structure. In light of the
 longitudinal nature of many modern microbiome studies, one of the most
-intriguing of these variants is called the Dynamic Topic Model
+intriguing of these variants is called the Dynamic Topic Moderl
 [@blei2006dynamic; @wang2012continuous]. This is discussed in section
 \@ref(sec:dtm) -- here, we describe a related, simpler model, called the Dynamic
 Unigram model, which was also investigated in [@blei2006dynamic].
@@ -764,7 +764,7 @@ same way.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours2, fig.width = 7, fig.height = 4, fig.cap = "The analogous figure , with distributions over $V = 50$ instead of 10 features."}
+```{r betacontours2, fig.width = 7, fig.height = 4, fig.cap = "The analogous figure, with distributions over $V = 50$ instead of 10 features."}
 ```
 \endgroup
 
@@ -907,12 +907,14 @@ these are in Figures \@ref(fig:thetaboxplot1) and \@ref(fig:thetaboxplot2).
 \endgroup
 \elandscape
 
+\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r thetaboxplot2, fig.width = 10, fig.height = 6, echo = FALSE, fig.cap = "The analog of \\@ref(fig:thetaboxplot1), when $D = 100$"}
+```{r thetaboxplot2, fig.width = 10, fig.height = 6, echo = FALSE, fig.cap = "The analogous figure, when $D = 100$"}
 ```
 \endgroup
+\elandscape
 
 Here, each panel gives the posterior for $\theta_{i1}$, within an experimental
 configuration. The index $i$ is specified by the labels across columns. The
@@ -939,11 +941,28 @@ $\beta_{vk}$, increasing $N$ reduced uncertainty, while for estimating
 $\theta_{ik}$, increasing $V$ increases uncertainty.
 
 We conjecture that these differences between estimating topics and mixing
-proportions is a result of the fact that the $\theta_{i}$s are ``local''
+proportions is a result of the fact that the $\theta_{i}$s are "local"
 parameters, whose number grow with the sample size, while the $\beta_{\cdot k}$s
-are ``global'' parameters, whose number are indepenent of sample size.
+are "global" parameters, whose number are indepenent of sample size.
 
 ##### Error Histograms #####
+
+To more directly assess the precision of estimates across methods and
+experimental configurations, we again histogram the discrepancies between
+samples and known simulation values. The increasing narrowness in histograms
+moving from left to right in groups of three reflects increasing sample sizes.
+The last three columns tend to have slightly wider histograms than the the first
+three, corresponding to higher errors for $V = 50$ relative to $V = 10$.
+
+The $V = 10$, $N = 100$, $D = 20$ case has error distributions for the two
+topics that seem to be shifted relative to one another, though we have no
+explanation why this effect only appears here and the $50, 50, 20$ VB case.
+
+Comparing methods, for small $N$ and $D$, MCMC has the widest error histogram,
+followed by VB and the bootstrapping. The width in the MCMC samples errors
+reflects the larger uncertainty in the MCMC posteriors. It is possible that the
+MCMC posterior mean might be more accurate, but we only have a single posterior
+mean for each experimental configuration, so we cannot make this judgement.
 
 \begingroup
 \setstretch{1}
