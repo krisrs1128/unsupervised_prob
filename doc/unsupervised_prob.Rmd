@@ -987,47 +987,90 @@ antibiotic treatment. Here, several patients were sampled for several weeks
 
 ### Data Description ###
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r read_lda, eval = TRUE}
 read_chunk("../src/antibiotics-study/lda.R")
 ```
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r setup, eval = TRUE}
 ```
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r get-data, eval = TRUE}
 ```
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r histograms, eval = TRUE}
 ```
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r heatmaps, eval = TRUE}
 ```
+\endgroup
 
 ### LDA ###
 
 #### Estimation ####
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r lda, eval = TRUE}
 ```
+\endgroup
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r extract_beta, eval = TRUE}
 ```
+\endgroup
 
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r extract_theta, eval = TRUE}
 ```
+\endgroup
+\elandscape
 
 #### Diagnostics ####
 
 #### Visualization and Interpretation ####
 
-```{r visualize_beta, eval = TRUE}
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_beta, eval = TRUE, fig.width = 6.5, fig.height = 5}
 ```
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r visualize_theta, eval = TRUE}
 ```
 
 ### Unigram Model ###
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r unigram_setup}
 rm(list = ls())
 read_chunk("../src/antibiotic-study/unigram.R")
@@ -1035,6 +1078,10 @@ read_chunk("../src/antibiotic-study/unigram.R")
 
 ### DTM ###
 
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r dtm_setup}
 rm(list = ls())
 read_chunk("../src/antibiotic-study/dtm.R")

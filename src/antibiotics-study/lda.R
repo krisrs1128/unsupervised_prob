@@ -93,6 +93,21 @@ sorted_taxa <- names(sort(table(beta_hat$Taxon_5), decreasing = TRUE))
 beta_hat$Taxon_5 <- factor(beta_hat$Taxon_5, levels = sorted_taxa)
 beta_hat$rsv <- factor(beta_hat$rsv, levels = taxa$rsv)
 
+## ---- extract_theta ----
+theta_hat <- samples$theta %>%
+  melt(
+    varnames = c("iteration", "sample", "cluster"),
+    value.name = "theta"
+  )
+
+theta_hat$sample <- rownames(X)[theta_hat$sample]
+sample_info <- sample_data(abt)
+sample_info$sample <- rownames(sample_info)
+theta_hat$cluster <- paste("Cluster", theta_hat$cluster)
+
+theta_hat <- theta_hat %>%
+  left_join(sample_info, by = "sample")
+
 ## ---- visualize_beta ----
 # might want to set prior for more extreme decay
 plot_opts <- list(
@@ -114,32 +129,19 @@ ggboxplot(
   labs(y = "beta", fill = "Family") +
   theme(
     axis.text.x = element_blank(),
-    strip.text.x = element_blank()
+    strip.text.x = element_blank(),
+    legend.position = "bottom"
   )
 
-## ---- extract_theta ----
-theta_hat <- samples$theta %>%
-  melt(
-    varnames = c("iteration", "sample", "cluster"),
-    value.name = "theta"
-  )
-
-theta_hat$sample <- rownames(X)[theta_hat$sample]
-sample_info <- sample_data(abt)
-sample_info$sample <- rownames(sample_info)
-theta_hat$cluster <- paste("Cluster", theta_hat$cluster)
-
-theta_hat <- theta_hat %>%
-  left_join(sample_info, by = "sample")
-
-## ---- visualize_theta ----
+## ---- visualize_theta_heatmap ----
 plot_opts <- list(
   "x" = "time",
   "y" = "cluster",
   "fill" = "mean(theta)"
 )
-p1 <- ggheatmap(theta_hat, plot_opts)
+ggheatmap(theta_hat, plot_opts)
 
+## ---- visualize_theta_boxplot ----
 plot_opts <- list(
   "x" = "as.factor(time)",
   "y" = "theta",
@@ -150,7 +152,7 @@ plot_opts <- list(
   "facet_terms" = c("cluster", "."),
   "theme_opts" = list("panel_border" = 0.7)
 )
-p1 <- ggboxplot(data.frame(theta_hat), plot_opts) +
+ggboxplot(data.frame(theta_hat), plot_opts) +
   labs(x = "Time") +
   theme(legend.position = "none")
 
