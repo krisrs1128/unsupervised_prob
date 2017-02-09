@@ -24,7 +24,7 @@ chunk_opts <- list(
   cache = FALSE,
   warning = FALSE,
   message = FALSE,
-  eval = TRUE
+  eval = FALSE
 )
 
 opts_chunk$set(chunk_opts)
@@ -987,23 +987,49 @@ antibiotic treatment. Here, several patients were sampled for several weeks
 
 ### Data Description ###
 
-```{r read_lda}
-read_chunks("../src/lda.R")
+```{r read_lda, eval = TRUE}
+read_chunk("../src/antibiotics-study/lda.R")
 ```
 
-```{r setup}
+```{r setup, eval = TRUE}
 ```
 
-```{r get-data}
+```{r get-data, eval = TRUE}
 ```
 
-```{r histograms}
+```{r histograms, eval = TRUE}
 ```
 
-```{r heatmaps}
+```{r heatmaps, eval = TRUE}
 ```
 
 ### LDA ###
 
+#### Estimation ####
+
+```{r lda, eval = TRUE}
+```
+
+```{r extract_beta, eval = TRUE}
+```
+
+```{r extract_theta, eval = TRUE}
+```
+
+#### Diagnostics ####
+
+#### Visualization and Interpretation ####
+
+```{r visualize_beta, eval = TRUE}
+```
+
+```{r visualize_theta, eval = TRUE}
+```
+
+### Unigram Model ###
+
+### DTM ###
+
+### NMF ###
 
 ## References ##

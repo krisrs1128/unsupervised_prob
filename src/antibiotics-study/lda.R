@@ -22,9 +22,8 @@ set.seed(11242016)
 # Code Block -------------------------------------------------------------------
 ## ---- get-data ----
 data(abt)
-n_samples <- ncol(otu_table(abt))
 abt <- abt %>%
-  filter_taxa(function(x) sum(x != 0) > .4 * n_samples, prune = TRUE) %>%
+  filter_taxa(function(x) sum(x != 0) > .4 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "D")
 
 ## ---- histograms ---
@@ -61,8 +60,8 @@ ggheatmap(
   min_theme(list(text_size = 0))
 
 ## ----  lda ----
-m <- stan_model(file = "lda_counts.stan")
-X <- asinh(t(otu_table(abt)@.Data))
+m <- stan_model(file = "../src/stan/lda_counts.stan")
+X <- asinh(get_taxa(abt))
 X[] <- as.integer(round(X, 2) * 100)
 
 stan_data <- list(
@@ -106,7 +105,7 @@ plot_opts <- list(
   "facet_space" = "free_x",
   "theme_opts" = list(border_size = 0)
 )
-p2 <- ggboxplot(
+ggboxplot(
   beta_hat %>%
   data.frame() %>%
   filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]),
