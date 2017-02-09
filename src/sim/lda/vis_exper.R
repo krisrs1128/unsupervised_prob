@@ -18,11 +18,12 @@ library("rstan")
 library("ggplot2")
 library("ggscaffold")
 source("../src/sim/lda/vis_utils.R")
+base_dir <- "../src/sim/lda"
 
 ## ---- paths ----
-output_path <- "/scratch/users/kriss1/output/boot_expers"
+output_path <- file.path(base_dir, "..", "..", "..", "data", "fits", "lda-sim")
 metadata <- fread(file.path(output_path, "metadata.csv")) %>%
-  unique() 
+  unique()
 
 ## ---- beta-samples ----
 beta <- get_truth_data(metadata, "beta") %>%
@@ -44,23 +45,8 @@ combined <- mcombined %>%
   unite(temp, type, dimension) %>%
   spread(temp, value)
 
-## ---- beta-boxplots-object ----
-unique_V <- unique(mcombined$V)
-p <- list()
-for (i in seq_along(unique_V)) {
-  p[[i]] <- experiment_boxplots(
-    mcombined %>%
-    filter_(sprintf("V == %s", unique_V[i]))
-  )
-}
-
-## ---- betaboxplot1 ----
-p[[1]]
-
-## ---- betaboxplot2 ----
-p[[2]]
-
 ## ---- beta-contours-object ----
+unique_V <- unique(mcombined$V)
 p <- list()
 for (i in seq_along(unique_V)) {
   p[[i]] <- experiment_contours(
@@ -76,10 +62,61 @@ p[[1]]
 p[[2]]
 
 ## ---- betahistograms ----
-error_histograms(mcombined, c("method + V", "D + N"))
+error_histograms(mcombined, c("V + method", "D + N"))
+
+## ---- beta-boxplots-object ----
+p <- list()
+for (i in seq_along(unique_V)) {
+  p[[i]] <- experiment_boxplots(
+    mcombined %>%
+    filter_(sprintf("V == %s", unique_V[i]))
+  )
+}
+
+## ---- betaboxplot1 ----
+p[[1]]
+
+## ---- betaboxplot2 ----
+p[[2]]
 
 ## ---- theta-samples ----
-theta <- get_truth_data(metadata, "theta", "i")
-combined <- get_samples(metadata, "theta", c("iteration", "variable", "k"))  %>%
+theta <- get_truth_data(metadata, "theta", "i") %>%
+  rename(variable = i)
+combined <- get_samples(metadata, "theta", c("iteration", "variable", "k")) %>%
   full_join(get_bootstraps(metadata, "theta", "i")) %>%
   left_join(theta)
+
+## ---- theta-alignment ----
+mcombined <- melt_reshaped_samples(combined)
+mcombined <- rbind(
+  align_posteriors(mcombined %>% filter(method %in% c("vb", "gibbs"))),
+  align_bootstraps(mcombined %>% filter(method == "bootstrap"))
+)
+
+combined <- mcombined %>%
+  gather(type, value, truth, estimate) %>%
+  unite(temp, type, dimension) %>%
+  spread(temp, value)
+
+## ---- theta-boxplot-object ----
+unique_D <- unique(mcombined$D)
+p <- list()
+for (i in seq_along(unique_D)) {
+  p[[i]] <- experiment_boxplots(
+    mcombined %>%
+    filter_(sprintf("D == %s", unique_D[i]), "dimension == 1")
+  ) +
+    facet_grid(
+      N + V ~ variable,
+      scale = "free_x"
+    )
+}
+
+## ---- thetaboxplot1 ----
+p[[1]]
+
+## ---- thetaboxplot2 ----
+p[[2]]
+
+## ---- thetahistograms ----
+error_histograms(mcombined, c("D + method", "V + N"))

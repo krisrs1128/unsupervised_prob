@@ -15,7 +15,7 @@ source(file.path(base_dir, "nmf_utils.R"))
 
 ## ---- theta-reshape ----
 ## extract theta information from the fits
-fits_dir <- file.path("..", "data", "fits")
+fits_dir <- file.path("..", "data", "fits", "nmf-sim")
 fits <- list.files(fits_dir, "fit-*", full.names = TRUE)
 expers <- fromJSON(
   file.path(base_dir, "config.json"),

@@ -1,6 +1,6 @@
 ---
 documentclass: report
-title: "Evalfuating Unsupervised Probabilistic Models of the Microbiome"
+title: "Evaluating Unsupervised Probabilistic Models of the Microbiome"
 date: "`r Sys.Date()`"
 keep-tex: true
 output:
@@ -31,7 +31,7 @@ opts_chunk$set(chunk_opts)
 ```
 \endgroup
 
-# Context #
+## Context ##
 
 Generally, microbiome studies attempt to characterize variation in microbial
 abundance profiles across different experimental conditions
@@ -51,7 +51,7 @@ would be different compared to if those microbes were not related to one
 another. Further, metagenomic or proteomic data can often supplement raw
 microbial abundance data, providing functional context.
 
-## Data Description ##
+### Data Description ###
 
 In this study, we focus on 16S sequencing data, one of the original approaches
 to quantifying microbial abundances, and still one of the most common protocols
@@ -77,7 +77,7 @@ typically variation in sequencing depth. Hence, there is often better precision
 in the estimates for some samples than for others. This difference is often
 explicitly modeled [@mcmurdie2014waste; @love2014differential; @ren2016bayesian]
 
-## Statistical Background ##
+### Statistical Background ###
 
 We now review a few of the statistical modeling techniques that we believe can
 be useful building blocks when performing microbiome analysis. Many of these
@@ -92,7 +92,7 @@ Further, we expect these methods to only be the starting point for more
 sophisticated analysis -- in fact, the extensibility and modularity of these
 methods are some of their most attractive features.
 
-### Latent Dirichlet Allocation ###
+#### Latent Dirichlet Allocation ####
 
 Latent Dirichlet Allocation (LDA) is a generalization of multinomial mixture
 modeling applicable to count matrices. We adopt the usual topic modeling
@@ -154,7 +154,7 @@ $\beta_{\cdot k}$ with a point on the $V$-dimensional simplex. Then the
 expectation of the distribution over terms for the $d^{th}$ document, $\beta
 \theta_{d}$ is a new point between the different $\beta_{\cdot k}$, with more
 attraction towards those $\beta_{\cdot k}$ where $\theta_{dk}$ are large. See
-Figure \ref{fig:simplex_lda}. That is, a collection of samples are modeled as
+Figure \@ref(fig:simplex_lda). That is, a collection of samples are modeled as
 points lying anywhere between the $K$ latent topics. This is in contrast to
 multinomial mixture modeling, which identifies each sample with one of the $K$
 points $\beta_{\cdot k}$, but similar in spirit to Correspondence Analysis,
@@ -168,11 +168,11 @@ which also tries to focus interest on subsets of $\simplex^{V}$
 \label{fig:simplex_lda}
 \end{figure}
 
-## Dynamic Unigrams ##
+### Dynamic Unigrams ###
 
 LDA can be adapted to incorporate more specific structure. In light of the
 longitudinal nature of many modern microbiome studies, one of the most
-intriguing of these variants is called the Dynamic Topic Model
+intriguing of these variants is called the Dynamic Topic Moderl
 [@blei2006dynamic; @wang2012continuous]. This is discussed in section
 \@ref(sec:dtm) -- here, we describe a related, simpler model, called the Dynamic
 Unigram model, which was also investigated in [@blei2006dynamic].
@@ -217,7 +217,7 @@ That is, while LDA can be thought of a modification of latent factor modeling to
 counts, the dynamic unigrams model can be thought of as the corresponding
 variant of nonparametric smoothing.
 
-## Dynamic Topic Models {#sec:dtm}
+### Dynamic Topic Models {#sec:dtm}
 
 Unlike LDA, there is no notion of underlying topics in the Dynamic Unigrams
 Model, but blending the two modeling ideas leads straightforwardsly to the
@@ -247,7 +247,7 @@ unigrams, because the documents mixing proportions are closer to being fixed
 while the topics evolve. Conversely, large ratios $\frac{\delta}{\sigma}$ bring
 us closer to LDA, with samples mixing across more or less fixed topics.
 
-## Nonnegative Matrix Factorization ##
+### Nonnegative Matrix Factorization ###
 
 Consider the samples by microbe matrix, $N \in \reals^{D \times V}$ made from
 counts $n_{dv}$. In LDA, these counts are modeled by sampling from a
@@ -310,7 +310,7 @@ y_{ij} > 0.
 \end{cases}
 \end{align*}
 
-## Probabilistic Programming ## 
+### Probabilistic Programming ###
 
 Probabilistic programming tools provide generic interfaces to constructing
 Bayesian samplers [@plummer2003jags, @carpenter2016stan,
@@ -351,7 +351,7 @@ can be a time-consuming and error-prone process. All simulation and data
 analysis results described in this report have been implemented in STAN and are
 available at (todo: central repo).
 
-# Simulation Studies #
+## Simulation Studies ##
 
 It can be liberating to have easy access to such a variety of modeling
 strategies for any given data analysis problem. However, with this increased
@@ -371,7 +371,7 @@ reflect the diversity of data analysis settings that arise in practice. We
 choose a few situations we find interesting, but there are many other situations
 worth investigating.
 
-## NMF ##
+### NMF {#sec:nmf_sim} ###
 
 \begingroup
 \setstretch{1}
@@ -479,7 +479,7 @@ is small but consistent, especially in Gibbs Sampling.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas, fig.height = 6, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```{r visualizethetas, fig.height = 4, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
 ```
 \endgroup
 
@@ -519,7 +519,7 @@ increases.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetas, fig.height = 6, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+```{r visualizebetas, fig.height = 4, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
 ```
 \endgroup
 
@@ -542,7 +542,7 @@ access to the same number of samples across regimes.
 ```
 \endgroup
 
-## Zero-inflated NMF ##
+### Zero-inflated NMF ###
 
 Now we examine the effect of zero inflation on estimation of the $\theta_{i}$
 and $\beta_{v}$. Our interest revolves around two questions,
@@ -605,7 +605,7 @@ Z-GaP models.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfbetas, fig.height = 8, fig.width = 8, fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
+```{r visualizezinfbetas, fig.height = 6, fig.width = 6, fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
 ```
 \endgroup
 
@@ -616,10 +616,80 @@ Z-GaP models.
 ```
 \endgroup
 
+### LDA ###
+
+Here, we consider an analogous experiment to evaluate inference in the LDA
+model. We again consider several data generation regimes, varying
+
+* $D$: The number of samples.
+* $V$: The number of features.
+* $N$: The total count within each sample.
+
+We do not vary the total number of topics or the Dirichlet hyperparameter
+strength. Further, we always assume the model is corretly specified before doing
+inference. Nonetheless, even in this relatively restricted setting, we find
+certain observations worth sharing.
+
+In addition to comparing MCMC sampling with VB inference, we consider a
+parametric bootstrap approach to generating confidence sets. In this approach,
+we perform an initial VB fit to obtain posterior mean $\hat{\theta}$ and
+$\hat{\beta}$. Then, $B$ samples are simulated from an LDA model with these
+parameters, and separate VB fits are computed for each of these. We consider
+this approach in light of the suspicion (confirmed in the simulation) that VB
+typically underestimates the variance of fits, but that MCMC sampling is harder
+to parallelize than bootstrapping. The hope then would be that bootstrapping
+offers the best of both world -- the speed of VB with the accuracy of MCMC. We
+discuss whether our simulation study substantiats this idea below.
+
+We take $D \in \{20, 100\}$, $V \in \{10, 50\}$ and $N \in \{20, 50, 100\}$ and
+then simulate under all 12 combinations of these three parameters. Throughout,
+we fix $\alpha_{0} = \gamma_{0} = 1$ and $K = 2$. With these parameters, we aim
+to characterize performance of different inferential techniques under different
+signal-to-noise regimes, but avoid any investigation of robustness.
+
+#### Implementation ####
+
+This section describes ideas used to streamline the practical implementation of
+the simulation study. The remaining sections, focusing more on statistical
+consequences of the simulation, can be read independently. We believe that some
+of the techniques used in this simulation could be useful in a more general
+context, however, and so ar worth discussing.
+
+The main source complexity in the simulation study are the dependencies between
+different data generation and fitting procedures. For example, the bootstrapping
+approach requires the initial VB fit for the given experimental configuration be
+available, which itself requires that data from the associated LDA model is
+already simulated. In addition to this dependence between simulation tasks, it
+is desirable to parallelize as much as possible. For example, different
+experimental configurations can be run independently. There are also
+intermediate cases, where some parts of the pipeline can be parallelized, but
+the rest cannot be -- consider simulating data from the same underlying
+$\theta_{i}$ and $\beta_{k}$, but with different numbers of words per document
+$N$.
+
+In data engineering, it is common to think of data processing and modeling
+pipelines with nontrivial structure as directed acyclic graphs. We adopt this
+point of view in our simulations, encoding the task depednence structure using
+the Luigi library [@leipzig2016review], which then manages parallelization and
+execution order of the necessary simulation tasks. The full graph is displayed
+in Figure \ref{fig:luigi_pipeline}.
+
+A further advantage of this framework is that new experiments can make use of
+simulation output from earlier ones. For example, new models can be run on
+previously generated data sets, without recreating them\footnote{By setting
+seeds at every potential source of randomness, resimulating data would not lead
+to any change in the resulting data set. The downside of this approach is lack
+of computational efficiency, not experimental validity.}
+
+#### Topics $\beta_{\cdot k}$ ####
+
+The code below retrieves the output from the simulation experiments and prepares
+them for visualization.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r read-boot-expers, eval = TRUE}
+```{r read-boot-expers}
 read_chunk("../src/sim/lda/vis_exper.R")
 ```
 \endgroup
@@ -627,64 +697,292 @@ read_chunk("../src/sim/lda/vis_exper.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r libraries-boot-expers, eval = TRUE}
+```{r libraries-boot-expers}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r paths, eval = TRUE}
+```{r paths}
+```
+\endgroup
+
+##### Posterior Scatterplots #####
+
+The results of this simulation are summarized in Figures \@ref(betacontours1)
+through \@ref(betahistograms). Note that topics have been heuristically aligned
+across all samples, to avoid the label-switching problem\footnote{Specifically,
+we take the correlation between fitted and true topic vectors, and first
+identify the fitted and true topic with highest correlation. Among the remaining
+topics, we align those with the next highest correlation, and so on.}.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r beta-samples}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-samples, eval = TRUE}
+```{r beta-alignment}
+```
+\endgroup
+
+Figure \@ref(betacountours1) displays the true and posterior $\beta_{k}$ for the
+experiments with $V = 10$ features, while other simulation characteristics are
+varied. As before, each panel represents a single experimental configuration,
+with two axes associated with the two underlying topics. Each black number $v$
+is the true value of feature $v$ across topics: $\left(\beta_{v1},
+\beta_{v2}\right)$. The shaded clouds are sampled posteriors, while the orange
+labels give posterior means.
+
+Across rows, different inferential procedures are compared -- \texttt{bootstrap}
+refers to the bootstrap-after-variational bayes scheme, \texttt{gibbs} is MCMC
+sampling, and \texttt{vb} is variational bayes. Across columns we vary $D$, the
+total number of samples, and $N$, the total count within each sample. In
+particular, across the first and last three columns, the true $\beta_{vk}$
+values remain unchanged. Figure \@ref(fig:betacontours2) is read in exactly the
+same way.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r beta-contours-object}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-alignment, eval = TRUE}
+```{r betacontours1, fig.width = 7, fig.height = 4, fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10$ features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
 ```
 \endgroup
 
-```{r beta-contours-object, eval = TRUE}
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betacontours2, fig.width = 7, fig.height = 4, fig.cap = "The analogous figure, with distributions over $V = 50$ instead of 10 features."}
 ```
+\endgroup
 
-```{r betacontours1, fig.width = 7, fig.height = 4, eval = TRUE}
-```
+A few comments are in order. As expected, when $D$ increases, i.e., more samples
+are made available, the posterior for $\beta$, whose dimension do not increase
+with $D$, begins to concentrate around its true value. It is unclear whether the
+rate of concentration when $V = 50$ is much different from the case where $V =
+10$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
+could result from their being more fitted parameter values being displayed in
+the same space, though see \@ref(fig:betahistograms) for more clarity on this
+point.
 
-```{r betacontours2, fig.width = 7, fig.height = 4, eval = TRUE}
-```
+Consistent with earlier findings, the VB posteriors are generally lower variance
+and more elliptical than the true MCMC sampled posteriors. The bootstrap samples
+seem somewhere between the VB and MCMC sampled distributions in terms of
+variablity within each feature. As the number of samples or number of words
+within samples increases, the three methods become indistinguishable.
 
-```{r beta-boxplots-object, eval = TRUE}
+Interestingly, when $D$ and $N$ are small ($N = D =20$), VB appears more
+accurate than either the MCMC or bootstrapping approaches, whose posterior means
+all lie along the diagonal, corresponding to topics that both reflect the global
+marginal feature counts across samples. This effect is especially pronounced in
+the case $V = 50$. Here, even the $D = 20, N = 50$ configuration seems to lead
+to result in inference issues for the bootstrap. We have no explanation for this
+phenomenon.
+
+##### Alternative Visualization #####
+
+The scatterplots presented above are informative in the case that $K = 2$, but
+for larger $K$, it becomes unwieldy to display all $K \choose 2$ pairs of
+topics as scatterplots. We provide two alternative visualizations that are
+better adapted to this situation: error histograms, like those in Section
+\@ref(sec:nmf_sim), and faceted boxplots.
+
+The error histograms are given in Figure \@ref(fig:betahistograms). In each
+panel, there are two overlapping histograms -- one orange and one purple --
+representing the errors, on a square-root scale, for the two topics. Rows
+index different fitting methods and numbers of features $V$, while columns index
+different $D$ (first row of labels) and $N$ (second row of labels).
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betahistograms, fig.height = 6, fig.cap = "Histograms of the difference between sampled topic parameters and their true values, across experimental configurations."}
 ```
+\endgroup
+
+Compared to the NMF simulation, the histograms look less strongly like mixture
+distributions. Further, the tails seems somewhat lighter -- only MCMC with small
+sample sizes has large tails.
+
+As expected, for fixed $D$, as $N$ increases, the errors become more
+concentrated around 0, and when $D$ is larger, this concentration is apparent
+even for smaller $N$. All three methods seem equivalent in larger sample sizes.
+When fewer samples are available, the error distributions are widest for MCMC,
+though the bootstrap distributions are similarly shaped, only with lighter
+tails. The VB distributions are more irregularly shaped, not necessarily
+symmetric around zero, and with substantial lack of overlap between topic
+dimensions.
+
+An alternative view, which does not require looking only at errors, is given in
+Figures \@ref(fig:betaboxplot1) and \@ref(fig:betaboxplot2), which are the
+boxplot analogs of Figures \@ref(fig:betacontours1) and
+@\ref(fig:betacontours2), respectively. Within each panel, the posteriors for a
+single topic are represented by boxplots, with different colors corresponding to
+different inferential methods. Further, the true value for that parameter is
+given by a grey horizontal line.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r beta-boxplots-object}
+```
+\endgroup
+
 \blandscape
-```{r betaboxplot1, fig.width = 10, fig.height = 4.5, eval = TRUE}
+```{r betaboxplot1, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$.", echo = FALSE}
 ```
 \elandscape
 
 \blandscape
-```{r betaboxplot2, fig.width = 10, fig.height = 4.5, eval = TRUE}
+```{r betaboxplot2, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samles, when $V = 50$.", echo = FALSE}
 ```
 \elandscape
+ 
+Different columns index different features -- in Figure \@ref(fig:betaboxplot1),
+$V = 10$, while in Figure \@ref(fig:betaboxplot2), $V = 50$. Rows index
+different topics and experimental configurations. From inside out, the $y$-axis
+facet labels give $K$, $N$, and $D$, respectively. Note that the true values are
+not the same across experimental configurations, due to the simulation setup.
+
+The takeaways from these views of the simulation experiment are consistent with
+all others so far. One pattern that is not obvious from the other displays is
+that MCMC sampling can lead to posteriors with high skewness in the case that a
+parameter is close to one of the endpoints of its domain (0 or 1, in this case). 
+
+#### Mixing Proportions $\theta_{i}$ ####
+
+For completeness, we can perform a similar analyis on the recovered mixing
+proportions $\left(\theta_{i}\right)$. The block below combines output saved
+from different experimental configurations, in order to simplify visualization
+below.
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betahistograms, eval = TRUE, fig.height = 6}
+```{r theta-samples}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r theta-samples, eval = FALSE}
+```{r theta-alignment}
 ```
 \endgroup
 
-# References #
+##### Posterior Boxplots #####
+
+Across our simulation, we have fixed the number of topics $K = 2$. Since, for
+each sample $i$, $\theta_{i1} + \theta_{i2} = 1$, scatterplots like those in
+Figures \@ref(fig:betacontours1) and \@ref(fig:betacontours2) are not
+appropriate -- there is only one degree of freedom. Instead, we first provide
+the analogs of Figures \@ref(fig:betaboxplot1) and \@ref(fig:betaboxplot2);
+these are in Figures \@ref(fig:thetaboxplot1) and \@ref(fig:thetaboxplot2).
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r theta-boxplot-object}
+```
+\endgroup
+
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetaboxplot1, fig.width = 10, fig.height = 6, echo = FALSE, fig.cap = "Estimated and true proportions $\\theta_{i1}$ across samples, for simulations where $D = 20$."}
+```
+\endgroup
+\elandscape
+
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetaboxplot2, fig.width = 10, fig.height = 6, echo = FALSE, fig.cap = "The analogous figure, when $D = 100$"}
+```
+\endgroup
+\elandscape
+
+Here, each panel gives the posterior for $\theta_{i1}$, within an experimental
+configuration. The index $i$ is specified by the labels across columns. The
+three columns of labels for panels along the $y$-axis give $N$, the total count
+within each sample, and $V$, the number of measured features. Transparent
+horizontal bars specify the true value $\theta_{i1}$ in each configuration.
+
+Increases in sample size are reflected in the narrowing of boxplots and closer
+agreement between methods. As before, MCMC sampling outputs posteriors
+specifying higher uncertainty, and bootstrapping and MCMC tend to agree with
+each other more closely in the small sample size situation.
+
+Some patterns emerge in estimation of the $\theta_{i}$s that were not apparent
+when estimating the $\beta_{\cdot k}$s. First, estimation can be very biased
+for some coordinates, especially when $N$ is small, but even for many
+coordinates when $N$ is large. Generally this bias generally tends to pull
+coordinates towards the prior, making the estimated $\theta_{i1}$s flatter
+across $i$s. Second, VB behaves quite differently from MCMC and the bootstrap
+when $N$ is small, sometimes better (column 15 in row 1) and sometimes worse
+(column 6 in row 1). We also notice that when $V$ is larger, the uncertainty in
+estimated $\theta_{i}$ increases, perhaps because estimation of the underlying
+topics deteriorates. In this sense, LDA is not transposable -- when estimating
+$\beta_{vk}$, increasing $N$ reduced uncertainty, while for estimating
+$\theta_{ik}$, increasing $V$ increases uncertainty.
+
+We conjecture that these differences between estimating topics and mixing
+proportions is a result of the fact that the $\theta_{i}$s are "local"
+parameters, whose number grow with the sample size, while the $\beta_{\cdot k}$s
+are "global" parameters, whose number are indepenent of sample size.
+
+##### Error Histograms #####
+
+To more directly assess the precision of estimates across methods and
+experimental configurations, we again histogram the discrepancies between
+samples and known simulation values. The increasing narrowness in histograms
+moving from left to right in groups of three reflects increasing sample sizes.
+The last three columns tend to have slightly wider histograms than the the first
+three, corresponding to higher errors for $V = 50$ relative to $V = 10$.
+
+The $V = 10$, $N = 100$, $D = 20$ case has error distributions for the two
+topics that seem to be shifted relative to one another, though we have no
+explanation why this effect only appears here and the $50, 50, 20$ VB case.
+
+Comparing methods, for small $N$ and $D$, MCMC has the widest error histogram,
+followed by VB and the bootstrapping. The width in the MCMC samples errors
+reflects the larger uncertainty in the MCMC posteriors. It is possible that the
+MCMC posterior mean might be more accurate, but we only have a single posterior
+mean for each experimental configuration, so we cannot make this judgement.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetahistograms}
+```
+\endgroup
+
+## Data Analysis Case Studies ##
+
+In applying probabilistic methods to practical microbiome data analysis, two
+questions immediately come to mind,
+
+1. Do these models fit well to the raw or preprocessed data, and what techniques
+are available for evaluating model fit?
+2. Supposing these models fit well, do they lend themselves to informative
+summaries of the original data?
+
+To begin to develop answers to these questions, we reanalyze the data of
+[@dethlefsen2011incomplete], a study of microbial dynamics in response to
+antibiotic treatment. Here, several patients were sampled for several weeks 
+
+## References ##
