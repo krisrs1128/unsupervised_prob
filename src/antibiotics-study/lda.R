@@ -15,7 +15,7 @@ library("dplyr")
 library("ggplot2")
 library("phyloseq")
 library("treelapse")
-library("ggsscaffold")
+library("ggscaffold")
 library("feather")
 set.seed(11242016)
 
@@ -26,11 +26,36 @@ n_samples <- ncol(otu_table(abt))
 abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .4 * n_samples, prune = TRUE) %>%
   subset_samples(ind == "D")
-hist(colSums(otu_table(abt)), 15)
+
+## ---- 
+transformed_counts <- data.frame(
+  count = c(get_taxa(abt), asinh(get_taxa(abt))),
+  transformation = c(
+    rep("original", ntaxa(abt) * nsamples(abt)),
+    rep("asinh", ntaxa(abt) * nsamples(abt))
+  )
+)
+
+ggplot(transformed_counts) +
+  geom_histogram(aes(x = count)) +
+  facet_grid(. ~ transformation, scale = "free_x") +
+  min_theme(list(text_size = 8, subtitle_size = 12))
 
 ## ---- heatmaps ----
-heatmap(otu_table(abt))
-heatmap(asinh(otu_table(abt)))
+y_order <- names(sort(taxa_sums(abt)))
+x_order <- names(sort(sample_sums(abt)))
+ggheatmap(
+  get_taxa(abt) %>%
+  melt(value.name = "fill", varnames = c("y", "x")),
+  list("x_order" = x_order, "y_order" = y_order)
+) +
+  min_theme(list(text_size = 0))
+ggheatmap(
+  asinh(get_taxa(abt)) %>%
+  melt(value.name = "fill", varnames = c("y", "x")),
+  list("x_order" = x_order, "y_order" = y_order)
+) +
+  min_theme(list(text_size = 0))
 
 ## ----  lda ----
 m <- stan_model(file = "lda_counts.stan")
