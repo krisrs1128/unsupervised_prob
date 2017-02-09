@@ -72,7 +72,7 @@ stan_data <- list(
   alpha = rep(1e-10, 4)
 )
 
-stan_fit <- vb(m, stan_data, eta = .1, adapt_engaged = FALSE, grad_samples = 1, iter = 2000)
+stan_fit <- sampling(m, stan_data, iter = 2000, chains = 1)
 samples <- rstan::extract(stan_fit)
 
 ## ---- extract_beta ----
@@ -152,7 +152,7 @@ plot_opts <- list(
   "facet_terms" = c("cluster", "."),
   "theme_opts" = list("panel_border" = 0.7)
 )
-ggboxplot(data.frame(theta_hat), plot_opts) +
+p <- ggboxplot(data.frame(theta_hat), plot_opts) +
   labs(x = "Time") +
   theme(legend.position = "none")
 

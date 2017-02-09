@@ -1041,14 +1041,12 @@ read_chunk("../src/antibiotics-study/lda.R")
 ```
 \endgroup
 
-\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r extract_theta, eval = TRUE}
+```{r extract_theta, echo = FALSE, eval = TRUE}
 ```
 \endgroup
-\elandscape
 
 #### Diagnostics ####
 
@@ -1059,12 +1057,21 @@ read_chunk("../src/antibiotics-study/lda.R")
 \fontsize{8pt}{8pt}
 ```{r visualize_beta, eval = TRUE, fig.width = 6.5, fig.height = 5}
 ```
+\endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_theta, eval = TRUE}
+```{r visualize_theta_heatmap, eval = TRUE}
 ```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_theta_boxplot, eval = TRUE}
+```
+\endgroup
 
 ### Unigram Model ###
 
@@ -1075,9 +1082,9 @@ read_chunk("../src/antibiotics-study/lda.R")
 rm(list = ls())
 read_chunk("../src/antibiotic-study/unigram.R")
 ```
+\endgroup
 
 ### DTM ###
-
 
 \begingroup
 \setstretch{1}
@@ -1086,6 +1093,7 @@ read_chunk("../src/antibiotic-study/unigram.R")
 rm(list = ls())
 read_chunk("../src/antibiotic-study/dtm.R")
 ```
+\endgroup
 
 ### NMF ###
 
