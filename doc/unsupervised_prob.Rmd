@@ -31,7 +31,7 @@ opts_chunk$set(chunk_opts)
 ```
 \endgroup
 
-# Context #
+## Context ##
 
 Generally, microbiome studies attempt to characterize variation in microbial
 abundance profiles across different experimental conditions
@@ -51,7 +51,7 @@ would be different compared to if those microbes were not related to one
 another. Further, metagenomic or proteomic data can often supplement raw
 microbial abundance data, providing functional context.
 
-## Data Description ##
+### Data Description ###
 
 In this study, we focus on 16S sequencing data, one of the original approaches
 to quantifying microbial abundances, and still one of the most common protocols
@@ -77,7 +77,7 @@ typically variation in sequencing depth. Hence, there is often better precision
 in the estimates for some samples than for others. This difference is often
 explicitly modeled [@mcmurdie2014waste; @love2014differential; @ren2016bayesian]
 
-## Statistical Background ##
+### Statistical Background ###
 
 We now review a few of the statistical modeling techniques that we believe can
 be useful building blocks when performing microbiome analysis. Many of these
@@ -92,7 +92,7 @@ Further, we expect these methods to only be the starting point for more
 sophisticated analysis -- in fact, the extensibility and modularity of these
 methods are some of their most attractive features.
 
-### Latent Dirichlet Allocation ###
+#### Latent Dirichlet Allocation ####
 
 Latent Dirichlet Allocation (LDA) is a generalization of multinomial mixture
 modeling applicable to count matrices. We adopt the usual topic modeling
@@ -154,7 +154,7 @@ $\beta_{\cdot k}$ with a point on the $V$-dimensional simplex. Then the
 expectation of the distribution over terms for the $d^{th}$ document, $\beta
 \theta_{d}$ is a new point between the different $\beta_{\cdot k}$, with more
 attraction towards those $\beta_{\cdot k}$ where $\theta_{dk}$ are large. See
-Figure \ref{fig:simplex_lda}. That is, a collection of samples are modeled as
+Figure \@ref(fig:simplex_lda). That is, a collection of samples are modeled as
 points lying anywhere between the $K$ latent topics. This is in contrast to
 multinomial mixture modeling, which identifies each sample with one of the $K$
 points $\beta_{\cdot k}$, but similar in spirit to Correspondence Analysis,
@@ -168,7 +168,7 @@ which also tries to focus interest on subsets of $\simplex^{V}$
 \label{fig:simplex_lda}
 \end{figure}
 
-## Dynamic Unigrams ##
+### Dynamic Unigrams ###
 
 LDA can be adapted to incorporate more specific structure. In light of the
 longitudinal nature of many modern microbiome studies, one of the most
@@ -217,7 +217,7 @@ That is, while LDA can be thought of a modification of latent factor modeling to
 counts, the dynamic unigrams model can be thought of as the corresponding
 variant of nonparametric smoothing.
 
-## Dynamic Topic Models {#sec:dtm}
+### Dynamic Topic Models {#sec:dtm}
 
 Unlike LDA, there is no notion of underlying topics in the Dynamic Unigrams
 Model, but blending the two modeling ideas leads straightforwardsly to the
@@ -247,7 +247,7 @@ unigrams, because the documents mixing proportions are closer to being fixed
 while the topics evolve. Conversely, large ratios $\frac{\delta}{\sigma}$ bring
 us closer to LDA, with samples mixing across more or less fixed topics.
 
-## Nonnegative Matrix Factorization ##
+### Nonnegative Matrix Factorization ###
 
 Consider the samples by microbe matrix, $N \in \reals^{D \times V}$ made from
 counts $n_{dv}$. In LDA, these counts are modeled by sampling from a
@@ -310,7 +310,7 @@ y_{ij} > 0.
 \end{cases}
 \end{align*}
 
-## Probabilistic Programming ## 
+### Probabilistic Programming ###
 
 Probabilistic programming tools provide generic interfaces to constructing
 Bayesian samplers [@plummer2003jags, @carpenter2016stan,
@@ -351,7 +351,7 @@ can be a time-consuming and error-prone process. All simulation and data
 analysis results described in this report have been implemented in STAN and are
 available at (todo: central repo).
 
-# Simulation Studies #
+## Simulation Studies ##
 
 It can be liberating to have easy access to such a variety of modeling
 strategies for any given data analysis problem. However, with this increased
@@ -371,7 +371,7 @@ reflect the diversity of data analysis settings that arise in practice. We
 choose a few situations we find interesting, but there are many other situations
 worth investigating.
 
-## NMF {#sec:nmf_sim}
+### NMF {#sec:nmf_sim} ###
 
 \begingroup
 \setstretch{1}
@@ -542,7 +542,7 @@ access to the same number of samples across regimes.
 ```
 \endgroup
 
-## Zero-inflated NMF ##
+### Zero-inflated NMF ###
 
 Now we examine the effect of zero inflation on estimation of the $\theta_{i}$
 and $\beta_{v}$. Our interest revolves around two questions,
@@ -616,7 +616,7 @@ Z-GaP models.
 ```
 \endgroup
 
-## LDA ##
+### LDA ###
 
 Here, we consider an analogous experiment to evaluate inference in the LDA
 model. We again consider several data generation regimes, varying
@@ -643,11 +643,11 @@ discuss whether our simulation study substantiats this idea below.
 
 We take $D \in \{20, 100\}$, $V \in \{10, 50\}$ and $N \in \{20, 50, 100\}$ and
 then simulate under all 12 combinations of these three parameters. Throughout,
-we fix $alpha_{0} = \gamma_{0} = 1$ and $K = 2$. With these parameters, we aim
+we fix $\alpha_{0} = \gamma_{0} = 1$ and $K = 2$. With these parameters, we aim
 to characterize performance of different inferential techniques under different
 signal-to-noise regimes, but avoid any investigation of robustness.
 
-### Implementation ###
+#### Implementation ####
 
 This section describes ideas used to streamline the practical implementation of
 the simulation study. The remaining sections, focusing more on statistical
@@ -681,11 +681,10 @@ seeds at every potential source of randomness, resimulating data would not lead
 to any change in the resulting data set. The downside of this approach is lack
 of computational efficiency, not experimental validity.}
 
-### Recovered Topics ###
+#### Topics $\beta_{\cdot k}$ ####
 
-#### Setup ####
-
-The code below retrieves the output from the simulation experiments.
+The code below retrieves the output from the simulation experiments and prepares
+them for visualization.
 
 \begingroup
 \setstretch{1}
@@ -709,7 +708,7 @@ read_chunk("../src/sim/lda/vis_exper.R")
 ```
 \endgroup
 
-#### Posterior Scatterplots ####
+##### Posterior Scatterplots #####
 
 The results of this simulation are summarized in Figures \@ref(betacontours1)
 through \@ref(betahistograms). Note that topics have been heuristically aligned
@@ -792,7 +791,7 @@ the case $V = 50$. Here, even the $D = 20, N = 50$ configuration seems to lead
 to result in inference issues for the bootstrap. We have no explanation for this
 phenomenon.
 
-#### Alternative Visualization ####
+##### Alternative Visualization #####
 
 The scatterplots presented above are informative in the case that $K = 2$, but
 for larger $K$, it becomes unwieldy to display all $K \choose 2$ pairs of
@@ -842,15 +841,15 @@ given by a grey horizontal line.
 \endgroup
 
 \blandscape
-```{r betaboxplot1, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$."}
+```{r betaboxplot1, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$.", echo = FALSE}
 ```
 \elandscape
 
 \blandscape
-```{r betaboxplot2, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samles, when $V = 50$."}
+```{r betaboxplot2, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samles, when $V = 50$.", echo = FALSE}
 ```
 \elandscape
-
+ 
 Different columns index different features -- in Figure \@ref(fig:betaboxplot1),
 $V = 10$, while in Figure \@ref(fig:betaboxplot2), $V = 50$. Rows index
 different topics and experimental configurations. From inside out, the $y$-axis
@@ -862,12 +861,12 @@ all others so far. One pattern that is not obvious from the other displays is
 that MCMC sampling can lead to posteriors with high skewness in the case that a
 parameter is close to one of the endpoints of its domain (0 or 1, in this case). 
 
-### Recovered Mixing Proportions ###
+#### Mixing Proportions $\theta_{i}$ ####
 
 For completeness, we can perform a similar analyis on the recovered mixing
-proportions $\left(\theta_{i}\right)$.
-
-#### Setup ####
+proportions $\left(\theta_{i}\right)$. The block below combines output saved
+from different experimental configurations, in order to simplify visualization
+below.
 
 \begingroup
 \setstretch{1}
@@ -883,7 +882,14 @@ proportions $\left(\theta_{i}\right)$.
 ```
 \endgroup
 
-#### Posterior Boxplots ####
+##### Posterior Boxplots #####
+
+Across our simulation, we have fixed the number of topics $K = 2$. Since, for
+each sample $i$, $\theta_{i1} + \theta_{i2} = 1$, scatterplots like those in
+Figures \@ref(fig:betacontours1) and \@ref(fig:betacontours2) are not
+appropriate -- there is only one degree of freedom. Instead, we first provide
+the analogs of Figures \@ref(fig:betaboxplot1) and \@ref(fig:betaboxplot2);
+these are in Figures \@ref(fig:thetaboxplot1) and \@ref(fig:thetaboxplot2).
 
 \begingroup
 \setstretch{1}
@@ -896,7 +902,7 @@ proportions $\left(\theta_{i}\right)$.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r thetaboxplot1}
+```{r thetaboxplot1, fig.width = 10, fig.height = 6, echo = FALSE, fig.cap = "Estimated and true proportions $\\theta_{i1}$ across samples, for simulations where $D = 20$."}
 ```
 \endgroup
 \elandscape
@@ -904,11 +910,40 @@ proportions $\left(\theta_{i}\right)$.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r thetaboxplot2}
+```{r thetaboxplot2, fig.width = 10, fig.height = 6, echo = FALSE, fig.cap = "The analog of \\@ref(fig:thetaboxplot1), when $D = 100$"}
 ```
 \endgroup
 
-#### Error Histograms ####
+Here, each panel gives the posterior for $\theta_{i1}$, within an experimental
+configuration. The index $i$ is specified by the labels across columns. The
+three columns of labels for panels along the $y$-axis give $N$, the total count
+within each sample, and $V$, the number of measured features. Transparent
+horizontal bars specify the true value $\theta_{i1}$ in each configuration.
+
+Increases in sample size are reflected in the narrowing of boxplots and closer
+agreement between methods. As before, MCMC sampling outputs posteriors
+specifying higher uncertainty, and bootstrapping and MCMC tend to agree with
+each other more closely in the small sample size situation.
+
+Some patterns emerge in estimation of the $\theta_{i}$s that were not apparent
+when estimating the $\beta_{\cdot k}$s. First, estimation can be very biased
+for some coordinates, especially when $N$ is small, but even for many
+coordinates when $N$ is large. Generally this bias generally tends to pull
+coordinates towards the prior, making the estimated $\theta_{i1}$s flatter
+across $i$s. Second, VB behaves quite differently from MCMC and the bootstrap
+when $N$ is small, sometimes better (column 15 in row 1) and sometimes worse
+(column 6 in row 1). We also notice that when $V$ is larger, the uncertainty in
+estimated $\theta_{i}$ increases, perhaps because estimation of the underlying
+topics deteriorates. In this sense, LDA is not transposable -- when estimating
+$\beta_{vk}$, increasing $N$ reduced uncertainty, while for estimating
+$\theta_{ik}$, increasing $V$ increases uncertainty.
+
+We conjecture that these differences between estimating topics and mixing
+proportions is a result of the fact that the $\theta_{i}$s are ``local''
+parameters, whose number grow with the sample size, while the $\beta_{\cdot k}$s
+are ``global'' parameters, whose number are indepenent of sample size.
+
+##### Error Histograms #####
 
 \begingroup
 \setstretch{1}
@@ -917,7 +952,7 @@ proportions $\left(\theta_{i}\right)$.
 ```
 \endgroup
 
-# Data Analysis Case Studies #
+## Data Analysis Case Studies ##
 
 In applying probabilistic methods to practical microbiome data analysis, two
 questions immediately come to mind,
@@ -931,4 +966,4 @@ To begin to develop answers to these questions, we reanalyze the data of
 [@dethlefsen2011incomplete], a study of microbial dynamics in response to
 antibiotic treatment. Here, several patients were sampled for several weeks 
 
-# References #
+## References ##
