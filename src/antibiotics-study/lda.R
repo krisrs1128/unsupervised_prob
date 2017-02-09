@@ -27,7 +27,7 @@ abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .4 * n_samples, prune = TRUE) %>%
   subset_samples(ind == "D")
 
-## ---- 
+## ---- histograms ---
 transformed_counts <- data.frame(
   count = c(get_taxa(abt), asinh(get_taxa(abt))),
   transformation = c(
@@ -44,12 +44,15 @@ ggplot(transformed_counts) +
 ## ---- heatmaps ----
 y_order <- names(sort(taxa_sums(abt)))
 x_order <- names(sort(sample_sums(abt)))
-ggheatmap(
-  get_taxa(abt) %>%
-  melt(value.name = "fill", varnames = c("y", "x")),
-  list("x_order" = x_order, "y_order" = y_order)
-) +
-  min_theme(list(text_size = 0))
+ordered_map <- function(x) {
+  ggheatmap(
+    x %>%
+    melt(value.name = "fill", varnames = c("y", "x")),
+    list("x_order" = x_order, "y_order" = y_order)
+  ) +
+    min_theme(list(text_size = 0))
+}
+
 ggheatmap(
   asinh(get_taxa(abt)) %>%
   melt(value.name = "fill", varnames = c("y", "x")),
