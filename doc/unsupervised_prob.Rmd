@@ -1028,7 +1028,17 @@ read_chunk("../src/antibiotics-study/lda.R")
 
 ### Unigram Model ###
 
+```{r unigram_setup}
+rm(list = ls())
+read_chunk("../src/antibiotic-study/unigram.R")
+```
+
 ### DTM ###
+
+```{r dtm_setup}
+rm(list = ls())
+read_chunk("../src/antibiotic-study/dtm.R")
+```
 
 ### NMF ###
 

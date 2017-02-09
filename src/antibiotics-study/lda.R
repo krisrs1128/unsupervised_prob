@@ -61,7 +61,7 @@ ggheatmap(
 
 ## ----  lda ----
 m <- stan_model(file = "../src/stan/lda_counts.stan")
-X <- asinh(get_taxa(abt))
+X <- asinh(t(get_taxa(abt)))
 X[] <- as.integer(round(X, 2) * 100)
 
 stan_data <- list(
