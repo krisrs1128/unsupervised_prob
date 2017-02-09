@@ -107,7 +107,7 @@ for (i in seq_along(unique_D)) {
     filter_(sprintf("D == %s", unique_D[i]), "dimension == 1")
   ) +
     facet_grid(
-      D + N + V + dimension ~ variable,
+      N + V ~ variable,
       scale = "free_x"
     )
 }
