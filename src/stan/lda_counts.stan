@@ -6,6 +6,7 @@ data {
 
   // hyperparameters
   vector<lower=0>[K] alpha;
+  vector<lower=0>[V] gamma;
 }
 
 parameters {
@@ -18,14 +19,18 @@ model {
     theta[d] ~ dirichlet(alpha);
   }
 
+  for (k in 1:K) {
+    beta[k] ~ dirichlet(gamma);
+  }
+
   for (d in 1:D) {
-    vector[V] gamma;
-    gamma = beta[1] * theta[d, 1];
+    vector[V] eta;
+    eta = beta[1] * theta[d, 1];
 
     for (k in 2:K) {
-      gamma = gamma + beta[k] * theta[d, k];
+      eta = eta + beta[k] * theta[d, k];
     }
-    n[d] ~ multinomial(gamma);
+    n[d] ~ multinomial(eta);
   }
 
 }

@@ -52,34 +52,33 @@ ordered_map <- function(x) {
     min_theme(list(text_size = 0))
 }
 
-ggheatmap(
-  asinh(get_taxa(abt)) %>%
-  melt(value.name = "fill", varnames = c("y", "x")),
-  list("x_order" = x_order, "y_order" = y_order)
-) +
-  min_theme(list(text_size = 0))
+ordered_map(get_taxa(abt))
+ordered_map(asinh(get_taxa(abt)))
 
-## ----  lda ----
-m <- stan_model(file = "../src/stan/lda_counts.stan")
+## ----  rounding ----
 X <- asinh(t(get_taxa(abt)))
-X[] <- as.integer(round(X, 2) * 100)
+X[] <- as.integer(round(X, 0) * 1)
 
+## ---- lda ----
 stan_data <- list(
-  K = 4,
+  K = 3,
   V = ncol(X),
   D = nrow(X),
   n = X,
-  alpha = rep(1e-10, 4)
+  alpha = rep(1e-10, 3),
+  gamma = rep(1e-10, ncol(X))
 )
 
-stan_fit <- sampling(m, stan_data, iter = 2000, chains = 1)
+m <- stan_model(file = "../src/stan/lda_counts.stan")
+stan_fit <- vb(m, stan_data, iter = 2000, eta = 0.1, adapt_engaged = FALSE)
+#stan_fit <- sampling(m, stan_data, iter = 2000, chains = 1) 
 samples <- rstan::extract(stan_fit)
 
 ## ---- extract_beta ----
 # underlying RSV distributions
 beta_hat <- samples$beta %>%
   melt() %>%
-  setnames(c("iterations", "cluster", "rsv_ix", "beta"))
+  setnames(c("iterations", "topic", "rsv_ix", "beta"))
 beta_hat$rsv <- rownames(tax_table(abt))[beta_hat$rsv_ix]
 
 taxa <- data.table(tax_table(abt)@.Data)
@@ -96,17 +95,48 @@ beta_hat$rsv <- factor(beta_hat$rsv, levels = taxa$rsv)
 ## ---- extract_theta ----
 theta_hat <- samples$theta %>%
   melt(
-    varnames = c("iteration", "sample", "cluster"),
+    varnames = c("iteration", "sample", "topic"),
     value.name = "theta"
   )
 
 theta_hat$sample <- rownames(X)[theta_hat$sample]
 sample_info <- sample_data(abt)
 sample_info$sample <- rownames(sample_info)
-theta_hat$cluster <- paste("Cluster", theta_hat$cluster)
+theta_hat$topic <- paste("Topic", theta_hat$topic)
 
 theta_hat <- theta_hat %>%
   left_join(sample_info, by = "sample")
+
+## ---- visualize_theta_heatmap ----
+plot_opts <- list(
+  "x" = "time",
+  "y" = "topic",
+  "fill" = "mean_theta",
+  "y_order" = paste("Topic", stan_data$K:1)
+)
+
+ggheatmap(
+  theta_hat %>%
+  group_by(topic, time) %>%
+  summarise(mean_theta = mean(theta)) %>%
+  as.data.frame(),
+  plot_opts
+)
+
+## ---- visualize_theta_boxplot ----
+plot_opts <- list(
+  "x" = "as.factor(time)",
+  "y" = "theta",
+  "fill" = "topic",
+  "col" = "topic",
+  "fill_colors" = RColorBrewer::brewer.pal(stan_data$K, "Set2"),
+  "col_colors" = RColorBrewer::brewer.pal(stan_data$K, "Set2"),
+  "facet_terms" = c("topic", "."),
+  "theme_opts" = list("panel_border" = 0.7)
+)
+ggboxplot(data.frame(theta_hat), plot_opts) +
+  labs(x = "Time") +
+  theme(legend.position = "none")
 
 ## ---- visualize_beta ----
 # might want to set prior for more extreme decay
@@ -115,10 +145,9 @@ plot_opts <- list(
   "y" =  "beta",
   "fill" = "Taxon_5",
   "col" = "Taxon_5",
-  "facet_terms" = c("cluster", "Taxon_5"),
+  "facet_terms" = c("topic", "Taxon_5"),
   "facet_scales" = "free_x",
-  "facet_space" = "free_x",
-  "theme_opts" = list(border_size = 0)
+  "facet_space" = "free_x"
 )
 ggboxplot(
   beta_hat %>%
@@ -127,34 +156,12 @@ ggboxplot(
   plot_opts
 ) +
   labs(y = "beta", fill = "Family") +
+  scale_y_continuous(limits = c(0, 0.36), oob = scales::rescale_none) +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank(),
     legend.position = "bottom"
   )
-
-## ---- visualize_theta_heatmap ----
-plot_opts <- list(
-  "x" = "time",
-  "y" = "cluster",
-  "fill" = "mean(theta)"
-)
-ggheatmap(theta_hat, plot_opts)
-
-## ---- visualize_theta_boxplot ----
-plot_opts <- list(
-  "x" = "as.factor(time)",
-  "y" = "theta",
-  "fill" = "cluster",
-  "col" = "cluster",
-  "fill_colors" = RColorBrewer::brewer.pal(stan_data$K, "Set2"),
-  "col_colors" = RColorBrewer::brewer.pal(stan_data$K, "Set2"),
-  "facet_terms" = c("cluster", "."),
-  "theme_opts" = list("panel_border" = 0.7)
-)
-p <- ggboxplot(data.frame(theta_hat), plot_opts) +
-  labs(x = "Time") +
-  theme(legend.position = "none")
 
 ## ---- save_results ----
 dir.create("results")
