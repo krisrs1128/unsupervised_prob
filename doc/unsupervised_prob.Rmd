@@ -24,7 +24,7 @@ chunk_opts <- list(
   cache = FALSE,
   warning = FALSE,
   message = FALSE,
-  eval = FALSE
+  eval = TRUE
 )
 
 opts_chunk$set(chunk_opts)
@@ -407,7 +407,7 @@ is used to parallelize the simulation.
 \endgroup
 
 Now that the simulation settings have been set, we send them off to our computer
-cluster, and wait for the results to get written. The code below creates the
+topic, and wait for the results to get written. The code below creates the
 batch scripts that run subsets of the experimental configurations.
 
 \begingroup
@@ -1019,20 +1019,43 @@ read_chunk("../src/antibiotics-study/lda.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmaps, eval = TRUE}
+```{r heatmaps, eval = TRUE, fig.show = "hold"}
 ```
 \endgroup
 
 ### LDA ###
 
+We first apply LDA directly. Note that, after the $\asinh$ transformation, the
+data are no longer actually counts. To make the model applicable, we round to
+the nearest integer -- the model here is really only a device, not a plausible
+data generating mechanism. In particular, uncertainty estimates for fitted
+parameters should be regarded skeptically.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r rounding, eval = TRUE}
+```
+\endgroup
+
 #### Estimation ####
+
+We fit LDA with $K = 3$, chosen arbitrarily, but with the heuristic that a large
+$K$ could be hard to interpret, considering there are only 56 samples. We use
+VB, because MCMC seemed to produce degenerate fits\footnote{Many of the
+sampled $\theta_{ik}$ were nearly 0 or 1. Somehow, VB seems to be performing a
+type of regularization.}
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r lda, eval = TRUE}
 ```
-\endgroup
+
+Before visualizing the results, we need to extract posterior samples for each
+parameter and link them with descriptions about associated samples or microbes.
+This data reshaping work is performed in the two code blocks below. The first
+reshapes $\beta$, the second reshapes $\theta$.
 
 \begingroup
 \setstretch{1}
@@ -1052,12 +1075,16 @@ read_chunk("../src/antibiotics-study/lda.R")
 
 #### Visualization and Interpretation ####
 
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r visualize_beta, eval = TRUE, fig.width = 6.5, fig.height = 5}
-```
-\endgroup
+The fitted parameter values are summarized in Figures \@ref(fig:visualize_beta),
+\@ref(fig:visualize_theta_heatmap) and \@ref(fig:visualize_theta_boxplot). We
+describe how to read each display and briefly interpret the underlying
+biological.
+
+A view of the posterior means for the $\theta_{ik}$ is given in Figure
+\@ref(fig:visualize_theta_heatmap). Here, the $k^{th}$ row corresponds to the
+$k^{th}$ topic, and the $i^{th}$ column gives the $i^{th}$ timepoint. That is,
+the $ki^{th}$ cell is shaded in according to the posterior mean for
+$\theta_{ik}$, and the sum for any column is 1.
 
 \begingroup
 \setstretch{1}
@@ -1066,12 +1093,66 @@ read_chunk("../src/antibiotics-study/lda.R")
 ```
 \endgroup
 
+A disadvantage of Figure \@ref(fig:visualize_theta_heatmap) is that it displays
+posterior means without any sense of the variability of these estimates. An
+alternative which does describe uncertainty is given in Figure
+\@ref(fig:visualize_thtea_boxplot). The rows and columns of panels again
+represent topics and time, but now each cell includes a boxplot of posterior
+samples from $\theta_{ik}$.
+
+Both views draw attention to the two antibiotic time courses, at which point the
+mixture weights place most mass on Topic 3. Topic 2 becomes depressed during the
+time courses, suggesting that it summarizes the "ordinary" microbial community
+structure. Topic 1 seems relatively stable over time, though it increases
+somewhat in the second time course -- it might represent microbes that become
+prominent in the second time course, but not the first.
+
+Finally, even after the second peak is over, the relative contribution of Topic
+3 at the end of the sampling period is somewhat larger than it had been at the
+start. This perhaps reflects subtle longer term effects of antibiotics on
+microbial communities. Across all topics, we find that uncertainty is typically
+larger for parameters with larger values.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualize_theta_boxplot, eval = TRUE}
 ```
 \endgroup
+
+To interpret these topics in terms of their microbial composition, we study
+the estimated topic distributions $\beta_{\cdot k}$, displayed in Figure
+\@ref(fig:visualize_beta). The three major rows correspond to the $K = 3$
+estimated topics. Each boxplot within a row is associated with posterior samples
+for a single microbe. Different colors identify different taxonomic families,
+and within these families, microbes are sorted according to evolutionary
+relatedness. Note that we have not displayed outliers, because they make the figure difficult to read.
+
+
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_beta, eval = TRUE, fig.width = 10, fig.height = 6, echo = FALSE}
+```
+\endgroup
+\elandscape
+
+In light of the mixture probabilities in Figure
+\@ref(fig:visualize_theta_boxplot), those microbes with large probabilities in
+the third row in Figure \@ref(fig:visualize_beta) make up a large
+fraction of the samples taken during antibiotic time courses. This could be due to these microbes thriving during the
+regimen or other microbes being more negatively impacted -- viewing the raw data
+directly supports the latter scenario. The fact that these distribution is
+relatively more concentrated on a small subset of microbes with high
+probabilities reflects a decrease in community diversity during antibiotic time
+courses. It is interesting that the two time courses can be identified with
+different microbial signatures.
+
+We also note "bumps" of neighboring microbes with similarly elevated topic
+probabilities. It is encouraging that, even without specifying smoothness along
+the tree in the prior for the $\beta_{\cdot k}$s, such smoothness arises in the
+fitted model.
 
 ### Unigram Model ###
 
@@ -1080,7 +1161,7 @@ read_chunk("../src/antibiotics-study/lda.R")
 \fontsize{8pt}{8pt}
 ```{r unigram_setup}
 rm(list = ls())
-read_chunk("../src/antibiotic-study/unigram.R")
+read_chunk("../src/antibiotics-study/unigram.R")
 ```
 \endgroup
 
@@ -1091,7 +1172,7 @@ read_chunk("../src/antibiotic-study/unigram.R")
 \fontsize{8pt}{8pt}
 ```{r dtm_setup}
 rm(list = ls())
-read_chunk("../src/antibiotic-study/dtm.R")
+read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
 
