@@ -1126,7 +1126,7 @@ the estimated topic distributions $\beta_{\cdot k}$, displayed in Figure
 estimated topics. Each boxplot within a row is associated with posterior samples
 for a single microbe. Different colors identify different taxonomic families,
 and within these families, microbes are sorted according to evolutionary
-relatedness.
+relatedness. Note that we have not displayed outliers, because they make the figure difficult to read.
 
 
 \blandscape
@@ -1144,9 +1144,10 @@ the third row in Figure \@ref(fig:visualize_beta) make up a large
 fraction of the samples taken during antibiotic time courses. This could be due to these microbes thriving during the
 regimen or other microbes being more negatively impacted -- viewing the raw data
 directly supports the latter scenario. The fact that these distribution is
-relatively more concentrated on a small subset of microbes reflects a decrease
-in community diversity during antibiotic time courses. It is interesting that
-the two time courses can be identified with different microbial signatures.
+relatively more concentrated on a small subset of microbes with high
+probabilities reflects a decrease in community diversity during antibiotic time
+courses. It is interesting that the two time courses can be identified with
+different microbial signatures.
 
 We also note "bumps" of neighboring microbes with similarly elevated topic
 probabilities. It is encouraging that, even without specifying smoothness along
