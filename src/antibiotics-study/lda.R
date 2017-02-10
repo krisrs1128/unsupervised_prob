@@ -66,7 +66,7 @@ stan_data <- list(
   D = nrow(X),
   n = X,
   alpha = rep(1e-10, 3),
-  gamma = rep(1e-10, ncol(X))
+  gamma = rep(1e-5, ncol(X))
 )
 
 m <- stan_model(file = "../src/stan/lda_counts.stan")
@@ -139,7 +139,6 @@ ggboxplot(data.frame(theta_hat), plot_opts) +
   theme(legend.position = "none")
 
 ## ---- visualize_beta ----
-# might want to set prior for more extreme decay
 plot_opts <- list(
   "x" = "rsv",
   "y" =  "beta",
@@ -147,7 +146,8 @@ plot_opts <- list(
   "col" = "Taxon_5",
   "facet_terms" = c("topic", "Taxon_5"),
   "facet_scales" = "free_x",
-  "facet_space" = "free_x"
+  "facet_space" = "free_x",
+  "outlier.size" = 0.01
 )
 ggboxplot(
   beta_hat %>%
@@ -156,7 +156,7 @@ ggboxplot(
   plot_opts
 ) +
   labs(y = "beta", fill = "Family") +
-  scale_y_continuous(limits = c(0, 0.36), oob = scales::rescale_none) +
+  #scale_y_continuous(limits = c(0, 0.025), oob = scales::rescale_none) +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank(),
