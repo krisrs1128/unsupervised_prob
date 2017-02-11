@@ -24,7 +24,7 @@ chunk_opts <- list(
   cache = FALSE,
   warning = FALSE,
   message = FALSE,
-  eval = TRUE
+  eval = FALSE
 )
 
 opts_chunk$set(chunk_opts)
@@ -983,9 +983,21 @@ summaries of the original data?
 
 To begin to develop answers to these questions, we reanalyze the data of
 [@dethlefsen2011incomplete], a study of microbial dynamics in response to
-antibiotic treatment. Here, several patients were sampled for several weeks 
+antibiotic treatment. This study monitored the microbiomes of three patients
+over ten months, with two antibiotics time courses introduced in between, in
+order to study the effect antiobiotic perturbations within the context of
+natural long term dynamics. The study concluded that antibiotics cause
+substantial changes in short-term community composition, with certain species
+being substantially more resilient than others, and that in one patient,
+long-term effects could be observed. The purpose of this data analysis is to
+evaluate whether similar conclusions are evident when applying the unsupervised
+probabilistic methods described so far.
 
-### Data Description ###
+### Data Preparation ###
+
+Before pursuing formal inference, we filter and transform the raw data, in line
+with the preprocessing steps in standard microbiome analysis. The code below
+sets up the environment for the rest of this data analysis application.
 
 \begingroup
 \setstretch{1}
@@ -1002,6 +1014,13 @@ read_chunk("../src/antibiotics-study/lda.R")
 ```
 \endgroup
 
+In light of the fact that variational in microbial signatures tends to be
+dominated by between individual effects, we choose to study one individual at a
+time. In this report, we focus on Subject F, who had been reported to exhibit
+incomplete recovery of the pre-antibiotic microbial community. Further, we
+filter to only those microbes present in at least 45\% of samples. This reduces
+the dimensionality from 2582 to 354.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
@@ -1009,19 +1028,29 @@ read_chunk("../src/antibiotics-study/lda.R")
 ```
 \endgroup
 
+We next transform counts so that they are not so heavily skewed -- otherwise,
+samples tend to be dominated by a few very highly abundant microbes. Since there
+are many zeros, but the counts are highly skewed, we apply an $\asinh$
+transformation, which behaves like $\log$ for large values, but is defined at 0.
+The difference between the histograms across raw and transformed data is
+displayed in Figure \@ref(fig:histograms), and the corresponding heatmaps for
+the original data matrices are given in Figure \@ref(fig:heatmaps).
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r histograms, eval = TRUE}
+```{r histograms, eval = TRUE, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmaps, eval = TRUE, fig.show = "hold"}
+```{r heatmaps, eval = TRUE, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
 ```
 \endgroup
+
+With these preprocessing steps out of the way, we can proceed with modeling.
 
 ### LDA ###
 
@@ -1042,9 +1071,9 @@ parameters should be regarded skeptically.
 
 We fit LDA with $K = 3$, chosen arbitrarily, but with the heuristic that a large
 $K$ could be hard to interpret, considering there are only 56 samples. We use
-VB, because MCMC seemed to produce degenerate fits\footnote{Many of the
+VB, because MCMC seemed to produce degenerate fits\footnote{Most of the
 sampled $\theta_{ik}$ were nearly 0 or 1. Somehow, VB seems to be performing a
-type of regularization.}
+type of regularization.}.
 
 \begingroup
 \setstretch{1}
