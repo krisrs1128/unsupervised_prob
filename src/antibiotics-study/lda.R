@@ -23,8 +23,8 @@ set.seed(11242016)
 ## ---- get-data ----
 data(abt)
 abt <- abt %>%
-  filter_taxa(function(x) sum(x != 0) > .4 * nsamples(abt), prune = TRUE) %>%
-  subset_samples(ind == "D")
+  filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
+  subset_samples(ind == "F")
 
 ## ---- histograms ---
 transformed_counts <- data.frame(
@@ -49,11 +49,12 @@ ordered_map <- function(x) {
     melt(value.name = "fill", varnames = c("y", "x")),
     list("x_order" = x_order, "y_order" = y_order)
   ) +
-    min_theme(list(text_size = 0))
+    min_theme(list(text_size = 0)) +
+    labs(x = "Sample", y = "Microbe")
 }
 
-ordered_map(get_taxa(abt))
-ordered_map(asinh(get_taxa(abt)))
+ordered_map(get_taxa(abt)) + ggtitle("Raw")
+ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
 
 ## ----  rounding ----
 X <- asinh(t(get_taxa(abt)))
@@ -65,12 +66,14 @@ stan_data <- list(
   V = ncol(X),
   D = nrow(X),
   n = X,
-  alpha = rep(1e-10, 3),
-  gamma = rep(1e-2, ncol(X))
+  ##alpha = rep(1e-10, 3),
+  ##gamma = rep(1e-2, ncol(X)),
+  alpha = rep(.1, 3),
+  gamma = rep(.1, ncol(X))
 )
 
 m <- stan_model(file = "../src/stan/lda_counts.stan")
-stan_fit <- vb(m, stan_data, iter = 2000, eta = 0.1, adapt_engaged = FALSE)
+stan_fit <- vb(m, stan_data, iter = 2000) #, eta = 0.12, adapt_engaged = FALSE)
 #stan_fit <- sampling(m, stan_data, iter = 2000, chains = 1) 
 samples <- rstan::extract(stan_fit)
 
