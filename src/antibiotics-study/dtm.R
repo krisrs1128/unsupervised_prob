@@ -19,23 +19,22 @@ set.seed(11242016)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-# Code Block -------------------------------------------------------------------
-## ---- get_data ----
+## ---- get-data ----
 data(abt)
 abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
-## ---- vis_times ----
+## ---- vis-times ----
 raw_times <- sample_data(abt)$time
-X <- asinh(t(otu_table(abt)@.Data))
+X <- t(asinh(get_taxa(abt)))
 X[] <- as.integer(round(X, 0) * 1)
 
 times <- 4 * round(raw_times / 4)
 times_mapping <- match(times, unique(times))
 times <- unique(times)
 
-## ----  run_model ----
+## ----  run-model ----
 N <- nrow(X)
 V <- ncol(X)
 T <- length(times)
@@ -45,7 +44,7 @@ stan_data <- list(
   N = N,
   V = V,
   T = T,
-  K = 3,
+  K = 2,
   sigma_hyper = c(0.5, 0.5),
   delta_hyper = c(0.5, 0.5),
   times = times,
@@ -109,8 +108,8 @@ beta_hat <- beta_hat %>%
   left_join(taxa) %>%
   filter(
     Taxon_5 %in% sorted_taxa[1:8],
-    iteration < 200,
-    time <= 20
+    time <= 16,
+    time >= 8
   )
 
 plot_opts <- list(
@@ -119,14 +118,19 @@ plot_opts <- list(
   "col" = "Taxon_5",
   "fill" = "Taxon_5",
   "outlier.shape" = NA,
-  "facet_terms" = c("time", "cluster", "Taxon_5"),
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
 )
 
 ggboxplot(beta_hat, plot_opts) +
-  scale_y_continuous(expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0.053, 0.0541), expand = c(0, 0)) +
+  facet_grid(
+    time ~ cluster + Taxon_5,
+    scales = "free_x",
+    space = "free_x"
+  ) +
   theme(
     axis.text.x = element_blank(),
-    strip.text.x = element_blank()
+    panel.border = element_rect(fill = "transparent", size = 0.2),
+    legend.position = "bottom"
   )
