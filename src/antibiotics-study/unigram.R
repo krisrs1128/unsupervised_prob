@@ -13,32 +13,17 @@ library("ggplot2")
 library("phyloseq")
 library("treelapse")
 library("feather")
+library("ggscaffold")
 set.seed(11242016)
 
-theme_set(theme_bw())
-min_theme <- theme_update(
-  panel.border = element_blank(),
-  panel.grid = element_blank(),
-  axis.ticks = element_blank(),
-  legend.title = element_text(size = 8),
-  legend.text = element_text(size = 6),
-  axis.text = element_text(size = 6),
-  axis.title = element_text(size = 8),
-  strip.background = element_blank(),
-  strip.text = element_text(size = 8),
-  legend.key = element_blank()
-)
-
-source("./unigram.R")
+theme_set(min_theme(list(text_size = 8, subtitle_size = 12)))
 
 # Code Block -------------------------------------------------------------------
 ## ---- get_data ----
 data(abt)
-n_samples <- ncol(otu_table(abt))
 abt <- abt %>%
-  filter_taxa(function(x) sum(x != 0) > .4 * n_samples, prune = TRUE) %>%
-  subset_samples(ind == "D")
-hist(colSums(otu_table(abt)), 15)
+  filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
+  subset_samples(ind == "I")
 
 ## ---- vis_times ----
 raw_times <- sample_data(abt)$time
