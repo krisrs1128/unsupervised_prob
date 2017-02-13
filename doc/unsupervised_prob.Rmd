@@ -1195,60 +1195,62 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \endgroup
 
 \begingroup
-\setstretch{1, eval = TRUE}
-\fontsize{8pt, eval = TRUE}{8pt}
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r setup, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
-\setstretch{1, eval = TRUE}
-\fontsize{8pt, eval = TRUE}{8pt}
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r utils, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
-\setstretch{1, eval = TRUE}
-\fontsize{8pt, eval = TRUE}{8pt}
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r get-data, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
-\setstretch{1, eval = TRUE}
-\fontsize{8pt, eval = TRUE}{8pt}
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r vis-times, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
-\setstretch{1, eval = TRUE}
-\fontsize{8pt, eval = TRUE}{8pt}
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r run-model, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
-\setstretch{1, eval = TRUE}
-\fontsize{8pt, eval = TRUE}{8pt}
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r prepare-beta, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
-\setstretch{1, eval = TRUE}
-\fontsize{8pt, eval = TRUE}{8pt}
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r unigram-series, eval = TRUE}
 ```
 \endgroup
 
+\blandscape
 \begingroup
-\setstretch{1, eval = TRUE}
-\fontsize{8pt, eval = TRUE}{8pt}
-```{r unigram-beta-boxplots, eval = TRUE}
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-beta-boxplots, fig.width = 10, fig.height = 6, eval = TRUE}
 ```
 \endgroup
+\elandscape
 
 ### DTM ###
 
