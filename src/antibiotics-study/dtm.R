@@ -54,7 +54,7 @@ stan_data <- list(
 stan_fit <- vb(m, data = stan_data)
 samples <- rstan::extract(stan_fit)
 
-## ---- visualize-theta ----
+## ---- prepare-theta ----
 softmax <- function(mu) {
   exp(mu) / sum(exp(mu))
 }
@@ -82,6 +82,8 @@ plot_opts <- list(
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
 )
+
+## ---- visualize-theta ----
 ggboxplot(theta_hat, plot_opts) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
   labs(
@@ -89,7 +91,7 @@ ggboxplot(theta_hat, plot_opts) +
     x = "time"
   )
 
-## ---- visualize-beta ----
+## ---- prepare-beta ----
 beta_hat <- apply(samples$beta, c(1, 2, 3), softmax) %>%
   melt(
     varnames = c("rsv_ix", "iteration", "time", "cluster")
@@ -122,6 +124,7 @@ plot_opts <- list(
   "facet_space" = "free_x"
 )
 
+## ---- visualize-beta ----
 ggboxplot(beta_hat, plot_opts) +
   scale_y_continuous(limits = c(0.053, 0.0541), expand = c(0, 0)) +
   facet_grid(
