@@ -109,12 +109,13 @@ beta_hat <- beta_hat %>%
   left_join(taxa) %>%
   filter(
     Taxon_5 %in% sorted_taxa[1:8],
-    iteration < 200
+    iteration < 200,
+    time <= 20
   )
 
 plot_opts <- list(
   "x" = "rsv",
-  "y" = "value",
+  "y" = "sqrt(value)",
   "col" = "Taxon_5",
   "fill" = "Taxon_5",
   "outlier.shape" = NA,
@@ -124,7 +125,7 @@ plot_opts <- list(
 )
 
 ggboxplot(beta_hat, plot_opts) +
-  scale_y_sqrt(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank()
