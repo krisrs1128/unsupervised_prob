@@ -15,7 +15,7 @@ link-citations: yes
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r knitr}
+```{r knitr, eval = TRUE}
 library("knitr")
 chunk_opts <- list(
   fig.width = 5,
@@ -1002,7 +1002,7 @@ sets up the environment for the rest of this data analysis application.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r read_lda, eval = TRUE}
+```{r read_lda}
 read_chunk("../src/antibiotics-study/lda.R")
 ```
 \endgroup
@@ -1010,7 +1010,7 @@ read_chunk("../src/antibiotics-study/lda.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup, eval = TRUE}
+```{r setup}
 ```
 \endgroup
 
@@ -1024,7 +1024,7 @@ the dimensionality from 2582 to 354.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r get-data, eval = TRUE}
+```{r get-data}
 ```
 \endgroup
 
@@ -1039,14 +1039,14 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r histograms, eval = TRUE, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
+```{r histograms, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmaps, eval = TRUE, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
+```{r heatmaps, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
 ```
 \endgroup
 
@@ -1063,7 +1063,7 @@ parameters should be regarded skeptically.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r rounding, eval = TRUE}
+```{r rounding}
 ```
 \endgroup
 
@@ -1078,7 +1078,7 @@ type of regularization.}.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r lda, eval = TRUE}
+```{r lda}
 ```
 
 Before visualizing the results, we need to extract posterior samples for each
@@ -1089,14 +1089,14 @@ reshapes $\beta$, the second reshapes $\theta$.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r extract_beta, eval = TRUE}
+```{r extract_beta}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r extract_theta, echo = FALSE, eval = TRUE}
+```{r extract_theta, echo = FALSE}
 ```
 \endgroup
 
@@ -1118,7 +1118,7 @@ $\theta_{ik}$, and the sum for any column is 1.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_theta_heatmap, eval = TRUE}
+```{r visualize_theta_heatmap}
 ```
 \endgroup
 
@@ -1145,7 +1145,7 @@ larger for parameters with larger values.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_theta_boxplot, eval = TRUE}
+```{r visualize_theta_boxplot}
 ```
 \endgroup
 
@@ -1162,7 +1162,7 @@ relatedness. Note that we have not displayed outliers, because they make the fig
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_beta, eval = TRUE, fig.width = 10, fig.height = 6, echo = FALSE}
+```{r visualize_beta, fig.width = 10, fig.height = 6, echo = FALSE}
 ```
 \endgroup
 \elandscape
@@ -1188,11 +1188,69 @@ fitted model.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram_setup}
+```{r unigram_setup, eval = TRUE}
 rm(list = ls())
 read_chunk("../src/antibiotics-study/unigram.R")
 ```
 \endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r setup, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r utils, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r get-data, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r vis-times, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r run-model, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r prepare-beta, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-series, eval = TRUE}
+```
+\endgroup
+
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-beta-boxplots, fig.width = 10, fig.height = 6, eval = TRUE}
+```
+\endgroup
+\elandscape
 
 ### DTM ###
 

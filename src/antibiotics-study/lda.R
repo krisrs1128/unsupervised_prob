@@ -144,7 +144,7 @@ ggboxplot(data.frame(theta_hat), plot_opts) +
 ## ---- visualize_beta ----
 plot_opts <- list(
   "x" = "rsv",
-  "y" =  "beta",
+  "y" =  "sqrt(beta)",
   "fill" = "Taxon_5",
   "col" = "Taxon_5",
   "facet_terms" = c("topic", "Taxon_5"),
@@ -158,7 +158,7 @@ ggboxplot(
   filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]),
   plot_opts
 ) +
-  labs(y = "beta", fill = "Family") +
+  labs(y = "sqrt(beta)", fill = "Family") +
   scale_y_continuous(limits = c(0, 0.045), oob = scales::rescale_none) +
   theme(
     axis.text.x = element_blank(),

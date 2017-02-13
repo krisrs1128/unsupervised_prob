@@ -10,7 +10,8 @@ data {
   int<lower=0> N; // number of samples
   int<lower=0> V; // number of words
   int<lower=0> T; // number of unique times
-  real<lower=0> sigma; // rate of evolution on simplex
+  real<lower=0> a0; // prior on sigma
+  real<lower=0> b0; // prior on sigma
 
   real times[T]; // unique times
   int<lower=0> times_mapping[N]; // times associated to each sample
@@ -19,9 +20,17 @@ data {
 
 parameters {
   vector[V] beta[T];
+  real<lower=0> sigma2;
+}
+
+transformed parameters {
+  real<lower=0> sigma;
+  sigma = sqrt(sigma2);
 }
 
 model {
+  sigma2 ~ inv_gamma(a0, b0);
+
   for (i in 1:(T - 1)) {
     beta[i + 1] ~ normal(beta[i], sqrt(times[i + 1] - times[i]) * sigma);
   }
