@@ -26,15 +26,14 @@ options(mc.cores = parallel::detectCores())
 # Code Block -------------------------------------------------------------------
 ## ---- get_data ----
 data(abt)
-n_samples <- ncol(otu_table(abt))
 abt <- abt %>%
-  filter_taxa(function(x) sum(x != 0) > .4 * n_samples, prune = TRUE) %>%
-  subset_samples(ind == "D")
+  filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
+  subset_samples(ind == "F")
 
 ## ---- vis_times ----
 raw_times <- sample_data(abt)$time
 X <- asinh(t(otu_table(abt)@.Data))
-X[] <- as.integer(round(X, 2) * 100)
+X[] <- as.integer(round(X, 0) * 1)
 
 times <- 4 * round(raw_times / 4)
 times_mapping <- match(times, unique(times))
@@ -51,15 +50,15 @@ param_grid <- expand.grid(
   K = c(2, 3)
 )
 
-m <- stan_model("dtm.stan")
+m <- stan_model("../src/stan/dtm.stan")
 timestamp <- gsub("[^0-9]", "", Sys.time())
 stan_data <- list(
   N = N,
   V = V,
   T = T,
-  K = param_grid[cur_ix, "K"],
-  sigma = param_grid[cur_ix, "sigma"],
-  delta = param_grid[cur_ix, "delta"],
+  K = 3,
+  sigma_hyper = c(0.5, 0.5),
+  delta_hyper = c(0.5, 0.5),
   times = times,
   times_mapping = times_mapping,
   X = X
@@ -78,7 +77,7 @@ retrieve_ix <- 18 # fit that seems reasonably interpretable
 stan_fit <- get(load(sprintf("fits/dtm_fit-%s.rda", retrieve_ix)))
 samples <- rstan::extract(stan_fit)
 
-## ---- visualize_theta ----
+## ---- visualize-theta ----
 softmax <- function(mu) {
   exp(mu) / sum(exp(mu))
 }
@@ -87,8 +86,7 @@ theta_hat <- apply(samples$alpha, c(1, 2), softmax) %>%
   melt(
     varnames = c("cluster", "iteration", "time"),
     value.name = "theta"
-  ) %>%
-  filter(cluster < param_grid[retrieve_ix, "K"])
+  )
 theta_hat$time <- times[theta_hat$time]
 
 cur_samples <- data.frame(sample_data(abt))
@@ -103,9 +101,7 @@ plot_opts <- list(
   "y" = "theta",
   "fill" = "as.factor(cluster)",
   "col" = "as.factor(cluster)",
-  "col_colors" = brewer.pal(param_grid[retrieve_ix, "K"] - 1, "Set2"),
-  "fill_colors" = brewer.pal(param_grid[retrieve_ix, "K"] - 1, "Set2"),
-  "facet_terms" = c(".", "condition"),
+  "facet_terms" = c("cluster", "condition"),
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
 )
@@ -118,7 +114,7 @@ p <- ggboxplot(theta_hat, plot_opts) +
 ggsave(p, file = sprintf("figure/%s%s-theta.png", cur_ix, timestamp))
 write_feather(theta_hat, "../lda/results/dtm_theta_hat.feather")
 
-## ---- visualize_beta ----
+## ---- visualize-beta ----
 beta_hat <- apply(samples$beta, c(1, 2, 3), softmax) %>%
   melt(
     varnames = c("rsv_ix", "iteration", "time", "cluster")
@@ -137,7 +133,7 @@ beta_hat <- beta_hat %>%
   left_join(taxa) %>%
   filter(
     Taxon_5 %in% sorted_taxa[1:8],
-    cluster < param_grid[retrieve_ix, "K"]
+    iteration < 200
   )
 
 plot_opts <- list(
@@ -145,16 +141,18 @@ plot_opts <- list(
   "y" = "value",
   "col" = "Taxon_5",
   "fill" = "Taxon_5",
+  "outlier.shape" = NA,
   "facet_terms" = c("time", "cluster", "Taxon_5"),
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
 )
 
 p <- ggboxplot(beta_hat, plot_opts) +
-  scale_y_continuous(limits = c(1 / 421 * 0.98, 1 / 421 * 1.03), expand = c(0, 0)) +
+  scale_y_sqrt(expand = c(0, 0)) +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank()
   )
+
 ggsave(p, file = sprintf("figure/%s%s-beta.png", cur_ix, timestamp))
 write_feather(beta_hat, "../lda/results/dtm_abt_beta.feather")
