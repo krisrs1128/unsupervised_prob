@@ -128,6 +128,7 @@ ggboxplot(
   as.data.frame(),
   plot_opts
 ) +
+  scale_y_continuous(breaks = scales::pretty_breaks(2)) +
   theme(
     strip.text.x = element_blank(),
     axis.text.x = element_blank(),
