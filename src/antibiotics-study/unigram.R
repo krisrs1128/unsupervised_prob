@@ -32,8 +32,6 @@ abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
-dim(get_taxa(abt))
-
 ## ---- vis-times ----
 raw_times <- sample_data(abt)$time
 X <- asinh(t(otu_table(abt)@.Data))
@@ -47,7 +45,6 @@ times <- unique(times)
 N <- nrow(X)
 V <- ncol(X)
 T <- length(times)
-sigma <- 2
 
 stan_data <- list(
   N = N,
