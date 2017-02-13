@@ -50,11 +50,11 @@ stan_data <- list(
   N = N,
   V = V,
   T = T,
-  a0 = 0.5,
-  b0 = 0.5,
   times = times,
   times_mapping = times_mapping,
-  X = X
+  X = X,
+  a0 = 0.5,
+  b0 = 0.5
 )
 
 m <- stan_model("../src/stan/unigram.stan")
@@ -66,6 +66,7 @@ taxa <- data.table(
   rsv = rownames(tax_table(abt)),
   tax_table(abt)@.Data
 )
+taxa$Taxon_5[which(taxa$Taxon_5 == "")] <- taxa$Taxon_4[which(taxa$Taxon_5 == "")]
 
 beta_hat <- samples$beta %>%
   melt(
@@ -79,24 +80,24 @@ beta_hat <- beta_hat %>%
   group_by(time) %>%
   mutate(prob = softmax(beta))
 
-group_order <- sort(table(taxa$Taxon_4), decreasing = TRUE)
-beta_hat$Taxon_4 <- factor(beta_hat$Taxon_4, levels = names(group_order))
+group_order <- sort(table(taxa$Taxon_5), decreasing = TRUE)
+beta_hat$Taxon_5 <- factor(beta_hat$Taxon_5, levels = names(group_order))
 beta_hat$rsv <- factor(taxa[beta_hat$rsv_ix]$rsv, levels = rownames(tax_table(abt)))
 
 ## ---- unigram-series ----
 plot_opts <- list(
   "x" = "time",
   "y" = "sqrt(mean_prob)",
-  "col" = "Taxon_4",
+  "col" = "Taxon_5",
   "alpha" = 0.4,
   "group" = "rsv",
-  "facet_terms" = c("Taxon_4", ".")
+  "facet_terms" = c("Taxon_5", ".")
 )
 gglines(
   beta_hat %>%
-  filter(Taxon_4 %in% levels(beta_hat$Taxon_4)[1:8]) %>%
+  filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]) %>%
   group_by(rsv, time) %>%
-  summarise(mean_prob = mean(prob), Taxon_4 = Taxon_4[1]) %>%
+  summarise(mean_prob = mean(prob), Taxon_5 = Taxon_5[1]) %>%
   as.data.frame(),
   plot_opts
 ) +
@@ -111,18 +112,18 @@ gglines(
 plot_opts <- list(
   "x" = "rsv",
   "y" = "sqrt(prob)",
-  "fill" = "Taxon_4",
-  "col" = "Taxon_4",
+  "fill" = "Taxon_5",
+  "col" = "Taxon_5",
   "outlier.shape" = NA,
   "alpha" = 0.4,
-  "facet_terms" = c("time", "Taxon_4"),
+  "facet_terms" = c("time", "Taxon_5"),
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
 )
 ggboxplot(
   beta_hat %>%
   filter(
-    Taxon_4 %in% levels(beta_hat$Taxon_4)[1:8]
+    Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]
   ) %>%
   as.data.frame(),
   plot_opts
