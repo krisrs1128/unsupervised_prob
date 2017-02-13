@@ -28,7 +28,7 @@ abt <- abt %>%
 ## ---- vis_times ----
 raw_times <- sample_data(abt)$time
 X <- asinh(t(otu_table(abt)@.Data))
-X[] <- as.integer(round(X, 2) * 100)
+X[] <- as.integer(round(X, 0) * 1)
 
 times <- 4 * round(raw_times / 4)
 times_mapping <- match(times, unique(times))
@@ -50,7 +50,7 @@ stan_data <- list(
   X = X
 )
 
-m <- stan_model("unigram.stan")
+m <- stan_model("../src/stan/unigram.stan")
 stan_fit <- vb(m, data = stan_data)
 samples <- rstan::extract(stan_fit)
 
