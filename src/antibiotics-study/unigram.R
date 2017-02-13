@@ -23,7 +23,7 @@ theme_set(min_theme(list(text_size = 8, subtitle_size = 12)))
 data(abt)
 abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
-  subset_samples(ind == "I")
+  subset_samples(ind == "F")
 
 ## ---- vis_times ----
 raw_times <- sample_data(abt)$time
