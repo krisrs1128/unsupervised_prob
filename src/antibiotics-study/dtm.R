@@ -4,10 +4,6 @@
 # This is an application of the dynamic unigram model to the antibiotics data
 
 ## ---- setup ----
-args <- commandArgs(trailingOnly = TRUE)
-cur_ix <- args[1]
-cur_ix <- 18
-
 library("rstan")
 library("data.table")
 library("reshape2")
@@ -44,14 +40,7 @@ N <- nrow(X)
 V <- ncol(X)
 T <- length(times)
 
-param_grid <- expand.grid(
-  sigma = c(.001, .005, .01, .05, .1, .5),
-  delta = c(.001, .005, .01, .05, .1, .5),
-  K = c(2, 3)
-)
-
 m <- stan_model("../src/stan/dtm.stan")
-timestamp <- gsub("[^0-9]", "", Sys.time())
 stan_data <- list(
   N = N,
   V = V,
@@ -63,18 +52,7 @@ stan_data <- list(
   times_mapping = times_mapping,
   X = X
 )
-print(timestamp)
 stan_fit <- vb(m, data = stan_data)
-dir.create("fits")
-save(stan_fit, file = sprintf("fits/dtm_fit-%s.rda", cur_ix))
-
-################################################################################
-## Once we've found a saved model to visualize, we can use the code below. The
-## model comparisons can be done by looking at some convergence diagnostics.
-################################################################################
-
-retrieve_ix <- 18 # fit that seems reasonably interpretable
-stan_fit <- get(load(sprintf("fits/dtm_fit-%s.rda", retrieve_ix)))
 samples <- rstan::extract(stan_fit)
 
 ## ---- visualize-theta ----
@@ -105,14 +83,12 @@ plot_opts <- list(
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
 )
-p <- ggboxplot(theta_hat, plot_opts) +
+ggboxplot(theta_hat, plot_opts) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
   labs(
     fill = "Cluster",
     x = "time"
   )
-ggsave(p, file = sprintf("figure/%s%s-theta.png", cur_ix, timestamp))
-write_feather(theta_hat, "../lda/results/dtm_theta_hat.feather")
 
 ## ---- visualize-beta ----
 beta_hat <- apply(samples$beta, c(1, 2, 3), softmax) %>%
@@ -147,12 +123,9 @@ plot_opts <- list(
   "facet_space" = "free_x"
 )
 
-p <- ggboxplot(beta_hat, plot_opts) +
+ggboxplot(beta_hat, plot_opts) +
   scale_y_sqrt(expand = c(0, 0)) +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank()
   )
-
-ggsave(p, file = sprintf("figure/%s%s-beta.png", cur_ix, timestamp))
-write_feather(beta_hat, "../lda/results/dtm_abt_beta.feather")
