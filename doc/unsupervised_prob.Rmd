@@ -1257,7 +1257,7 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm_setup}
+```{r dtm_setup, eval = TRUE}
 rm(list = ls())
 read_chunk("../src/antibiotics-study/dtm.R")
 ```
@@ -1266,58 +1266,60 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup}
+```{r setup, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r get-data}
+```{r get-data, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r vis-times}
+```{r vis-times, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r run-model}
+```{r run-model, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-theta}
+```{r prepare-theta, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-theta}
+```{r visualize-theta, fig.width = 6, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-beta}
+```{r prepare-beta, eval = TRUE}
 ```
 \endgroup
 
+\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-beta}
+```{r visualize-beta, eval = TRUE, fig.width = 10, fig.height = 6}
 ```
 \endgroup
+\elandscape
 
 ### NMF ###
 

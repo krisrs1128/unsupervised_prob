@@ -89,6 +89,9 @@ ggboxplot(theta_hat, plot_opts) +
   labs(
     fill = "Cluster",
     x = "time"
+  ) +
+  theme(
+    panel.border = element_rect(fill = "transparent", size = 0.2)
   )
 
 ## ---- prepare-beta ----
