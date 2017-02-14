@@ -30,7 +30,7 @@ raw_times <- sample_data(abt)$time
 X <- t(asinh(get_taxa(abt)))
 X[] <- as.integer(round(X, 0) * 1)
 
-times <- 4 * round(raw_times / 4)
+times <- 4 * floor(raw_times / 4)
 times_mapping <- match(times, unique(times))
 times <- unique(times)
 
@@ -55,22 +55,18 @@ stan_fit <- vb(m, data = stan_data)
 samples <- rstan::extract(stan_fit)
 
 ## ---- prepare-theta ----
-softmax <- function(mu) {
-  exp(mu) / sum(exp(mu))
-}
-
-theta_hat <- apply(samples$alpha, c(1, 2), softmax) %>%
+theta_hat <- samples$theta %>%
   melt(
-    varnames = c("cluster", "iteration", "time"),
+    varnames = c("iteration", "time", "cluster"),
     value.name = "theta"
   )
 theta_hat$time <- times[theta_hat$time]
 
 cur_samples <- data.frame(sample_data(abt))
-cur_samples$time <- 4 * round(cur_samples$time / 4)
-cur_samples <- cur_samples[c(1, which(diff(cur_samples$time) != 0)), ]
+cur_samples$time <- 4 * floor(cur_samples$time / 4)
 
 theta_hat <- cur_samples %>%
+  unique() %>%
   right_join(theta_hat)
 
 plot_opts <- list(
@@ -78,6 +74,8 @@ plot_opts <- list(
   "y" = "theta",
   "fill" = "as.factor(cluster)",
   "col" = "as.factor(cluster)",
+  "fill_colors" = brewer.pal(3, "Set2"),
+  "col_colors" = brewer.pal(3, "Set2"),
   "facet_terms" = c("cluster", "condition"),
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
@@ -91,13 +89,14 @@ ggboxplot(theta_hat, plot_opts) +
     x = "time"
   ) +
   theme(
-    panel.border = element_rect(fill = "transparent", size = 0.2)
+    panel.border = element_rect(fill = "transparent", size = 0.2),
+    legend.position = "bottom"
   )
 
 ## ---- prepare-beta ----
-beta_hat <- apply(samples$beta, c(1, 2, 3), softmax) %>%
+beta_hat <- samples$beta %>%
   melt(
-    varnames = c("rsv_ix", "iteration", "time", "cluster")
+    varnames = c("iteration", "time", "cluster", "rsv_ix")
   )
 beta_hat$time <- times[beta_hat$time]
 
@@ -134,6 +133,10 @@ ggboxplot(beta_hat, plot_opts) +
     time ~ cluster + Taxon_5,
     scales = "free_x",
     space = "free_x"
+  ) +
+  labs(
+    "col" = "Taxonomic Family",
+    "fill" = "Taxonomic Family"
   ) +
   theme(
     axis.text.x = element_blank(),

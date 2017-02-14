@@ -37,7 +37,7 @@ raw_times <- sample_data(abt)$time
 X <- asinh(t(otu_table(abt)@.Data))
 X[] <- as.integer(round(X, 0) * 1)
 
-times <- 4 * round(raw_times / 4)
+times <- 4 * floor(raw_times / 4)
 times_mapping <- match(times, unique(times))
 times <- unique(times)
 
