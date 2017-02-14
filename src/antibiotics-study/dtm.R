@@ -4,10 +4,6 @@
 # This is an application of the dynamic unigram model to the antibiotics data
 
 ## ---- setup ----
-args <- commandArgs(trailingOnly = TRUE)
-cur_ix <- args[1]
-cur_ix <- 18
-
 library("rstan")
 library("data.table")
 library("reshape2")
@@ -23,79 +19,54 @@ set.seed(11242016)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-# Code Block -------------------------------------------------------------------
-## ---- get_data ----
+## ---- get-data ----
 data(abt)
-n_samples <- ncol(otu_table(abt))
 abt <- abt %>%
-  filter_taxa(function(x) sum(x != 0) > .4 * n_samples, prune = TRUE) %>%
-  subset_samples(ind == "D")
+  filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
+  subset_samples(ind == "F")
 
-## ---- vis_times ----
+## ---- vis-times ----
 raw_times <- sample_data(abt)$time
-X <- asinh(t(otu_table(abt)@.Data))
-X[] <- as.integer(round(X, 2) * 100)
+X <- t(asinh(get_taxa(abt)))
+X[] <- as.integer(round(X, 0) * 1)
 
-times <- 4 * round(raw_times / 4)
+times <- 4 * floor(raw_times / 4)
 times_mapping <- match(times, unique(times))
 times <- unique(times)
 
-## ----  run_model ----
+## ----  run-model ----
 N <- nrow(X)
 V <- ncol(X)
 T <- length(times)
 
-param_grid <- expand.grid(
-  sigma = c(.001, .005, .01, .05, .1, .5),
-  delta = c(.001, .005, .01, .05, .1, .5),
-  K = c(2, 3)
-)
-
-m <- stan_model("dtm.stan")
-timestamp <- gsub("[^0-9]", "", Sys.time())
+m <- stan_model("../src/stan/dtm.stan")
 stan_data <- list(
   N = N,
   V = V,
   T = T,
-  K = param_grid[cur_ix, "K"],
-  sigma = param_grid[cur_ix, "sigma"],
-  delta = param_grid[cur_ix, "delta"],
+  K = 2,
+  sigma_hyper = c(0.5, 0.5),
+  delta_hyper = c(0.5, 0.5),
   times = times,
   times_mapping = times_mapping,
   X = X
 )
-print(timestamp)
 stan_fit <- vb(m, data = stan_data)
-dir.create("fits")
-save(stan_fit, file = sprintf("fits/dtm_fit-%s.rda", cur_ix))
-
-################################################################################
-## Once we've found a saved model to visualize, we can use the code below. The
-## model comparisons can be done by looking at some convergence diagnostics.
-################################################################################
-
-retrieve_ix <- 18 # fit that seems reasonably interpretable
-stan_fit <- get(load(sprintf("fits/dtm_fit-%s.rda", retrieve_ix)))
 samples <- rstan::extract(stan_fit)
 
-## ---- visualize_theta ----
-softmax <- function(mu) {
-  exp(mu) / sum(exp(mu))
-}
-
-theta_hat <- apply(samples$alpha, c(1, 2), softmax) %>%
+## ---- prepare-theta ----
+theta_hat <- samples$theta %>%
   melt(
-    varnames = c("cluster", "iteration", "time"),
+    varnames = c("iteration", "time", "cluster"),
     value.name = "theta"
-  ) %>%
-  filter(cluster < param_grid[retrieve_ix, "K"])
+  )
 theta_hat$time <- times[theta_hat$time]
 
 cur_samples <- data.frame(sample_data(abt))
-cur_samples$time <- 4 * round(cur_samples$time / 4)
-cur_samples <- cur_samples[c(1, which(diff(cur_samples$time) != 0)), ]
+cur_samples$time <- 4 * floor(cur_samples$time / 4)
 
 theta_hat <- cur_samples %>%
+  unique() %>%
   right_join(theta_hat)
 
 plot_opts <- list(
@@ -103,25 +74,29 @@ plot_opts <- list(
   "y" = "theta",
   "fill" = "as.factor(cluster)",
   "col" = "as.factor(cluster)",
-  "col_colors" = brewer.pal(param_grid[retrieve_ix, "K"] - 1, "Set2"),
-  "fill_colors" = brewer.pal(param_grid[retrieve_ix, "K"] - 1, "Set2"),
-  "facet_terms" = c(".", "condition"),
+  "fill_colors" = brewer.pal(3, "Set2"),
+  "col_colors" = brewer.pal(3, "Set2"),
+  "facet_terms" = c("cluster", "condition"),
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
 )
-p <- ggboxplot(theta_hat, plot_opts) +
+
+## ---- visualize-theta ----
+ggboxplot(theta_hat, plot_opts) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
   labs(
     fill = "Cluster",
     x = "time"
+  ) +
+  theme(
+    panel.border = element_rect(fill = "transparent", size = 0.2),
+    legend.position = "bottom"
   )
-ggsave(p, file = sprintf("figure/%s%s-theta.png", cur_ix, timestamp))
-write_feather(theta_hat, "../lda/results/dtm_theta_hat.feather")
 
-## ---- visualize_beta ----
-beta_hat <- apply(samples$beta, c(1, 2, 3), softmax) %>%
+## ---- prepare-beta ----
+beta_hat <- samples$beta %>%
   melt(
-    varnames = c("rsv_ix", "iteration", "time", "cluster")
+    varnames = c("iteration", "time", "cluster", "rsv_ix")
   )
 beta_hat$time <- times[beta_hat$time]
 
@@ -137,24 +112,34 @@ beta_hat <- beta_hat %>%
   left_join(taxa) %>%
   filter(
     Taxon_5 %in% sorted_taxa[1:8],
-    cluster < param_grid[retrieve_ix, "K"]
+    time <= 16,
+    time >= 8
   )
 
 plot_opts <- list(
   "x" = "rsv",
-  "y" = "value",
+  "y" = "sqrt(value)",
   "col" = "Taxon_5",
   "fill" = "Taxon_5",
-  "facet_terms" = c("time", "cluster", "Taxon_5"),
+  "outlier.shape" = NA,
   "facet_scales" = "free_x",
   "facet_space" = "free_x"
 )
 
-p <- ggboxplot(beta_hat, plot_opts) +
-  scale_y_continuous(limits = c(1 / 421 * 0.98, 1 / 421 * 1.03), expand = c(0, 0)) +
+## ---- visualize-beta ----
+ggboxplot(beta_hat, plot_opts) +
+  scale_y_continuous(limits = c(0.053, 0.0541), expand = c(0, 0)) +
+  facet_grid(
+    time ~ cluster + Taxon_5,
+    scales = "free_x",
+    space = "free_x"
+  ) +
+  labs(
+    "col" = "Taxonomic Family",
+    "fill" = "Taxonomic Family"
+  ) +
   theme(
     axis.text.x = element_blank(),
-    strip.text.x = element_blank()
+    panel.border = element_rect(fill = "transparent", size = 0.2),
+    legend.position = "bottom"
   )
-ggsave(p, file = sprintf("figure/%s%s-beta.png", cur_ix, timestamp))
-write_feather(beta_hat, "../lda/results/dtm_abt_beta.feather")

@@ -15,7 +15,7 @@ link-citations: yes
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r knitr, eval = TRUE}
+```{r knitr}
 library("knitr")
 chunk_opts <- list(
   fig.width = 5,
@@ -1188,7 +1188,7 @@ fitted model.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram_setup, eval = TRUE}
+```{r unigram_setup}
 rm(list = ls())
 read_chunk("../src/antibiotics-study/unigram.R")
 ```
@@ -1197,14 +1197,76 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup, eval = TRUE}
+```{r setup}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r utils, eval = TRUE}
+```{r utils}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r get-data}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r vis-times}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r run-model}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r prepare-beta}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-series}
+```
+\endgroup
+
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-beta-boxplots, fig.width = 10, fig.height = 6}
+```
+\endgroup
+\elandscape
+
+### DTM ###
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm_setup, eval = TRUE}
+rm(list = ls())
+read_chunk("../src/antibiotics-study/dtm.R")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r setup, eval = TRUE}
 ```
 \endgroup
 
@@ -1232,14 +1294,21 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-beta, eval = TRUE}
+```{r prepare-theta, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram-series, eval = TRUE}
+```{r visualize-theta, fig.width = 6, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r prepare-beta, eval = TRUE}
 ```
 \endgroup
 
@@ -1247,21 +1316,10 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram-beta-boxplots, fig.width = 10, fig.height = 6, eval = TRUE}
+```{r visualize-beta, eval = TRUE, fig.width = 10, fig.height = 6}
 ```
 \endgroup
 \elandscape
-
-### DTM ###
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r dtm_setup}
-rm(list = ls())
-read_chunk("../src/antibiotics-study/dtm.R")
-```
-\endgroup
 
 ### NMF ###
 
