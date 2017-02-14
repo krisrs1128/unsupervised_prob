@@ -1052,7 +1052,7 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 
 With these preprocessing steps out of the way, we can proceed with modeling.
 
-### LDA ###
+### LDA {sec:antibiotics-lda}
 
 We first apply LDA directly. Note that, after the $\asinh$ transformation, the
 data are no longer actually counts. To make the model applicable, we round to
@@ -1185,10 +1185,22 @@ fitted model.
 
 ### Unigram Model ###
 
+Next, we apply the unigram model to the same data. While we might generally
+suspect that gut microbiome profiles can change slightly over several days and
+that there might be an immediate antibiotic effect, we still choose to avoid
+explicitly setting $\sigma$. Instead, we use a hyperprior, $\sigma \sim \InvGam
+\left(\frac{1}{2}, \frac{1}{2}\right)$, which is flat on a log-scale. Further,
+since visualizing $\tilde 50$ $\beta_{t}$ is difficult, we group timepoints into
+windows of length four days, so that there are fewer $\beta_{t}$'s to display.
+A reasonable alternative would have been to display every fourth estimated
+$\beta_{t}$ (we would expect a more slowly evolving estimated $\sigma$).
+
+The code chunks below prime our environment for the subsequent analysis.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram_setup}
+```{r unigram_setup, eval = TRUE}
 rm(list = ls())
 read_chunk("../src/antibiotics-study/unigram.R")
 ```
@@ -1197,14 +1209,76 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup}
+```{r setup, eval = TRUE}
+```
+\endgroup
+
+Next, we load and filter to the same samples and microbes considered in the LDA
+example of Section \@ref(sec:antibiotics-lda).
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r get-data, eval = TRUE}
+```
+\endgroup
+
+As before, we round the transformed data in order to accomodate a count-based
+probabilistic model. We further define the windows that pool neighboring
+timepoints to the same $\beta_{t}$s.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r vis-times, eval = TRUE}
+```
+\endgroup
+
+The block below estimates the unigraom model using VB.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r run-model, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r utils}
+```{r prepare-beta, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-series, eval = TRUE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-boxplots, fig.width = 10, fig.height = 6}
+```
+\endgroup
+
+### DTM ###
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm_setup}
+rm(list = ls())
+read_chunk("../src/antibiotics-study/dtm.R")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r setup}
 ```
 \endgroup
 
@@ -1232,91 +1306,29 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
+```{r prepare-theta}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize-theta, fig.width = 6}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r prepare-beta}
 ```
 \endgroup
 
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r unigram-series}
-```
-\endgroup
-
 \blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram-beta-boxplots, fig.width = 10, fig.height = 6}
-```
-\endgroup
-\elandscape
-
-### DTM ###
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r dtm_setup, eval = TRUE}
-rm(list = ls())
-read_chunk("../src/antibiotics-study/dtm.R")
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r setup, eval = TRUE}
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r get-data, eval = TRUE}
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r vis-times, eval = TRUE}
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r run-model, eval = TRUE}
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r prepare-theta, eval = TRUE}
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r visualize-theta, fig.width = 6, eval = TRUE}
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r prepare-beta, eval = TRUE}
-```
-\endgroup
-
-\blandscape
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r visualize-beta, eval = TRUE, fig.width = 10, fig.height = 6}
+```{r visualize-beta, fig.width = 10, fig.height = 6}
 ```
 \endgroup
 \elandscape
