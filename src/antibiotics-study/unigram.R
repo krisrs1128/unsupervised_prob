@@ -3,6 +3,8 @@
 # File description -------------------------------------------------------------
 # This is an application of the dynamic unigram model to the antibiotics data
 
+# Code block ------------------------------------------------------------------
+
 ## ---- setup ----
 library("rstan")
 library("data.table")
@@ -20,12 +22,10 @@ theme_set(
   min_theme(list(text_size = 8, subtitle_size = 12))
 )
 
-## ---- utils ----
 softmax <- function(x) {
   exp(x) / sum(exp(x))
 }
 
-# Code Block -------------------------------------------------------------------
 ## ---- get-data ----
 data(abt)
 abt <- abt %>%
@@ -41,15 +41,11 @@ times <- 4 * floor(raw_times / 4)
 times_mapping <- match(times, unique(times))
 times <- unique(times)
 
-## ----  run-model ----
-N <- nrow(X)
-V <- ncol(X)
-T <- length(times)
-
+## ---- run-model ----
 stan_data <- list(
-  N = N,
-  V = V,
-  T = T,
+  N = nrow(X),
+  V = ncol(X),
+  T = length(times),
   times = times,
   times_mapping = times_mapping,
   X = X,
@@ -108,7 +104,7 @@ gglines(
     legend.position = "bottom"
   )
 
-## ---- unigram-beta-boxplots ----
+## ---- unigram-boxplots ----
 plot_opts <- list(
   "x" = "rsv",
   "y" = "sqrt(prob)",
