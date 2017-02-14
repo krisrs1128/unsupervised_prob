@@ -34,3 +34,17 @@ model {
   }
 
 }
+
+generated quantities {
+  int<lower=0> n_sim[D, V]; // simulated word counts, for posterior checking
+
+  for (d in 1:D) {
+    vector[V] eta;
+    eta = beta[1] * theta[d, 1];
+
+    for (k in 2:K) {
+      eta = eta + beta[k] * theta[d, k];
+    }
+    n_sim[d] = multinomial_rng(eta, sum(n[d]));
+  }
+}
