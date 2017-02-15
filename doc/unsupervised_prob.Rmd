@@ -1234,7 +1234,7 @@ timepoints to the same $\beta_{t}$s.
 ```
 \endgroup
 
-The block below estimates the unigraom model using VB.
+The block below estimates the unigram model using VB.
 
 \begingroup
 \setstretch{1}
@@ -1243,6 +1243,14 @@ The block below estimates the unigraom model using VB.
 ```
 \endgroup
 
+The only parameters to inspect for the unigram model are the sequence
+of $\beta_{t}$. To interpret our estimates in terms of the taxonomic context
+associated with each microbe and sampling context associated with each time
+point, we merge our parameter estimates with external information. As before, we
+impute missing taxonomic family labels with those available at the next higher
+(order) level and ensure microbes are ordered according to evolutionary
+proximity. These postprocessing steps are performed in the code block below.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
@@ -1250,19 +1258,53 @@ The block below estimates the unigraom model using VB.
 ```
 \endgroup
 
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r unigram-series, eval = TRUE}
-```
-\endgroup
+Our first view of the $\beta_{t}$, given in Figure \@ref(fig:unigramseries),
+tracks the time series of posterior means, grouped by taxonomic family. Here,
+each line represents the sequence $\left(\beta_{tk}\right)_{t}$ for a single
+microbe $k$. Each color / panel is associated with a taxonomic family, sorted
+from most to least prevalent. Note that the $\beta_{tk}$ have been globally
+centered -- this makes no difference in the associated probabilities.
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram-boxplots, fig.width = 10, fig.height = 6}
+```{r unigramseries, eval = TRUE, fig.caption = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively."}
 ```
 \endgroup
+
+While useful for building general intution about the fitted model, Figure
+\@ref(fig:unigramseries) is unsatisfactory for two reasons. First, it only
+displays point estimates -- the posterior mean -- for each $\beta_{kv}$, which
+leaves uncertainty in the estimate unknown. Second, in families with many
+microbes, many of the paths occlude one another. Figure
+\@ref(fig:unigramboxplots) is the time series version of Figure
+\@ref(fig:visualize_beta), and it is designed to overcome these limitations.
+
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigramboxplots, eval = TRUE, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.caption = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced."}
+```
+\endgroup
+\elandscape
+
+In Figure \@ref(fig:unigramboxplots), each boxplot represent the posterior
+quantiles of $\beta_{kv}$ for a single microbe. Each row is associated with a
+set of timepoints, according to the windowing strategy described in the data
+preparation phase. The labels on the far right describe the sampling condition
+at that timepoint -- e.g., 1st Cp (Cipriofloxacin) indicates samples associated
+with the first time course of antibiotics. Individual microbes are sorted
+according to evolutionary relatedness, and colors / columns indicate different
+taxonomic families.
+
+We note as an aside that, while it is possible to plot the raw
+probabilities\footnote{These are in fact a column of the \texttt{beta_hat}
+data.frame in the code chunks above.} $p_{tk} =
+\frac{\exp{\beta_{tk}}}{\sum_{k^{\prime}} \exp{\beta_{tk^{\prime}}}}$, we find
+the $\beta_{tk}$s to be on a more useful scale, allowing comparison of slightly
+different small probabilities. This observation is in line with the discussion
+in Figure 23.8 of [@mackay2003information].
 
 ### DTM ###
 
