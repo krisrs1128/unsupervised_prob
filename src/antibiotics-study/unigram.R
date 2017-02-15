@@ -64,26 +64,32 @@ taxa <- data.table(
 )
 taxa$Taxon_5[which(taxa$Taxon_5 == "")] <- taxa$Taxon_4[which(taxa$Taxon_5 == "")]
 
+## center the betas
+samples$beta <- samples$beta - mean(samples$beta)
+
 beta_hat <- samples$beta %>%
   melt(
     varnames = c("iteration", "time", "rsv_ix"),
     value.name = "beta"
   )
+
 beta_hat$rsv <- rownames(otu_table(abt))[beta_hat$rsv_ix]
 beta_hat$time <- times[beta_hat$time]
 beta_hat <- beta_hat %>%
   left_join(taxa) %>%
+  left_join(sample_data(abt)[, c("time", "condition")]) %>%
   group_by(time) %>%
   mutate(prob = softmax(beta))
+beta_hat$condition[is.na(beta_hat$condition)] <- "Pre Cp"
 
 group_order <- sort(table(taxa$Taxon_5), decreasing = TRUE)
 beta_hat$Taxon_5 <- factor(beta_hat$Taxon_5, levels = names(group_order))
 beta_hat$rsv <- factor(taxa[beta_hat$rsv_ix]$rsv, levels = rownames(tax_table(abt)))
 
-## ---- unigram-series ----
+## ---- unigramseries ----
 plot_opts <- list(
   "x" = "time",
-  "y" = "sqrt(mean_prob)",
+  "y" = "mean_beta",
   "col" = "Taxon_5",
   "alpha" = 0.4,
   "group" = "rsv",
@@ -93,28 +99,26 @@ gglines(
   beta_hat %>%
   filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]) %>%
   group_by(rsv, time) %>%
-  summarise(mean_prob = mean(prob), Taxon_5 = Taxon_5[1]) %>%
+  summarise(mean_beta = mean(beta), Taxon_5 = Taxon_5[1]) %>%
   as.data.frame(),
   plot_opts
 ) +
-  scale_y_continuous(breaks = scales::pretty_breaks(2)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(3)) +
   guides(colour = guide_legend(override.aes = list(alpha = 1, size = 1))) +
   theme(
     strip.text.y = element_blank(),
     legend.position = "bottom"
   )
 
-## ---- unigram-boxplots ----
+## ---- unigramboxplots ----
 plot_opts <- list(
   "x" = "rsv",
-  "y" = "sqrt(prob)",
+  "y" = "beta",
   "fill" = "Taxon_5",
   "col" = "Taxon_5",
   "outlier.shape" = NA,
   "alpha" = 0.4,
-  "facet_terms" = c("time", "Taxon_5"),
-  "facet_scales" = "free_x",
-  "facet_space" = "free_x"
+  "theme_opts" = list(border.size = .5)
 )
 ggboxplot(
   beta_hat %>%
@@ -124,7 +128,12 @@ ggboxplot(
   as.data.frame(),
   plot_opts
 ) +
-  scale_y_continuous(breaks = scales::pretty_breaks(2)) +
+  scale_y_continuous(
+    breaks = scales::pretty_breaks(3),
+    limits = c(-4, 4),
+    oob = scales::rescale_none
+  ) +
+  facet_grid(condition + time ~ Taxon_5, scales = "free_x", space = "free_x") +
   theme(
     strip.text.x = element_blank(),
     axis.text.x = element_blank(),
