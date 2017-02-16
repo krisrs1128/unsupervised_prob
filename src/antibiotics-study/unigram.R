@@ -19,7 +19,7 @@ library("feather")
 library("ggscaffold")
 set.seed(11242016)
 
-theme_set(
+ theme_set(
   min_theme(list(text_size = 8, subtitle_size = 12))
 )
 
@@ -31,17 +31,11 @@ softmax <- function(x) {
 data(abt)
 abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
-  subset_samples(ind == "D")
+  subset_samples(ind == "F")
 
 ## ---- vis-times ----
 raw_times <- sample_data(abt)$time
-#X <- asinh(t(otu_table(abt)@.Data))
 X <- t(get_taxa(abt))
-
-#times <- 4 * floor(raw_times / 4)
-times <- raw_times
-times_mapping <- match(times, unique(times))
-times <- unique(times)
 
 ## ---- run-model ----
 stan_data <- list(
@@ -49,7 +43,7 @@ stan_data <- list(
   V = ncol(X),
   T = length(times),
   times = times,
-  times_mapping = times_mapping,
+  times_mapping = times,
   X = X,
   a0 = 0.5,
   b0 = 0.5
@@ -71,7 +65,6 @@ beta <- samples$beta
 for (i in seq_len(stan_data$T)) {
   beta[, i,] <- beta[, i, ] - mean(beta[, i,])
 }
-
 
 beta_hat <- samples$beta %>%
   melt(
@@ -133,7 +126,7 @@ plot_opts <- list(
 ggboxplot(
   beta_hat %>%
   filter(
-    Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8],
+    Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4],
     time %in% seq(10, 20, by = 3)
   ) %>%
   as.data.frame(),
