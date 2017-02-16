@@ -12,6 +12,7 @@ library("reshape2")
 library("plyr")
 library("dplyr")
 library("ggplot2")
+library("RColorBrewer")
 library("phyloseq")
 library("treelapse")
 library("feather")
@@ -92,8 +93,7 @@ plot_opts <- list(
   "y" = "mean_beta",
   "col" = "Taxon_5",
   "alpha" = 0.4,
-  "group" = "rsv",
-  "facet_terms" = c("Taxon_5", ".")
+  "group" = "rsv"
 )
 gglines(
   beta_hat %>%
@@ -118,6 +118,8 @@ plot_opts <- list(
   "col" = "Taxon_5",
   "outlier.shape" = NA,
   "alpha" = 0.4,
+  "col_colors" = brewer.pal(8, "Set2"),
+  "fill_colors" = brewer.pal(8, "Set2"),
   "theme_opts" = list(border.size = .5)
 )
 ggboxplot(
