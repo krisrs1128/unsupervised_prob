@@ -21,7 +21,7 @@ chunk_opts <- list(
   fig.width = 5,
   fig.height = 3,
   fig.align = "center",
-  cache = FALSE,
+  cache = TRUE,
   warning = FALSE,
   message = FALSE,
   eval = FALSE
@@ -1188,7 +1188,7 @@ fitted model.
 Next, we apply the unigram model to the same data. While we might generally
 suspect that gut microbiome profiles can change slightly over several days and
 that there might be an immediate antibiotic effect, we still choose to avoid
-explicitly setting $\sigma$. Instead, we use a hyperprior, $\sigma \sim \InvGam
+explicitly setting $\sigma$. Instead, we use a hyperprior, $\sigma^{2} \sim \InvGam
 \left(\frac{1}{2}, \frac{1}{2}\right)$, which is flat on a log-scale. Further,
 since visualizing $\tilde 50$ $\beta_{t}$ is difficult, we group timepoints into
 windows of length four days, so that there are fewer $\beta_{t}$'s to display.
@@ -1200,7 +1200,7 @@ The code chunks below prime our environment for the subsequent analysis.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram_setup, eval = TRUE}
+```{r unigram_setup}
 rm(list = ls())
 read_chunk("../src/antibiotics-study/unigram.R")
 ```
@@ -1209,7 +1209,7 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup, eval = TRUE}
+```{r setup}
 ```
 \endgroup
 
@@ -1219,7 +1219,7 @@ example of Section \@ref(sec:antibiotics-lda).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r get-data, eval = TRUE}
+```{r get-data}
 ```
 \endgroup
 
@@ -1230,7 +1230,7 @@ timepoints to the same $\beta_{t}$s.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r vis-times, eval = TRUE}
+```{r vis-times}
 ```
 \endgroup
 
@@ -1239,7 +1239,7 @@ The block below estimates the unigram model using VB.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r run-model, eval = TRUE}
+```{r run-model}
 ```
 \endgroup
 
@@ -1254,7 +1254,7 @@ proximity. These postprocessing steps are performed in the code block below.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-beta, eval = TRUE}
+```{r prepare-beta}
 ```
 \endgroup
 
@@ -1268,7 +1268,7 @@ centered -- this makes no difference in the associated probabilities.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramseries, eval = TRUE, fig.caption = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively."}
+```{r unigramseries, fig.caption = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively."}
 ```
 \endgroup
 
@@ -1284,7 +1284,7 @@ microbes, many of the paths occlude one another. Figure
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramboxplots, eval = TRUE, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.caption = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced."}
+```{r unigramboxplots, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.caption = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced."}
 ```
 \endgroup
 \elandscape
@@ -1299,7 +1299,7 @@ according to evolutionary relatedness, and colors / columns indicate different
 taxonomic families.
 
 We note as an aside that, while it is possible to plot the raw
-probabilities\footnote{These are in fact a column of the \texttt{beta_hat}
+probabilities\footnote{These are in fact a column of the \texttt{beta\_hat}
 data.frame in the code chunks above.} $p_{tk} =
 \frac{\exp{\beta_{tk}}}{\sum_{k^{\prime}} \exp{\beta_{tk^{\prime}}}}$, we find
 the $\beta_{tk}$s to be on a more useful scale, allowing comparison of slightly
@@ -1308,10 +1308,23 @@ in Figure 23.8 of [@mackay2003information].
 
 ### DTM ###
 
+We can attempt blend mixture and temporal evolution interpretations of the
+antibiotic data using the DTM. Now, the complexity of choosing the topic
+evolution rate $\sigma$ in the dynamic unigram model is compounded by the
+addition of a new mixture evolution rate parameter, $\delta$. Moreover, these
+parameters are tied to eachother in the posterior -- it is easier to imagine
+mixture memberships remaining steady over time if topics are allowed to evolve
+rapidly. In absence of any more definitive domain knowledge, we choose to place
+identical $\InvGam\left(\frac{1}{2}, \frac{1}{2}\right)$ priors on both
+$\sigma^{2}$ and $\delta^{2}$.
+
+Paralleling our experiments above, we again clear our code environment and
+prepare it for a new analysis.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm_setup}
+```{r dtm_setup, eval = TRUE}
 rm(list = ls())
 read_chunk("../src/antibiotics-study/dtm.R")
 ```
@@ -1320,49 +1333,49 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup}
+```{r setup, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r get-data}
+```{r get-data, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r vis-times}
+```{r vis-times, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r run-model}
+```{r run-model, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-theta}
+```{r prepare-theta, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-theta, fig.width = 6}
+```{r visualize-theta, fig.width = 6, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-beta}
+```{r prepare-beta, eval = TRUE}
 ```
 \endgroup
 
@@ -1370,11 +1383,9 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-beta, fig.width = 10, fig.height = 6}
+```{r visualize-beta, fig.width = 10, fig.height = 6, eval = TRUE, echo = FALSE}
 ```
 \endgroup
 \elandscape
-
-### NMF ###
 
 ## References ##
