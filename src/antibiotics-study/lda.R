@@ -56,34 +56,38 @@ ordered_map <- function(x) {
 ordered_map(get_taxa(abt)) + ggtitle("Raw")
 ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
 
-## ----  rounding ----
-X <- asinh(t(get_taxa(abt)))
-X[] <- as.integer(round(X, 0) * 1)
-
 ## ---- lda ----
+X <- t(get_taxa(abt))
 stan_data <- list(
-  K = 3,
+  K = 4,
   V = ncol(X),
   D = nrow(X),
   n = X,
-  ##alpha = rep(1e-10, 3),
-  ##gamma = rep(1e-2, ncol(X)),
-  alpha = rep(.1, 3),
-  gamma = rep(.1, ncol(X))
+  alpha = rep(1, 4),
+  gamma = rep(0.5, ncol(X))
 )
 
 m <- stan_model(file = "../src/stan/lda_counts.stan")
-stan_fit <- vb(m, stan_data, iter = 2000) #, eta = 0.12, adapt_engaged = FALSE)
-#stan_fit <- sampling(m, stan_data, iter = 2000, chains = 1) 
+n_iter <- 2000
+stan_fit <- vb(m, stan_data, iter = n_iter)
 samples <- rstan::extract(stan_fit)
 
 ## ---- extract_beta ----
 # underlying RSV distributions
-beta_hat <- samples$beta %>%
-  melt() %>%
-  setnames(c("iterations", "topic", "rsv_ix", "beta"))
-beta_hat$rsv <- rownames(tax_table(abt))[beta_hat$rsv_ix]
+beta_logit <- samples$beta
 
+for (i in seq_len(n_iter / 2)) {
+  for (k in seq_len(stan_data$K)) {
+    beta_logit[i, k, ] <- log(beta_logit[i, k, ])
+    beta_logit[i, k, ] <- beta_logit[i, k, ] - mean(beta_logit[i, k, ])
+  }
+}
+
+beta_hat <- beta_logit %>%
+  melt() %>%
+  setnames(c("iterations", "topic", "rsv_ix", "beta_logit"))
+
+beta_hat$rsv <- rownames(tax_table(abt))[beta_hat$rsv_ix]
 taxa <- data.table(tax_table(abt)@.Data)
 taxa$rsv <- rownames(tax_table(abt))
 taxa$Taxon_5[which(taxa$Taxon_5 == "")] <- taxa$Taxon_4[which(taxa$Taxon_5 == "")]
@@ -96,10 +100,18 @@ beta_hat$Taxon_5 <- factor(beta_hat$Taxon_5, levels = sorted_taxa)
 beta_hat$rsv <- factor(beta_hat$rsv, levels = taxa$rsv)
 
 ## ---- extract_theta ----
-theta_hat <- samples$theta %>%
+theta_logit <- samples$theta
+for (i in seq_len(n_iter / 2)) {
+  for (d in seq_len(stan_data$D)) {
+    theta_logit[i, d, ] <- log(theta_logit[i, d, ])
+    theta_logit[i, d, ] <- theta_logit[i, d, ] - mean(theta_logit[i, d, ])
+  }
+}
+
+theta_hat <- theta_logit %>%
   melt(
     varnames = c("iteration", "sample", "topic"),
-    value.name = "theta"
+    value.name = "theta_logit"
   )
 
 theta_hat$sample <- rownames(X)[theta_hat$sample]
@@ -121,7 +133,7 @@ plot_opts <- list(
 ggheatmap(
   theta_hat %>%
   group_by(topic, time) %>%
-  summarise(mean_theta = mean(theta)) %>%
+  summarise(mean_theta = mean(theta_logit, na.rm = TRUE)) %>%
   as.data.frame(),
   plot_opts
 )
@@ -129,37 +141,41 @@ ggheatmap(
 ## ---- visualize_theta_boxplot ----
 plot_opts <- list(
   "x" = "as.factor(time)",
-  "y" = "theta",
+  "y" = "theta_logit",
   "fill" = "topic",
   "col" = "topic",
-  "fill_colors" = RColorBrewer::brewer.pal(stan_data$K, "Set2"),
-  "col_colors" = RColorBrewer::brewer.pal(stan_data$K, "Set2"),
+  "fill_colors" = brewer.pal(stan_data$K, "Set2"),
+  "col_colors" = brewer.pal(stan_data$K, "Set2"),
   "facet_terms" = c("topic", "."),
-  "theme_opts" = list("panel_border" = 0.7)
+  "theme_opts" = list(border_size = 0.2, spacing = 0.5)
 )
 ggboxplot(data.frame(theta_hat), plot_opts) +
+  geom_hline(yintercept = 0, size = 0.1, alpha = 0.4) +
   labs(x = "Time") +
   theme(legend.position = "none")
 
 ## ---- visualize_beta ----
-plot_opts <- list(
-  "x" = "rsv",
-  "y" =  "sqrt(beta)",
+plot_opts <- list("x" = "rsv",
+  "y" =  "beta_logit",
   "fill" = "Taxon_5",
   "col" = "Taxon_5",
   "facet_terms" = c("topic", "Taxon_5"),
   "facet_scales" = "free_x",
   "facet_space" = "free_x",
+  "fill_colors" = brewer.pal(stan_data$K, "Set2"),
+  "col_colors" = brewer.pal(stan_data$K, "Set2"),
+  "theme_opts" = list(border_size = 0.2, spacing = 0.5),
   "outlier.shape" = NA
 )
 ggboxplot(
   beta_hat %>%
   data.frame() %>%
-  filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]),
+  filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4]),
   plot_opts
 ) +
-  labs(y = "sqrt(beta)", fill = "Family") +
-  scale_y_continuous(limits = c(0, 0.045), oob = scales::rescale_none) +
+  geom_hline(yintercept = 0, size = 0.1, alpha = 0.4) +
+  scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+  labs(y = "beta", fill = "Family") +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank(),
