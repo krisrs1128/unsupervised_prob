@@ -1048,7 +1048,7 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \setstretch{1}
 \fontsize{8pt}{8pt}
 \begin{}
-```{r histograms_figure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
+```{r histogramsfigure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
 include_graphics("figure/histograms-1.png")
 ```
 \endgroup
@@ -1063,7 +1063,7 @@ include_graphics("figure/histograms-1.png")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmaps_figure, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
+```{r heatmapsfigure, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
 include_graphics("figure/heatmaps-1.png")
 include_graphics("figure/heatmaps-2.png")
 ```
@@ -1144,7 +1144,7 @@ $\theta_{ik}$, and the sum for any column is 1.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_lda_theta_heatmap_figure, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time."}
+```{r visualizeldathetaheatmapfigure, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time."}
 include_graphics("figure/visualize_lda_theta_heatmap-1.png")
 ```
 \endgroup
@@ -1180,7 +1180,7 @@ larger for parameters with larger values.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_theta_boxplot_figure, fig.width = 10, fig.height = 8, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time."}
+```{r visualizethetaboxplotfigure, fig.width = 10, fig.height = 8, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time."}
 include_graphics("figure/visualize_theta_boxplot-1.png")
 ```
 \endgroup
@@ -1206,7 +1206,7 @@ relatedness. Note that we have not displayed outliers, because they make the fig
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_beta_figure, fig.width = 10, fig.height = 6, fig.cap = "The distribution over microbes associated with each LDA topic."}
+```{r visualizebetafigure, fig.width = 10, fig.height = 6, fig.cap = "The distribution over microbes associated with each LDA topic."}
 include_graphics("figure/visualize_beta_boxplot-1.png")
 ```
 \endgroup
@@ -1320,7 +1320,7 @@ centered -- this makes no difference in the associated probabilities.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramseries_figure, fig.caption = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively."}
+```{r unigramseriesfigure, fig.cap = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively."}
 include_graphics("figure/unigramseries-1.png")
 ```
 \endgroup
@@ -1344,12 +1344,13 @@ microbes, many of the paths occlude one another. Figure
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramboxplots_figure, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.caption = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced."}
+```{r unigramboxplotsfigure, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.cap = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced."}
+include_graphics("figure/unigramboxplots-1.png")
 ```
 \endgroup
 \elandscape
 
-In Figure \@ref(fig:unigramboxplots), each boxplot represent the posterior
+In Figure \@ref(fig:unigramboxplotsfigure), each boxplot represent the posterior
 quantiles of $\beta_{kv}$ for a single microbe. Each row is associated with a
 set of timepoints, according to the windowing strategy described in the data
 preparation phase. The labels on the far right describe the sampling condition
@@ -1454,7 +1455,7 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-alpha-figure, fig.width = 6}
+```{r visualizealphafigure}
 include_graphics("figure/visualize-alpha-figure-1.png")
 ```
 \endgroup
@@ -1463,7 +1464,7 @@ include_graphics("figure/visualize-alpha-figure-1.png")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizemufigure, fig.width = 10, fig.height = 6, echo = FALSE}
+```{r visualizemufigure, fig.width = 10, fig.height = 6}
 include_graphics("figure/visualize-mu-figure-1.png")
 ```
 \endgroup
