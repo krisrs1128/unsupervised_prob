@@ -361,5 +361,6 @@ experiment_contours <- function(combined) {
         summarise(estimate_mean_1 = mean(estimate_1), estimate_mean_2 = mean(estimate_2)),
       aes(x = sqrt(estimate_mean_1), y = sqrt(estimate_mean_2), label = variable),
       size = 2, col = "#fc8d62" ) +
-  facet_grid(method ~ D + N)
+  facet_grid(method ~ D + N) +
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
 }
