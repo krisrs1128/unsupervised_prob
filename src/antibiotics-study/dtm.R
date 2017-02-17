@@ -25,22 +25,16 @@ abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
-## ---- vis-times ----
-raw_times <- sample_data(abt)$time
-X <- t(asinh(get_taxa(abt)))
-X[] <- as.integer(round(X, 0) * 1)
-
-times <- 4 * floor(raw_times / 4)
-times <- raw_times
-times_mapping <- match(times, unique(times))
-times <- unique(times)
+## ---- prepare-data ----
+times <- sample_data(abt)$time
+X <- t(get_taxa(abt))
 
 ## ----  run-model ----
 N <- nrow(X)
 V <- ncol(X)
 T <- length(times)
 
-m <- stan_model("../src/stan/dtm.stan")
+m <- stan_model("../stan/dtm.stan")
 stan_data <- list(
   N = N,
   V = V,
@@ -49,17 +43,24 @@ stan_data <- list(
   sigma_hyper = c(0.5, 0.5),
   delta_hyper = c(0.5, 0.5),
   times = times,
-  times_mapping = times_mapping,
+  times_mapping = times,
   X = X
 )
 stan_fit <- vb(m, data = stan_data)
+save(
+  stan_fit,
+  file = sprintf("../../data/fits/dtm-%s.rda", gsub("[:|| ||-]", "", Sys.time()))
+)
 samples <- rstan::extract(stan_fit)
 rm(stan_fit)
 
 ## ---- prepare-alpha ----
+## center the alpha
 alpha <- samples$alpha
-for (i in seq_len(dim(alpha)[2])) {
-  alpha[, i, ] <- alpha[, i, ] - mean(alpha[, i, ])
+for (d in seq_len(stan_data$N)) {
+  for (i in seq_len(dim(alpha)[1])) {
+    alpha[i, d, ] <- alpha[i, d, ] - mean(alpha[i, d, ])
+  }
 }
 
 alpha_hat <- alpha %>%
@@ -90,10 +91,12 @@ plot_opts <- list(
 ## ---- prepare-mu ----
 mu <- samples$mu
 for (k in seq_len(dim(mu)[3])) {
-  mu[,, k, ] <- mu[,, k, ] - mean(mu[,, k, ])
+  for (i in seq_len(stan_data$K)) {
+    mu[i, k, ] <- mu[,, k, ] - mean(mu[i, k, ])
+  }
 }
 
-cur_times <- c(11, 12, 13)
+cur_times <- times %in% seq(10, 20, by = 3)
 mu_hat <- mu[, cur_times,, ] %>%
   melt(
     varnames = c("iteration", "time", "cluster", "rsv_ix")
@@ -125,9 +128,8 @@ plot_opts <- list(
   "theme_opts" = list(border_size = 0.7)
 )
 
-
 ## ---- visualize-alpha ----
-ggboxplot(alpha_hat, plot_opts) +
+p <- ggboxplot(alpha_hat, plot_opts) +
   labs(
     fill = "Topic",
     x = "time"
@@ -136,9 +138,10 @@ ggboxplot(alpha_hat, plot_opts) +
   theme(
     legend.position = "bottom"
   )
+ggsave("../../doc/figure/visualize-alpha-1.pdf", p)
 
 ## ---- visualize-mu ----
-ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
+p <- ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
   facet_grid(
     time ~ cluster + Taxon_5,
     scales = "free_x",
@@ -154,3 +157,4 @@ ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
     axis.text.x = element_blank(),
     legend.position = "bottom"
   )
+ggsave("../../doc/figure/visualize-mu-1.pdf", p)

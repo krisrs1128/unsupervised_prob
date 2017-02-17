@@ -35,10 +35,11 @@ transformed_counts <- data.frame(
   )
 )
 
-ggplot(transformed_counts) +
+p <- ggplot(transformed_counts) +
   geom_histogram(aes(x = count)) +
   facet_grid(. ~ transformation, scale = "free_x") +
   min_theme(list(text_size = 8, subtitle_size = 12))
+ggsave("../../doc/figure/histograms-1.png", p)
 
 ## ---- heatmaps ----
 y_order <- names(sort(taxa_sums(abt)))
@@ -53,8 +54,11 @@ ordered_map <- function(x) {
     labs(x = "Sample", y = "Microbe")
 }
 
-ordered_map(get_taxa(abt)) + ggtitle("Raw")
-ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
+p <- ordered_map(get_taxa(abt)) + ggtitle("Raw")
+ggsave("../../doc/figure/heatmaps-1.png", p)
+
+p <- ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
+ggsave("../../doc/figure/heatmaps-2.png", p)
 
 ## ---- lda ----
 X <- t(get_taxa(abt))
@@ -67,10 +71,15 @@ stan_data <- list(
   gamma = rep(0.5, ncol(X))
 )
 
-m <- stan_model(file = "../src/stan/lda_counts.stan")
+m <- stan_model(file = "../stan/lda_counts.stan")
 n_iter <- 2000
 stan_fit <- vb(m, stan_data, iter = n_iter)
+save(
+  stan_fit,
+  file = sprintf("../../data/fits/lda-%s.rda", gsub("[:|| ||-]", "", Sys.time()))
+)
 samples <- rstan::extract(stan_fit)
+rm(stan_fit)
 
 ## ---- extract_beta ----
 # underlying RSV distributions
@@ -122,7 +131,7 @@ theta_hat$topic <- paste("Topic", theta_hat$topic)
 theta_hat <- theta_hat %>%
   left_join(sample_info, by = "sample")
 
-## ---- visualize_theta_heatmap ----
+## ---- visualize_lda_theta_heatmap ----
 plot_opts <- list(
   "x" = "time",
   "y" = "topic",
@@ -130,15 +139,16 @@ plot_opts <- list(
   "y_order" = paste("Topic", stan_data$K:1)
 )
 
-ggheatmap(
+p <- ggheatmap(
   theta_hat %>%
   group_by(topic, time) %>%
   summarise(mean_theta = mean(theta_logit, na.rm = TRUE)) %>%
   as.data.frame(),
   plot_opts
 )
+ggsave("../../doc/figure/visualize_lda_theta_heatmap.png", p)
 
-## ---- visualize_theta_boxplot ----
+## ---- visualize_lda_theta_boxplot ----
 plot_opts <- list(
   "x" = "as.factor(time)",
   "y" = "theta_logit",
@@ -149,12 +159,13 @@ plot_opts <- list(
   "facet_terms" = c("topic", "."),
   "theme_opts" = list(border_size = 0.7)
 )
-ggboxplot(data.frame(theta_hat), plot_opts) +
+p <- ggboxplot(data.frame(theta_hat), plot_opts) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   labs(x = "Time") +
   theme(legend.position = "none")
+ggsave("../../doc/figure/visualize_lda_theta_boxplot.png", p)
 
-## ---- visualize_beta ----
+## ---- visualize_lda_beta ----
 plot_opts <- list("x" = "rsv",
   "y" =  "beta_logit",
   "fill" = "Taxon_5",
@@ -167,7 +178,7 @@ plot_opts <- list("x" = "rsv",
   "theme_opts" = list(border_size = 0.7),
   "outlier.shape" = NA
 )
-ggboxplot(
+p <- ggboxplot(
   beta_hat %>%
   data.frame() %>%
   filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4]),
@@ -181,6 +192,7 @@ ggboxplot(
     strip.text.x = element_blank(),
     legend.position = "bottom"
   )
+ggsave("../../doc/figure/visualize_lda_beta.png", p)
 
 ## ---- save_results ----
 dir.create("results")

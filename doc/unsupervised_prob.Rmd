@@ -1318,9 +1318,14 @@ rapidly. In absence of any more definitive domain knowledge, we choose to place
 identical $\InvGam\left(\frac{1}{2}, \frac{1}{2}\right)$ priors on both
 $\sigma^{2}$ and $\delta^{2}$.
 
-Paralleling our experiments above, we again clear our code environment and
-prepare it for a new analysis.
+By this point, the general arc of these modeling experiments should be familiar:
+we first clear our workspace, reload and prepare the data, fit the model of
+interest, and extract and comment on the output. This encapsulates the usual
+inferential stage of data modeling, where a particular model is posited and
+estimated, but omits the important stage of model revision and comparison, which
+we defer at this point.
 
+We first refresh our workspace and prepare the data to model.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}

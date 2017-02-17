@@ -34,7 +34,7 @@ abt <- abt %>%
   subset_samples(ind == "F")
 
 ## ---- vis-times ----
-raw_times <- sample_data(abt)$time
+times <- sample_data(abt)$time
 X <- t(get_taxa(abt))
 
 ## ---- run-model ----
@@ -49,9 +49,14 @@ stan_data <- list(
   b0 = 0.5
 )
 
-m <- stan_model("../src/stan/unigram.stan")
+m <- stan_model("../stan/unigram.stan")
 stan_fit <- vb(m, data = stan_data)
+save(
+  stan_fit,
+  file = sprintf("../../data/fits/unigram-%s.rda", gsub("[:|| ||-]", "", Sys.time()))
+)
 samples <- rstan::extract(stan_fit)
+rm(stan_fit)
 
 ## ---- prepare-beta ----
 taxa <- data.table(
@@ -96,7 +101,7 @@ plot_opts <- list(
   "alpha" = 0.4,
   "group" = "rsv"
 )
-gglines(
+p <- gglines(
   beta_hat %>%
   filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4]) %>%
   group_by(rsv, time) %>%
@@ -110,6 +115,7 @@ gglines(
     strip.text.y = element_blank(),
     legend.position = "bottom"
   )
+ggsave("../../doc/figure/unigramseries.png", p)
 
 ## ---- unigramboxplots ----
 plot_opts <- list(
@@ -123,7 +129,7 @@ plot_opts <- list(
   "fill_colors" = brewer.pal(8, "Set2"),
   "theme_opts" = list(border_size = 0.7)
 )
-ggboxplot(
+p <- ggboxplot(
   beta_hat %>%
   filter(
     Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4],
@@ -140,3 +146,4 @@ ggboxplot(
     axis.text.x = element_blank(),
     legend.position = "bottom"
   )
+ggsave("../../doc/figure/unigramboxplots.png", p)
