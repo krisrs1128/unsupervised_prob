@@ -75,7 +75,7 @@ alpha_hat <- sample_data(abt) %>%
   unique() %>%
   right_join(alpha_hat)
 
-plot_opts <- list(
+alpha_plot_opts <- list(
   "x" = "as.factor(time)",
   "y" = "alpha",
   "fill" = "as.factor(cluster)",
@@ -114,10 +114,10 @@ mu_hat$rsv <- taxa$rsv[mu_hat$rsv_ix]
 mu_hat <- mu_hat %>%
   left_join(taxa) %>%
   filter(
-    Taxon_5 %in% sorted_taxa[1:8]
+    Taxon_5 %in% sorted_taxa[1:4]
   )
 
-plot_opts <- list(
+mu_plot_opts <- list(
   "x" = "rsv",
   "y" = "value",
   "col" = "Taxon_5",
@@ -129,7 +129,7 @@ plot_opts <- list(
 )
 
 ## ---- visualize-alpha ----
-p <- ggboxplot(alpha_hat, plot_opts) +
+p <- ggboxplot(alpha_hat, alpha_plot_opts) +
   labs(
     fill = "Topic",
     x = "time"
@@ -141,7 +141,7 @@ p <- ggboxplot(alpha_hat, plot_opts) +
 ggsave("../../doc/figure/visualize-alpha-1.png", p)
 
 ## ---- visualize-mu ----
-p <- ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
+p <- ggboxplot(mu_hat, mu_plot_opts) +
   facet_grid(
     time ~ cluster + Taxon_5,
     scales = "free_x",

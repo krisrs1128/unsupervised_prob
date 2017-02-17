@@ -1039,7 +1039,7 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r histograms_code}
+```{r histograms}
 ```
 \endgroup
 
@@ -1048,7 +1048,7 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \setstretch{1}
 \fontsize{8pt}{8pt}
 \begin{}
-```{r histograms, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
+```{r histograms_figure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
 include_graphics("figure/histograms-1.png")
 ```
 \endgroup
@@ -1056,14 +1056,14 @@ include_graphics("figure/histograms-1.png")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmaps_code}
+```{r heatmaps}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmaps, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
+```{r heatmaps_figure, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
 include_graphics("figure/heatmaps-1.png")
 include_graphics("figure/heatmaps-2.png")
 ```
@@ -1137,14 +1137,14 @@ $\theta_{ik}$, and the sum for any column is 1.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_lda_theta_heatmap_code}
+```{r visualize_lda_theta_heatmap}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_lda_theta_heatmap, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time."}
+```{r visualize_lda_theta_heatmap_figure, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time."}
 include_graphics("figure/visualize_lda_theta_heatmap-1.png")
 ```
 \endgroup
@@ -1172,7 +1172,7 @@ larger for parameters with larger values.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_theta_boxplot_code}
+```{r visualize_theta_boxplot}
 ```
 \endgroup
 
@@ -1180,7 +1180,8 @@ larger for parameters with larger values.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_theta_boxplot, fig.width = 10, fig.height = 8, fig.cap = ""}
+```{r visualize_theta_boxplot_figure, fig.width = 10, fig.height = 8, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time."}
+include_graphics("figure/visualize_theta_boxplot-1.png")
 ```
 \endgroup
 \elandscape
@@ -1194,11 +1195,19 @@ and within these families, microbes are sorted according to evolutionary
 relatedness. Note that we have not displayed outliers, because they make the figure difficult to read.
 
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_beta}
+```
+\endgroup
+
 \blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_beta, fig.width = 10, fig.height = 6, echo = FALSE}
+```{r visualize_beta_figure, fig.width = 10, fig.height = 6, fig.cap = "The distribution over microbes associated with each LDA topic."}
+include_graphics("figure/visualize_beta_boxplot-1.png")
 ```
 \endgroup
 \elandscape
@@ -1304,7 +1313,15 @@ centered -- this makes no difference in the associated probabilities.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramseries, fig.caption = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively."}
+```{r unigramseries}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigramseries_figure, fig.caption = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively."}
+include_graphics("figure/unigramseries-1.png")
 ```
 \endgroup
 
@@ -1316,11 +1333,18 @@ microbes, many of the paths occlude one another. Figure
 \@ref(fig:unigramboxplots) is the time series version of Figure
 \@ref(fig:visualize_beta), and it is designed to overcome these limitations.
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigramboxplots}
+```
+\endgroup
+
 \blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramboxplots, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.caption = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced."}
+```{r unigramboxplots_figure, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.caption = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced."}
 ```
 \endgroup
 \elandscape
@@ -1416,7 +1440,22 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-alpha, fig.width = 6}
+```{r visualize-alpha}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize-mu}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize-alpha-figure, fig.width = 6}
+include_graphics("figure/visualize-alpha-figure-1.png")
 ```
 \endgroup
 
@@ -1424,7 +1463,8 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-mu, fig.width = 10, fig.height = 6, echo = FALSE}
+```{r visualizemufigure, fig.width = 10, fig.height = 6, echo = FALSE}
+include_graphics("figure/visualize-mu-figure-1.png")
 ```
 \endgroup
 \elandscape
