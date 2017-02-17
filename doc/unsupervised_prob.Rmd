@@ -18,13 +18,13 @@ link-citations: yes
 ```{r knitr}
 library("knitr")
 chunk_opts <- list(
-  fig.width = 5,
-  fig.height = 3,
+  out.width = "5in",
+  out.height = "3in",
   fig.align = "center",
   cache = FALSE,
   warning = FALSE,
   message = FALSE,
-  eval = FALSE
+  eval = TRUE
 )
 
 opts_chunk$set(chunk_opts)
@@ -53,10 +53,10 @@ microbial abundance data, providing functional context.
 
 ### Data Description ###
 
-In this study, we focus on 16S sequencing data, one of the original approaches
+In this study, we focus on 1"6in"S sequencing data, one of the original approaches
 to quantifying microbial abundances, and still one of the most common protocols
 for describing microbial ecology. Briefly, this procedure relies on the fact
-that the 16S gene is conserved across most bacterial species, but is variable
+that the 1"6in"S gene is conserved across most bacterial species, but is variable
 enough to differ across different strains. Hence, by counting number of
 occurrences of different versions of this gene, it is possible to measure the
 numbers of different species present in a sample, without attempting the
@@ -389,12 +389,12 @@ read_chunk("../src/sim/nmf/nmf_expers.R")
 \endgroup
 
 We specify our experiment using a JSON file whose elements provide simulation
-and model fitting parameters. We fix the total number of samples at 100 and
+and model fitting parameters. We fix the total number of samples at "10in"0 and
 latent factors at 2. We set the dimension to either 75 or 125. We alternate
 fitting using Gibbs sampling and Variational Bayes. We vary the zero inflation
 probability across $\{0, 0.2\}$, and fit using either the zero-inflation
 likelihood with known zero inflation probability or using the GaP model which is
-unaware of zero-inflation. In all, there are 16 configurations. These simulation
+unaware of zero-inflation. In all, there are 1"6in" configurations. These simulation
 parameters are set up in the configuration \texttt{data.frame} below, which is
 output to \texttt{config.json} so that it can be read by the batch script, which
 is used to parallelize the simulation.
@@ -479,7 +479,7 @@ is small but consistent, especially in Gibbs Sampling.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas, fig.height = 4, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```{r visualizethetas, out.height = 4, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
 ```
 \endgroup
 
@@ -519,7 +519,7 @@ increases.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetas, fig.height = 4, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+```{r visualizebetas, out.height = 4, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
 ```
 \endgroup
 
@@ -571,7 +571,7 @@ modeling (Z-GaP vs. GaP) and the underlying zero inflation probability.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfthetas, fig.height = 8, fig.width = 8, fig.cap = "Each panel displays the estimated scores for a different simulation setting, with a focus on the effect of zero inflation. Columns distinguish between different zero-inflation probabilities and modeling techniques."}
+```{r visualizezinfthetas, out.height = 8, out.width = 8, fig.cap = "Each panel displays the estimated scores for a different simulation setting, with a focus on the effect of zero inflation. Columns distinguish between different zero-inflation probabilities and modeling techniques."}
 ```
 \endgroup
 
@@ -605,7 +605,7 @@ Z-GaP models.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfbetas, fig.height = 6, fig.width = 6, fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
+```{r visualizezinfbetas, out.height = "6in", out.width = "6in", fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
 ```
 \endgroup
 
@@ -641,7 +641,7 @@ to parallelize than bootstrapping. The hope then would be that bootstrapping
 offers the best of both world -- the speed of VB with the accuracy of MCMC. We
 discuss whether our simulation study substantiats this idea below.
 
-We take $D \in \{20, 100\}$, $V \in \{10, 50\}$ and $N \in \{20, 50, 100\}$ and
+We take $D \in \{20, "10in"0\}$, $V \in \{"10in", 50\}$ and $N \in \{20, 50, "10in"0\}$ and
 then simulate under all 12 combinations of these three parameters. Throughout,
 we fix $\alpha_{0} = \gamma_{0} = 1$ and $K = 2$. With these parameters, we aim
 to characterize performance of different inferential techniques under different
@@ -732,7 +732,7 @@ topics, we align those with the next highest correlation, and so on.}.
 \endgroup
 
 Figure \@ref(betacountours1) displays the true and posterior $\beta_{k}$ for the
-experiments with $V = 10$ features, while other simulation characteristics are
+experiments with $V = "10in"$ features, while other simulation characteristics are
 varied. As before, each panel represents a single experimental configuration,
 with two axes associated with the two underlying topics. Each black number $v$
 is the true value of feature $v$ across topics: $\left(\beta_{v1},
@@ -757,14 +757,14 @@ same way.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours1, fig.width = 7, fig.height = 4, fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10$ features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
+```{r betacontours1, out.width = 7, out.height = 4, fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10 features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours2, fig.width = 7, fig.height = 4, fig.cap = "The analogous figure, with distributions over $V = 50$ instead of 10 features."}
+```{r betacontours2, out.width = 7, out.height = 4, fig.cap = "The analogous figure, with distributions over $V = 50$ instead of 10 features."}
 ```
 \endgroup
 
@@ -772,7 +772,7 @@ A few comments are in order. As expected, when $D$ increases, i.e., more samples
 are made available, the posterior for $\beta$, whose dimension do not increase
 with $D$, begins to concentrate around its true value. It is unclear whether the
 rate of concentration when $V = 50$ is much different from the case where $V =
-10$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
+"10in"$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
 could result from their being more fitted parameter values being displayed in
 the same space, though see \@ref(fig:betahistograms) for more clarity on this
 point.
@@ -808,7 +808,7 @@ different $D$ (first row of labels) and $N$ (second row of labels).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betahistograms, fig.height = 6, fig.cap = "Histograms of the difference between sampled topic parameters and their true values, across experimental configurations."}
+```{r betahistograms, out.height = "6in", fig.cap = "Histograms of the difference between sampled topic parameters and their true values, across experimental configurations."}
 ```
 \endgroup
 
@@ -841,17 +841,17 @@ given by a grey horizontal line.
 \endgroup
 
 \blandscape
-```{r betaboxplot1, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$.", echo = FALSE}
+```{r betaboxplot1, out.width = "10in", out.height = "6in", fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$.", echo = FALSE}
 ```
 \elandscape
 
 \blandscape
-```{r betaboxplot2, fig.width = 10, fig.height = 6, fig.cap = "Boxplots of posterior samles, when $V = 50$.", echo = FALSE}
+```{r betaboxplot2, out.width = "10in", out.height = "6in", fig.cap = "Boxplots of posterior samles, when $V = 50$.", echo = FALSE}
 ```
 \elandscape
  
 Different columns index different features -- in Figure \@ref(fig:betaboxplot1),
-$V = 10$, while in Figure \@ref(fig:betaboxplot2), $V = 50$. Rows index
+$V = "10in"$, while in Figure \@ref(fig:betaboxplot2), $V = 50$. Rows index
 different topics and experimental configurations. From inside out, the $y$-axis
 facet labels give $K$, $N$, and $D$, respectively. Note that the true values are
 not the same across experimental configurations, due to the simulation setup.
@@ -902,7 +902,7 @@ these are in Figures \@ref(fig:thetaboxplot1) and \@ref(fig:thetaboxplot2).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r thetaboxplot1, fig.width = 10, fig.height = 6, echo = FALSE, fig.cap = "Estimated and true proportions $\\theta_{i1}$ across samples, for simulations where $D = 20$."}
+```{r thetaboxplot1, out.width = "10in", out.height = "6in", echo = FALSE, fig.cap = "Estimated and true proportions $\\theta_{i1}$ across samples, for simulations where $D = 20$."}
 ```
 \endgroup
 \elandscape
@@ -911,7 +911,7 @@ these are in Figures \@ref(fig:thetaboxplot1) and \@ref(fig:thetaboxplot2).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r thetaboxplot2, fig.width = 10, fig.height = 6, echo = FALSE, fig.cap = "The analogous figure, when $D = 100$"}
+```{r thetaboxplot2, out.width = "10in", out.height = "6in", echo = FALSE, fig.cap = "The analogous figure, when $D = 100"}
 ```
 \endgroup
 \elandscape
@@ -934,7 +934,7 @@ coordinates when $N$ is large. Generally this bias generally tends to pull
 coordinates towards the prior, making the estimated $\theta_{i1}$s flatter
 across $i$s. Second, VB behaves quite differently from MCMC and the bootstrap
 when $N$ is small, sometimes better (column 15 in row 1) and sometimes worse
-(column 6 in row 1). We also notice that when $V$ is larger, the uncertainty in
+(column "6in" in row 1). We also notice that when $V$ is larger, the uncertainty in
 estimated $\theta_{i}$ increases, perhaps because estimation of the underlying
 topics deteriorates. In this sense, LDA is not transposable -- when estimating
 $\beta_{vk}$, increasing $N$ reduced uncertainty, while for estimating
@@ -952,9 +952,9 @@ experimental configurations, we again histogram the discrepancies between
 samples and known simulation values. The increasing narrowness in histograms
 moving from left to right in groups of three reflects increasing sample sizes.
 The last three columns tend to have slightly wider histograms than the the first
-three, corresponding to higher errors for $V = 50$ relative to $V = 10$.
+three, corresponding to higher errors for $V = 50$ relative to $V = "10in"$.
 
-The $V = 10$, $N = 100$, $D = 20$ case has error distributions for the two
+The $V = "10in"$, $N = "10in"0$, $D = 20$ case has error distributions for the two
 topics that seem to be shifted relative to one another, though we have no
 explanation why this effect only appears here and the $50, 50, 20$ VB case.
 
@@ -1047,8 +1047,8 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r histogramsfigure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon asinh ransformation, the data are more regularly shaped, though still somewhat heavy tailed.", eval = TRUE, fig.width = 3, fig.height = 2}
-include_graphics("figure/histograms-1.pdf")
+```{r histogramsfigure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon asinhl ransformation, the data are more regularly shaped, though still somewhat heavy tailed.", eval = TRUE}
+include_graphics("figure/histograms-1.png")
 ```
 \endgroup
 
@@ -1062,8 +1062,8 @@ include_graphics("figure/histograms-1.pdf")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmapsfigure, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value.", eval = TRUE}
-include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf"))
+```{r heatmapsfigure, fig.show = "hold", fig.align = "left", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value.", eval = TRUE, out.height = "1.5in"}
+include_graphics(c("figure/heatmaps-1.png", "figure/heatmaps-2.png")) 
 ```
 \endgroup
 
@@ -1087,7 +1087,7 @@ parameters should be regarded skeptically.
 #### Estimation ####
 
 We fit LDA with $K = 3$, chosen arbitrarily, but with the heuristic that a large
-$K$ could be hard to interpret, considering there are only 56 samples. We use
+$K$ could be hard to interpret, considering there are only 5"6in" samples. We use
 VB, because MCMC seemed to produce degenerate fits\footnote{Most of the
 sampled $\theta_{ik}$ were nearly 0 or 1. Somehow, VB seems to be performing a
 type of regularization.}.
@@ -1143,7 +1143,7 @@ $\theta_{ik}$, and the sum for any column is 1.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualizeldathetaheatmapfigure, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time.", eval = TRUE}
-include_graphics("figure/visualize_lda_theta_heatmap-1.pdf")
+include_graphics("figure/visualize_lda_theta_heatmap-1.png")
 ```
 \endgroup
 
@@ -1178,8 +1178,8 @@ larger for parameters with larger values.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetaboxplotfigure, fig.width = 10, fig.height = 8, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time.", echo = FALSE, eval = TRUE}
-include_graphics("figure/visualize_lda_theta_boxplot-1.pdf")
+```{r visualizethetaboxplotfigure, out.width = "10in", out.height = "6in", fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time.", echo = FALSE, eval = TRUE}
+include_graphics("figure/visualize_lda_theta_boxplot-1.png")
 ```
 \endgroup
 \elandscape
@@ -1190,8 +1190,8 @@ the estimated topic distributions $\beta_{\cdot k}$, displayed in Figure
 estimated topics. Each boxplot within a row is associated with posterior samples
 for a single microbe. Different colors identify different taxonomic families,
 and within these families, microbes are sorted according to evolutionary
-relatedness. Note that we have not displayed outliers, because they make the
-figure difficult to read.
+relatedness. Note that we have not displayed outliers, because they make the figure difficult to read.
+
 
 \begingroup
 \setstretch{1}
@@ -1204,8 +1204,8 @@ figure difficult to read.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetafigure, fig.width = 10, fig.height = 6, fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE, eval = TRUE}
-include_graphics("figure/visualize_lda_beta-1.pdf")
+```{r visualizebetafigure, out.width = "10in", out.height = "6in", fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE, eval = TRUE}
+include_graphics("figure/visualize_lda_beta-1.png")
 ```
 \endgroup
 \elandscape
@@ -1318,7 +1318,7 @@ centered -- this makes no difference in the associated probabilities.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r unigramseriesfigure, fig.cap = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively.", eval = TRUE}
-include_graphics("figure/unigramseries-1.pdf")
+include_graphics("figure/unigramseries-1.png")
 ```
 \endgroup
 
@@ -1341,8 +1341,8 @@ microbes, many of the paths occlude one another. Figure
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramboxplotsfigure, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.cap = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced.", eval = TRUE}
-include_graphics("figure/unigramboxplots-1.pdf")
+```{r unigramboxplotsfigure, out.width = "10in", out.height = "6in", echo = FALSE, fig.cap = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced.", eval = TRUE}
+include_graphics("figure/unigramboxplots-1.png")
 ```
 \endgroup
 \elandscape
@@ -1453,7 +1453,7 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualizealphafigure, eval = TRUE}
-include_graphics("figure/visualize-alpha-1.pdf")
+include_graphics("figure/visualize-alpha-1.png")
 ```
 \endgroup
 
@@ -1461,8 +1461,8 @@ include_graphics("figure/visualize-alpha-1.pdf")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizemufigure, fig.width = 10, fig.height = 6, echo = FALSE, eval = TRUE}
-include_graphics("figure/visualize-mu-1.pdf")
+```{r visualizemufigure, out.width = "10in", out.height = "6in", echo = FALSE, eval = TRUE}
+include_graphics("figure/visualize-mu-1.png")
 ```
 \endgroup
 \elandscape
