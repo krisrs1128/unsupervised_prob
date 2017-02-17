@@ -9,8 +9,8 @@
 ## author: kriss1@stanford.edu
 
 ## ---- libraries-nmf-expers ----
-suppressMessages(library("jsonlite"))
-suppressMessages(library("SLURMHelpers"))
+library("jsonlite")
+library("SLURMHelpers")
 base_dir <- "../src/sim/nmf"
 source(file.path(base_dir, "nmf_utils.R"))
 submit_batch <- FALSE ## so we can recompile the knitr document without submitting cluster jobs

@@ -56,13 +56,14 @@ for (i in seq_along(unique_V)) {
 }
 
 ## ---- betacontours1 ----
-p[[1]]
+ggsave("figure/betacontours1-1.pdf", p[[1]])
 
 ## ---- betacontours2 ----
-p[[2]]
+ggsave("figure/betacontours2-1.pdf", p[[2]])
 
 ## ---- betahistograms ----
-error_histograms(mcombined, c("V + method", "D + N"))
+p <- error_histograms(mcombined, c("V + method", "D + N"))
+ggsave("figure/betahistograms-1.pdf", p)
 
 ## ---- beta-boxplots-object ----
 p <- list()
@@ -74,10 +75,10 @@ for (i in seq_along(unique_V)) {
 }
 
 ## ---- betaboxplot1 ----
-p[[1]]
+ggsave("figure/betaboxplot1-1.pdf", p[[1]])
 
 ## ---- betaboxplot2 ----
-p[[2]]
+ggsave("figure/betaboxplot2-1.pdf", p[[2]])
 
 ## ---- theta-samples ----
 theta <- get_truth_data(metadata, "theta", "i") %>%
@@ -113,10 +114,11 @@ for (i in seq_along(unique_D)) {
 }
 
 ## ---- thetaboxplot1 ----
-p[[1]]
+ggsave("figure/thetaboxplot1-1.pdf", p[[1]])
 
 ## ---- thetaboxplot2 ----
-p[[2]]
+ggsave("figure/thetaboxplot2-1.pdf", p[[2]])
 
 ## ---- thetahistograms ----
-error_histograms(mcombined, c("D + method", "V + N"))
+p <- error_histograms(mcombined, c("D + method", "V + N"))
+ggsave("figure/thetahistograms-1.pdf", p)
