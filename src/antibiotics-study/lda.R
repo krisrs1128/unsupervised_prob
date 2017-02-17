@@ -193,4 +193,4 @@ p <- ggboxplot(
     strip.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize_lda_beta.png", p)
+ggsave("../../doc/figure/visualize_lda_beta.png", p, width = 10, height = 8)

@@ -146,4 +146,4 @@ p <- ggboxplot(
     axis.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/unigramboxplots.png", p)
+ggsave("../../doc/figure/unigramboxplots.png", p, width = 10, height = 8)

@@ -157,4 +157,4 @@ p <- ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
     axis.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize-mu-1.pdf", p)
+ggsave("../../doc/figure/visualize-mu-1.pdf", p, width = 10, height = 8)
