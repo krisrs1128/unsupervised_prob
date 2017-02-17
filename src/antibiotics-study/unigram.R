@@ -115,7 +115,7 @@ p <- gglines(
     strip.text.y = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/unigramseries.png", p)
+ggsave("../../doc/figure/unigramseries-1.png", p)
 
 ## ---- unigramboxplots ----
 plot_opts <- list(
@@ -146,4 +146,4 @@ p <- ggboxplot(
     axis.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/unigramboxplots.png", p, width = 10, height = 8)
+ggsave("../../doc/figure/unigramboxplots-1.png", p, width = 10, height = 8)

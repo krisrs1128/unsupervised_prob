@@ -147,7 +147,7 @@ p <- ggheatmap(
   as.data.frame(),
   plot_opts
 )
-ggsave("../../doc/figure/visualize_lda_theta_heatmap.png", p)
+ggsave("../../doc/figure/visualize_lda_theta_heatmap-1.png", p)
 
 ## ---- visualize_lda_theta_boxplot ----
 plot_opts <- list(
@@ -164,7 +164,7 @@ p <- ggboxplot(data.frame(theta_hat), plot_opts) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   labs(x = "Time") +
   theme(legend.position = "none")
-ggsave("../../doc/figure/visualize_lda_theta_boxplot.png", p)
+ggsave("../../doc/figure/visualize_lda_theta_boxplot-1.png", p)
 
 ## ---- visualize_lda_beta ----
 plot_opts <- list("x" = "rsv",
@@ -193,4 +193,4 @@ p <- ggboxplot(
     strip.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize_lda_beta.png", p, width = 10, height = 8)
+ggsave("../../doc/figure/visualize_lda_beta-1.png", p, width = 10, height = 8)

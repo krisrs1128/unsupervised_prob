@@ -138,7 +138,7 @@ p <- ggboxplot(alpha_hat, plot_opts) +
   theme(
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize-alpha-1.pdf", p)
+ggsave("../../doc/figure/visualize-alpha-1.png", p)
 
 ## ---- visualize-mu ----
 p <- ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
@@ -157,4 +157,4 @@ p <- ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
     axis.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize-mu-1.pdf", p, width = 10, height = 8)
+ggsave("../../doc/figure/visualize-mu-1.png", p, width = 10, height = 8)
