@@ -92,7 +92,7 @@ plot_opts <- list(
 mu <- samples$mu
 for (k in seq_len(dim(mu)[3])) {
   for (i in seq_len(stan_data$K)) {
-    mu[i, k, ] <- mu[,, k, ] - mean(mu[i, k, ])
+    mu[i, k, ] <- mu[i, k, ] - mean(mu[i, k, ])
   }
 }
 
