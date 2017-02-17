@@ -1329,7 +1329,7 @@ We first refresh our workspace and prepare the data to model.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm_setup, eval = TRUE}
+```{r dtm_setup}
 rm(list = ls())
 read_chunk("../src/antibiotics-study/dtm.R")
 ```
@@ -1338,49 +1338,49 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup, eval = TRUE}
+```{r setup}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r get-data, eval = TRUE}
+```{r get-data}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r vis-times, eval = TRUE}
+```{r vis-times}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r run-model, eval = TRUE}
+```{r run-model}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-alpha, eval = TRUE}
+```{r prepare-alpha}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-mu, eval = TRUE}
+```{r prepare-mu}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-alpha, fig.width = 6, eval = TRUE}
+```{r visualize-alpha, fig.width = 6}
 ```
 \endgroup
 
@@ -1388,7 +1388,7 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-mu, fig.width = 10, fig.height = 6, eval = TRUE, echo = FALSE}
+```{r visualize-mu, fig.width = 10, fig.height = 6, echo = FALSE}
 ```
 \endgroup
 \elandscape
