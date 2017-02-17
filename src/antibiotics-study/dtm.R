@@ -56,7 +56,7 @@ stan_fit <- vb(m, data = stan_data)
 samples <- rstan::extract(stan_fit)
 rm(stan_fit)
 
-## ---- prepare-theta ----
+## ---- prepare-alpha ----
 alpha <- samples$alpha
 for (i in seq_len(dim(alpha)[2])) {
   alpha[, i, ] <- alpha[, i, ] - mean(alpha[, i, ])
@@ -67,13 +67,10 @@ alpha_hat <- alpha %>%
     varnames = c("iteration", "time", "cluster"),
     value.name = "alpha"
   )
+
 alpha_hat$time <- times[alpha_hat$time]
-
-cur_samples <- data.frame(sample_data(abt))
-
-#cur_samples$time <- 4 * floor(cur_samples$time / 4)
-
-alpha_hat <- cur_samples %>%
+alpha_hat <- sample_data(abt) %>%
+  data.frame() %>%
   unique() %>%
   right_join(alpha_hat)
 
@@ -86,21 +83,11 @@ plot_opts <- list(
   "col_colors" = brewer.pal(3, "Set2"),
   "facet_terms" = c("cluster", "condition"),
   "facet_scales" = "free_x",
-  "facet_space" = "free_x"
+  "facet_space" = "free_x",
+  "theme_opts" = list(border_size = 0.7)
 )
 
-## ---- visualize-theta ----
-ggboxplot(alpha_hat, plot_opts) +
-  labs(
-    fill = "Topic",
-    x = "time"
-  ) +
-  theme(
-    panel.border = element_rect(fill = "transparent", size = 0.2),
-    legend.position = "bottom"
-  )
-
-## ---- prepare-beta ----
+## ---- prepare-mu ----
 mu <- samples$mu
 for (k in seq_len(dim(mu)[3])) {
   mu[,, k, ] <- mu[,, k, ] - mean(mu[,, k, ])
@@ -134,8 +121,21 @@ plot_opts <- list(
   "fill" = "Taxon_5",
   "outlier.shape" = NA,
   "col_cols" = brewer.pal(3, "Set2"),
-  "fill_cols" = brewer.pal(3, "Set2")
+  "fill_cols" = brewer.pal(3, "Set2"),
+  "theme_opts" = list(border_size = 0.7)
 )
+
+
+## ---- visualize-alpha ----
+ggboxplot(alpha_hat, plot_opts) +
+  labs(
+    fill = "Topic",
+    x = "time"
+  ) +
+  geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
+  theme(
+    legend.position = "bottom"
+  )
 
 ## ---- visualize-mu ----
 ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
@@ -145,13 +145,12 @@ ggboxplot(mu_hat %>% filter(rsv_ix < 100), plot_opts) +
     space = "free_x"
   ) +
   scale_y_continuous(limits = c(-3.5, 8), oob = scales::rescale_none) +
-  geom_hline(yintercept = 0, alpha = 0.4, size = 0.3) +
+  geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   labs(
     "col" = "Taxonomic Family",
     "fill" = "Taxonomic Family"
   ) +
   theme(
     axis.text.x = element_blank(),
-    panel.border = element_rect(fill = "transparent", size = 0.2),
     legend.position = "bottom"
   )

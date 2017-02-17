@@ -1052,7 +1052,7 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 
 With these preprocessing steps out of the way, we can proceed with modeling.
 
-### LDA {sec:antibiotics-lda}
+### LDA {#sec:antibiotics-lda}
 
 We first apply LDA directly. Note that, after the $\asinh$ transformation, the
 data are no longer actually counts. To make the model applicable, we round to
@@ -1361,21 +1361,21 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-theta, eval = TRUE}
+```{r prepare-alpha, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-theta, fig.width = 6, eval = TRUE}
+```{r prepare-mu, eval = TRUE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-beta, eval = TRUE}
+```{r visualize-alpha, fig.width = 6, eval = TRUE}
 ```
 \endgroup
 
@@ -1383,7 +1383,7 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-beta, fig.width = 10, fig.height = 6, eval = TRUE, echo = FALSE}
+```{r visualize-mu, fig.width = 10, fig.height = 6, eval = TRUE, echo = FALSE}
 ```
 \endgroup
 \elandscape

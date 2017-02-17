@@ -121,7 +121,7 @@ plot_opts <- list(
   "alpha" = 0.4,
   "col_colors" = brewer.pal(8, "Set2"),
   "fill_colors" = brewer.pal(8, "Set2"),
-  "theme_opts" = list(border_size = 0.2, spacing = 0.5)
+  "theme_opts" = list(border_size = 0.7)
 )
 ggboxplot(
   beta_hat %>%
@@ -132,7 +132,7 @@ ggboxplot(
   as.data.frame(),
   plot_opts
 ) +
-  geom_hline(yintercept = 0, size = 0.1, alpha = 0.4) +
+  geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   scale_y_continuous(breaks = scales::pretty_breaks(3)) +
   facet_grid(condition + time ~ Taxon_5, scales = "free_x", space = "free_x") +
   theme(

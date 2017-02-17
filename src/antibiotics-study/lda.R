@@ -147,10 +147,10 @@ plot_opts <- list(
   "fill_colors" = brewer.pal(stan_data$K, "Set2"),
   "col_colors" = brewer.pal(stan_data$K, "Set2"),
   "facet_terms" = c("topic", "."),
-  "theme_opts" = list(border_size = 0.2, spacing = 0.5)
+  "theme_opts" = list(border_size = 0.7)
 )
 ggboxplot(data.frame(theta_hat), plot_opts) +
-  geom_hline(yintercept = 0, size = 0.1, alpha = 0.4) +
+  geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   labs(x = "Time") +
   theme(legend.position = "none")
 
@@ -164,7 +164,7 @@ plot_opts <- list("x" = "rsv",
   "facet_space" = "free_x",
   "fill_colors" = brewer.pal(stan_data$K, "Set2"),
   "col_colors" = brewer.pal(stan_data$K, "Set2"),
-  "theme_opts" = list(border_size = 0.2, spacing = 0.5),
+  "theme_opts" = list(border_size = 0.7),
   "outlier.shape" = NA
 )
 ggboxplot(
@@ -173,7 +173,7 @@ ggboxplot(
   filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4]),
   plot_opts
 ) +
-  geom_hline(yintercept = 0, size = 0.1, alpha = 0.4) +
+  geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   scale_y_continuous(breaks = scales::pretty_breaks(3)) +
   labs(y = "beta", fill = "Family") +
   theme(
