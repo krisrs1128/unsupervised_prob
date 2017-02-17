@@ -22,7 +22,7 @@ options(mc.cores = parallel::detectCores())
 ## ---- get-data ----
 data(abt)
 abt <- abt %>%
-  filter_taxa(function(x) sum(x != 0) > .9 * nsamples(abt), prune = TRUE) %>%
+  filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
 ## ---- prepare-data ----

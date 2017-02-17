@@ -21,7 +21,7 @@ chunk_opts <- list(
   fig.width = 5,
   fig.height = 3,
   fig.align = "center",
-  cache = TRUE,
+  cache = FALSE,
   warning = FALSE,
   message = FALSE,
   eval = FALSE
@@ -1180,7 +1180,7 @@ larger for parameters with larger values.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetaboxplotfigure, fig.width = 10, fig.height = 8, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time."}
+```{r visualizethetaboxplotfigure, fig.width = 10, fig.height = 8, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time.", echo = FALSE}
 include_graphics("figure/visualize_theta_boxplot-1.png")
 ```
 \endgroup
@@ -1206,7 +1206,7 @@ relatedness. Note that we have not displayed outliers, because they make the fig
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetafigure, fig.width = 10, fig.height = 6, fig.cap = "The distribution over microbes associated with each LDA topic."}
+```{r visualizebetafigure, fig.width = 10, fig.height = 6, fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE}
 include_graphics("figure/visualize_beta_boxplot-1.png")
 ```
 \endgroup
@@ -1246,7 +1246,6 @@ The code chunks below prime our environment for the subsequent analysis.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r unigram_setup}
-rm(list = ls())
 read_chunk("../src/antibiotics-study/unigram.R")
 ```
 \endgroup
@@ -1387,11 +1386,11 @@ estimated, but omits the important stage of model revision and comparison, which
 we defer at this point.
 
 We first refresh our workspace and prepare the data to model.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r dtm_setup}
-rm(list = ls())
 read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
@@ -1464,7 +1463,7 @@ include_graphics("figure/visualize-alpha-figure-1.png")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizemufigure, fig.width = 10, fig.height = 6}
+```{r visualizemufigure, fig.width = 10, fig.height = 6, echo = FALSE}
 include_graphics("figure/visualize-mu-figure-1.png")
 ```
 \endgroup
