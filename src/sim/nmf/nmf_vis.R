@@ -67,7 +67,7 @@ p <- theta_plots$grouped +
     "x" = expression(theta[1]),
     "y" = expression(theta[2])
   )
-ggsave(file.path("figure", "visualizethetas-prep-1.pdf"), p)
+ggsave(file.path("figure", "visualizethetas-1.pdf"), p)
 
 ## ---- visualizethetashist ----
 mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
@@ -89,7 +89,6 @@ beta_fits$method <- beta_fits$method %>%
       "nmf_gamma_poisson_zero.stan" = "Z-GaP"
     )
   )
-
 
 plot_opts$facet_terms <- c("N", "inference", "P")
 plot_opts$group <- "v"

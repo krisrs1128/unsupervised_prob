@@ -57,9 +57,11 @@ scores_contours <- function(plot_data, plot_opts) {
       size = plot_opts$text_size
     ) +
     scale_x_sqrt(limits = plot_opts$x_lim, expand = c(0, 0)) +
-    scale_y_sqrt(limits = plot_opts$y_lim, expand = c(0, 0))
+    scale_y_sqrt(limits = plot_opts$y_lim, expand = c(0, 0)) +
+    theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
   p2 <- p1 +
-    facet_wrap(formula(paste0("~", plot_opts$group)))
+    facet_wrap(formula(paste0("~", plot_opts$group))) +
+    theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
   list("grouped" = p1, "coordinates" = p2)
 }
 
