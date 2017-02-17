@@ -15,6 +15,7 @@ library("dplyr")
 library("ggplot2")
 library("phyloseq")
 library("treelapse")
+library("RColorBrewer")
 library("ggscaffold")
 library("feather")
 set.seed(11242016)
@@ -193,8 +194,3 @@ p <- ggboxplot(
     legend.position = "bottom"
   )
 ggsave("../../doc/figure/visualize_lda_beta.png", p)
-
-## ---- save_results ----
-dir.create("results")
-write_feather(theta_hat, path = "theta.feather")
-write_feather(beta_hat, path = "beta.feather")
