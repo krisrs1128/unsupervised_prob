@@ -1039,7 +1039,24 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
+```{r histograms_code}
+```
+\endgroup
+
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+\begin{}
 ```{r histograms, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
+include_graphics("figure/histograms-1.png")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r heatmaps_code}
 ```
 \endgroup
 
@@ -1047,6 +1064,8 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r heatmaps, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
+include_graphics("figure/heatmaps-1.png")
+include_graphics("figure/heatmaps-2.png")
 ```
 \endgroup
 
@@ -1096,7 +1115,7 @@ reshapes $\beta$, the second reshapes $\theta$.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r extract_theta, echo = FALSE}
+```{r extract_theta}
 ```
 \endgroup
 
@@ -1118,11 +1137,19 @@ $\theta_{ik}$, and the sum for any column is 1.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_theta_heatmap}
+```{r visualize_lda_theta_heatmap_code}
 ```
 \endgroup
 
-A disadvantage of Figure \@ref(fig:visualize_theta_heatmap) is that it displays
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_lda_theta_heatmap, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time."}
+include_graphics("figure/visualize_lda_theta_heatmap-1.png")
+```
+\endgroup
+
+A disadvantage of Figure \@ref(fig:visualize_lda_theta_heatmap) is that it displays
 posterior means without any sense of the variability of these estimates. An
 alternative which does describe uncertainty is given in Figure
 \@ref(fig:visualize_thtea_boxplot). The rows and columns of panels again
@@ -1145,9 +1172,18 @@ larger for parameters with larger values.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_theta_boxplot}
+```{r visualize_theta_boxplot_code}
 ```
 \endgroup
+
+\blandscape
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_theta_boxplot, fig.width = 10, fig.height = 8, fig.cap = ""}
+```
+\endgroup
+\elandscape
 
 To interpret these topics in terms of their microbial composition, we study
 the estimated topic distributions $\beta_{\cdot k}$, displayed in Figure
