@@ -305,34 +305,33 @@ merge_nmf_opts <- function(opts = list()) {
 #' @return A list with the latent thetas, betas, mask, and observed Y.
 nmf_sim <- function(opts) {
   opts <- merge_nmf_opts(opts)
-  attach(opts, warn.conflicts = FALSE)
 
   ## scores
   theta <- matrix(
-    rgamma(N * K, rate = a, shape = b),
-    N, K
+    rgamma(opts$N * opts$K, rate = opts$a, shape = opts$b),
+    opts$N, opts$K
   )
 
-  ## factors
+  ## faopts$ctors
   beta <- matrix(
-    rgamma(P * K, rate = c, shape = d),
-    P, K
+    rgamma(opts$P * opts$K, rate = opts$c, shape = opts$d),
+    opts$P, opts$K
   )
 
   ## observations
   y <- matrix(
-    rpois(N * P, theta %*% t(beta)),
-    N, P
+    rpois(opts$N * opts$P, theta %*% t(beta)),
+    opts$N, opts$P
   )
 
   ## set some proportion to zero
   mask <- matrix(
     sample(
       c(0, 1),
-      N * P,
+      opts$N * opts$P,
       replace = TRUE,
-      prob = c(1 - zero_inf_prob, zero_inf_prob)),
-    N, P
+      prob = c(1 - opts$zero_inf_prob, opts$zero_inf_prob)),
+    opts$N, opts$P
   )
   y[mask == 1] <- 0
 

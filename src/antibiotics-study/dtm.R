@@ -25,21 +25,16 @@ abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
-## ---- vis-times ----
-raw_times <- sample_data(abt)$time
-X <- t(asinh(get_taxa(abt)))
-X[] <- as.integer(round(X, 0) * 1)
-
-times <- 4 * floor(raw_times / 4)
-times_mapping <- match(times, unique(times))
-times <- unique(times)
+## ---- prepare-data ----
+times <- sample_data(abt)$time
+X <- t(get_taxa(abt))
 
 ## ----  run-model ----
 N <- nrow(X)
 V <- ncol(X)
 T <- length(times)
 
-m <- stan_model("../src/stan/dtm.stan")
+m <- stan_model("../stan/dtm.stan")
 stan_data <- list(
   N = N,
   V = V,
@@ -48,57 +43,65 @@ stan_data <- list(
   sigma_hyper = c(0.5, 0.5),
   delta_hyper = c(0.5, 0.5),
   times = times,
-  times_mapping = times_mapping,
+  times_mapping = times,
   X = X
 )
 stan_fit <- vb(m, data = stan_data)
+save(
+  stan_fit,
+  file = sprintf("../../data/fits/dtm-%s.rda", gsub("[:|| ||-]", "", Sys.time()))
+)
 samples <- rstan::extract(stan_fit)
+rm(stan_fit)
 
-## ---- prepare-theta ----
-theta_hat <- samples$theta %>%
+## ---- prepare-alpha ----
+## center the alpha
+alpha <- samples$alpha
+for (d in seq_len(stan_data$N)) {
+  for (i in seq_len(dim(alpha)[1])) {
+    alpha[i, d, ] <- alpha[i, d, ] - mean(alpha[i, d, ])
+  }
+}
+
+alpha_hat <- alpha %>%
   melt(
-    varnames = c("iteration", "time", "cluster"),
-    value.name = "theta"
+    varnames = c("iteration", "time", "topic"),
+    value.name = "alpha"
   )
-theta_hat$time <- times[theta_hat$time]
 
-cur_samples <- data.frame(sample_data(abt))
-cur_samples$time <- 4 * floor(cur_samples$time / 4)
-
-theta_hat <- cur_samples %>%
+alpha_hat$time <- times[alpha_hat$time]
+alpha_hat <- sample_data(abt) %>%
+  data.frame() %>%
   unique() %>%
-  right_join(theta_hat)
+  right_join(alpha_hat)
 
-plot_opts <- list(
+alpha_plot_opts <- list(
   "x" = "as.factor(time)",
-  "y" = "theta",
-  "fill" = "as.factor(cluster)",
-  "col" = "as.factor(cluster)",
+  "y" = "alpha",
+  "fill" = "as.factor(topic)",
+  "col" = "as.factor(topic)",
   "fill_colors" = brewer.pal(3, "Set2"),
   "col_colors" = brewer.pal(3, "Set2"),
-  "facet_terms" = c("cluster", "condition"),
+  "facet_terms" = c("topic", "condition"),
   "facet_scales" = "free_x",
-  "facet_space" = "free_x"
+  "facet_space" = "free_x",
+  "theme_opts" = list(border_size = 0.7)
 )
 
-## ---- visualize-theta ----
-ggboxplot(theta_hat, plot_opts) +
-  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  labs(
-    fill = "Cluster",
-    x = "time"
-  ) +
-  theme(
-    panel.border = element_rect(fill = "transparent", size = 0.2),
-    legend.position = "bottom"
-  )
+## ---- prepare-mu ----
+mu <- samples$mu
+for (k in seq_len(dim(mu)[3])) {
+  for (i in seq_len(stan_data$K)) {
+    mu[i,, k, ] <- mu[i,, k, ] - mean(mu[i,, k, ])
+  }
+}
 
-## ---- prepare-beta ----
-beta_hat <- samples$beta %>%
+cur_times <- times[times %in% seq(10, 20, by = 3)]
+mu_hat <- mu[, cur_times,, ] %>%
   melt(
-    varnames = c("iteration", "time", "cluster", "rsv_ix")
+    varnames = c("iteration", "time", "topic", "rsv_ix")
   )
-beta_hat$time <- times[beta_hat$time]
+mu_hat$time <- cur_times[mu_hat$time]
 
 ## merge in taxonomic information (for labeling evolutionary families)
 taxa <- data.table(tax_table(abt)@.Data)
@@ -107,39 +110,50 @@ taxa$Taxon_5[which(taxa$Taxon_5 == "")] <- taxa$Taxon_4[which(taxa$Taxon_5 == ""
 sorted_taxa <- names(sort(table(taxa$Taxon_5), decreasing = TRUE))
 taxa$Taxon_5 <- factor(taxa$Taxon_5, levels = sorted_taxa)
 
-beta_hat$rsv <- taxa$rsv[beta_hat$rsv_ix]
-beta_hat <- beta_hat %>%
+mu_hat$rsv <- taxa$rsv[mu_hat$rsv_ix]
+mu_hat <- mu_hat %>%
   left_join(taxa) %>%
   filter(
-    Taxon_5 %in% sorted_taxa[1:8],
-    time <= 16,
-    time >= 8
+    Taxon_5 %in% sorted_taxa[1:4]
   )
 
-plot_opts <- list(
+mu_plot_opts <- list(
   "x" = "rsv",
-  "y" = "sqrt(value)",
+  "y" = "value",
   "col" = "Taxon_5",
   "fill" = "Taxon_5",
   "outlier.shape" = NA,
-  "facet_scales" = "free_x",
-  "facet_space" = "free_x"
+  "fill_colors" = brewer.pal(4, "Set2"),
+  "col_colors" = brewer.pal(4, "Set2"),
+  "theme_opts" = list(border_size = 0.7)
 )
 
-## ---- visualize-beta ----
-ggboxplot(beta_hat, plot_opts) +
-  scale_y_continuous(limits = c(0.053, 0.0541), expand = c(0, 0)) +
+## ---- visualize-alpha ----
+p <- ggboxplot(alpha_hat, alpha_plot_opts) +
+  labs(
+    fill = "Topic",
+    x = "time"
+  ) +
+  geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
+  theme(
+    legend.position = "bottom"
+  )
+ggsave("../../doc/figure/visualize-alpha-1.pdf", p)
+
+## ---- visualize-mu ----
+p <- ggboxplot(mu_hat, mu_plot_opts) +
   facet_grid(
-    time ~ cluster + Taxon_5,
+    time ~ topic + Taxon_5,
     scales = "free_x",
     space = "free_x"
   ) +
+  geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   labs(
     "col" = "Taxonomic Family",
     "fill" = "Taxonomic Family"
   ) +
   theme(
     axis.text.x = element_blank(),
-    panel.border = element_rect(fill = "transparent", size = 0.2),
     legend.position = "bottom"
   )
+ggsave("../../doc/figure/visualize-mu-1.pdf", p)

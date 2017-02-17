@@ -19,7 +19,7 @@ library("feather")
 library("ggscaffold")
 set.seed(11242016)
 
-theme_set(
+ theme_set(
   min_theme(list(text_size = 8, subtitle_size = 12))
 )
 
@@ -34,13 +34,8 @@ abt <- abt %>%
   subset_samples(ind == "F")
 
 ## ---- vis-times ----
-raw_times <- sample_data(abt)$time
-X <- asinh(t(otu_table(abt)@.Data))
-X[] <- as.integer(round(X, 0) * 1)
-
-times <- 4 * floor(raw_times / 4)
-times_mapping <- match(times, unique(times))
-times <- unique(times)
+times <- sample_data(abt)$time
+X <- t(get_taxa(abt))
 
 ## ---- run-model ----
 stan_data <- list(
@@ -48,15 +43,20 @@ stan_data <- list(
   V = ncol(X),
   T = length(times),
   times = times,
-  times_mapping = times_mapping,
+  times_mapping = times,
   X = X,
   a0 = 0.5,
   b0 = 0.5
 )
 
-m <- stan_model("../src/stan/unigram.stan")
+m <- stan_model("../stan/unigram.stan")
 stan_fit <- vb(m, data = stan_data)
+save(
+  stan_fit,
+  file = sprintf("../../data/fits/unigram-%s.rda", gsub("[:|| ||-]", "", Sys.time()))
+)
 samples <- rstan::extract(stan_fit)
+rm(stan_fit)
 
 ## ---- prepare-beta ----
 taxa <- data.table(
@@ -66,7 +66,10 @@ taxa <- data.table(
 taxa$Taxon_5[which(taxa$Taxon_5 == "")] <- taxa$Taxon_4[which(taxa$Taxon_5 == "")]
 
 ## center the betas
-samples$beta <- samples$beta - mean(samples$beta)
+beta <- samples$beta
+for (i in seq_len(stan_data$T)) {
+  beta[, i,] <- beta[, i, ] - mean(beta[, i,])
+}
 
 beta_hat <- samples$beta %>%
   melt(
@@ -81,23 +84,26 @@ beta_hat <- beta_hat %>%
   left_join(sample_data(abt)[, c("time", "condition")]) %>%
   group_by(time) %>%
   mutate(prob = softmax(beta))
-beta_hat$condition[is.na(beta_hat$condition)] <- "Pre Cp"
 
 group_order <- sort(table(taxa$Taxon_5), decreasing = TRUE)
 beta_hat$Taxon_5 <- factor(beta_hat$Taxon_5, levels = names(group_order))
-beta_hat$rsv <- factor(taxa[beta_hat$rsv_ix]$rsv, levels = rownames(tax_table(abt)))
+beta_hat$rsv <- factor(
+  taxa[beta_hat$rsv_ix]$rsv,
+  levels = rownames(tax_table(abt))
+)
 
 ## ---- unigramseries ----
 plot_opts <- list(
   "x" = "time",
   "y" = "mean_beta",
   "col" = "Taxon_5",
+  "facet_terms" = c("Taxon_5", "."),
   "alpha" = 0.4,
   "group" = "rsv"
 )
-gglines(
+p <- gglines(
   beta_hat %>%
-  filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]) %>%
+  filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4]) %>%
   group_by(rsv, time) %>%
   summarise(mean_beta = mean(beta), Taxon_5 = Taxon_5[1]) %>%
   as.data.frame(),
@@ -109,6 +115,7 @@ gglines(
     strip.text.y = element_blank(),
     legend.position = "bottom"
   )
+ggsave("../../doc/figure/unigramseries-1.pdf", p)
 
 ## ---- unigramboxplots ----
 plot_opts <- list(
@@ -120,24 +127,23 @@ plot_opts <- list(
   "alpha" = 0.4,
   "col_colors" = brewer.pal(8, "Set2"),
   "fill_colors" = brewer.pal(8, "Set2"),
-  "theme_opts" = list(border.size = .5)
+  "theme_opts" = list(border_size = 0.7)
 )
-ggboxplot(
+p <- ggboxplot(
   beta_hat %>%
   filter(
-    Taxon_5 %in% levels(beta_hat$Taxon_5)[1:8]
+    Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4],
+    time %in% seq(10, 20, by = 3)
   ) %>%
   as.data.frame(),
   plot_opts
 ) +
-  scale_y_continuous(
-    breaks = scales::pretty_breaks(3),
-    limits = c(-4, 4),
-    oob = scales::rescale_none
-  ) +
+  geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
+  scale_y_continuous(breaks = scales::pretty_breaks(3)) +
   facet_grid(condition + time ~ Taxon_5, scales = "free_x", space = "free_x") +
   theme(
     strip.text.x = element_blank(),
     axis.text.x = element_blank(),
     legend.position = "bottom"
   )
+ggsave("../../doc/figure/unigramboxplots-1.pdf", p)
