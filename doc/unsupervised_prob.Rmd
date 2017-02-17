@@ -376,7 +376,7 @@ worth investigating.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r read-nmf}
+```{r read-nmf, eval = TRUE}
 read_chunk("../src/sim/nmf/nmf_expers.R")
 ```
 \endgroup
@@ -424,7 +424,7 @@ single object, suitable for plotting.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r read-vis}
+```{r read-vis, eval = TRUE}
 read_chunk("../src/sim/nmf/nmf_vis.R")
 ```
 \endgroup
@@ -689,7 +689,7 @@ them for visualization.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r read-boot-expers}
+```{r read-boot-expers, eval = TRUE}
 read_chunk("../src/sim/lda/vis_exper.R")
 ```
 \endgroup
@@ -1002,7 +1002,7 @@ sets up the environment for the rest of this data analysis application.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r read_lda}
+```{r read_lda, eval = TRUE}
 read_chunk("../src/antibiotics-study/lda.R")
 ```
 \endgroup
@@ -1047,9 +1047,8 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-\begin{}
-```{r histogramsfigure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon $\asinh$ transformation, the data are more regularly shaped, though still somewhat heavy tailed."}
-include_graphics("figure/histograms-1.png")
+```{r histogramsfigure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon asinh ransformation, the data are more regularly shaped, though still somewhat heavy tailed.", eval = TRUE, fig.width = 3, fig.height = 2}
+include_graphics("figure/histograms-1.pdf")
 ```
 \endgroup
 
@@ -1063,9 +1062,8 @@ include_graphics("figure/histograms-1.png")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmapsfigure, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value."}
-include_graphics("figure/heatmaps-1.png")
-include_graphics("figure/heatmaps-2.png")
+```{r heatmapsfigure, fig.show = "hold", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value.", eval = TRUE}
+include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf"))
 ```
 \endgroup
 
@@ -1144,8 +1142,8 @@ $\theta_{ik}$, and the sum for any column is 1.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizeldathetaheatmapfigure, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time."}
-include_graphics("figure/visualize_lda_theta_heatmap-1.png")
+```{r visualizeldathetaheatmapfigure, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time.", eval = TRUE}
+include_graphics("figure/visualize_lda_theta_heatmap-1.pdf")
 ```
 \endgroup
 
@@ -1180,8 +1178,8 @@ larger for parameters with larger values.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetaboxplotfigure, fig.width = 10, fig.height = 8, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time.", echo = FALSE}
-include_graphics("figure/visualize_theta_boxplot-1.png")
+```{r visualizethetaboxplotfigure, fig.width = 10, fig.height = 8, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time.", echo = FALSE, eval = TRUE}
+include_graphics("figure/visualize_lda_theta_boxplot-1.pdf")
 ```
 \endgroup
 \elandscape
@@ -1192,8 +1190,8 @@ the estimated topic distributions $\beta_{\cdot k}$, displayed in Figure
 estimated topics. Each boxplot within a row is associated with posterior samples
 for a single microbe. Different colors identify different taxonomic families,
 and within these families, microbes are sorted according to evolutionary
-relatedness. Note that we have not displayed outliers, because they make the figure difficult to read.
-
+relatedness. Note that we have not displayed outliers, because they make the
+figure difficult to read.
 
 \begingroup
 \setstretch{1}
@@ -1206,8 +1204,8 @@ relatedness. Note that we have not displayed outliers, because they make the fig
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetafigure, fig.width = 10, fig.height = 6, fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE}
-include_graphics("figure/visualize_beta_boxplot-1.png")
+```{r visualizebetafigure, fig.width = 10, fig.height = 6, fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE, eval = TRUE}
+include_graphics("figure/visualize_lda_beta-1.pdf")
 ```
 \endgroup
 \elandscape
@@ -1245,7 +1243,7 @@ The code chunks below prime our environment for the subsequent analysis.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram_setup}
+```{r unigram_setup, eval = TRUE}
 read_chunk("../src/antibiotics-study/unigram.R")
 ```
 \endgroup
@@ -1319,8 +1317,8 @@ centered -- this makes no difference in the associated probabilities.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramseriesfigure, fig.cap = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively."}
-include_graphics("figure/unigramseries-1.png")
+```{r unigramseriesfigure, fig.cap = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively.", eval = TRUE}
+include_graphics("figure/unigramseries-1.pdf")
 ```
 \endgroup
 
@@ -1343,8 +1341,8 @@ microbes, many of the paths occlude one another. Figure
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramboxplotsfigure, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.cap = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced."}
-include_graphics("figure/unigramboxplots-1.png")
+```{r unigramboxplotsfigure, fig.width = 10.5, fig.height = 8, echo = FALSE, fig.cap = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced.", eval = TRUE}
+include_graphics("figure/unigramboxplots-1.pdf")
 ```
 \endgroup
 \elandscape
@@ -1390,7 +1388,7 @@ We first refresh our workspace and prepare the data to model.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm_setup}
+```{r dtm_setup, eval = TRUE}
 read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
@@ -1454,8 +1452,8 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizealphafigure}
-include_graphics("figure/visualize-alpha-figure-1.png")
+```{r visualizealphafigure, eval = TRUE}
+include_graphics("figure/visualize-alpha-1.pdf")
 ```
 \endgroup
 
@@ -1463,8 +1461,8 @@ include_graphics("figure/visualize-alpha-figure-1.png")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizemufigure, fig.width = 10, fig.height = 6, echo = FALSE}
-include_graphics("figure/visualize-mu-figure-1.png")
+```{r visualizemufigure, fig.width = 10, fig.height = 6, echo = FALSE, eval = TRUE}
+include_graphics("figure/visualize-mu-1.pdf")
 ```
 \endgroup
 \elandscape
