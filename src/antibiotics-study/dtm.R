@@ -65,7 +65,7 @@ for (d in seq_len(stan_data$N)) {
 
 alpha_hat <- alpha %>%
   melt(
-    varnames = c("iteration", "time", "cluster"),
+    varnames = c("iteration", "time", "topic"),
     value.name = "alpha"
   )
 
@@ -78,11 +78,11 @@ alpha_hat <- sample_data(abt) %>%
 alpha_plot_opts <- list(
   "x" = "as.factor(time)",
   "y" = "alpha",
-  "fill" = "as.factor(cluster)",
-  "col" = "as.factor(cluster)",
+  "fill" = "as.factor(topic)",
+  "col" = "as.factor(topic)",
   "fill_colors" = brewer.pal(3, "Set2"),
   "col_colors" = brewer.pal(3, "Set2"),
-  "facet_terms" = c("cluster", "condition"),
+  "facet_terms" = c("topic", "condition"),
   "facet_scales" = "free_x",
   "facet_space" = "free_x",
   "theme_opts" = list(border_size = 0.7)
@@ -99,7 +99,7 @@ for (k in seq_len(dim(mu)[3])) {
 cur_times <- times %in% seq(10, 20, by = 3)
 mu_hat <- mu[, cur_times,, ] %>%
   melt(
-    varnames = c("iteration", "time", "cluster", "rsv_ix")
+    varnames = c("iteration", "time", "topic", "rsv_ix")
   )
 mu_hat$time <- cur_times[mu_hat$time]
 
@@ -123,8 +123,8 @@ mu_plot_opts <- list(
   "col" = "Taxon_5",
   "fill" = "Taxon_5",
   "outlier.shape" = NA,
-  "col_cols" = brewer.pal(3, "Set2"),
-  "fill_cols" = brewer.pal(3, "Set2"),
+  "fill_colors" = brewer.pal(3, "Set2"),
+  "col_colors" = brewer.pal(3, "Set2"),
   "theme_opts" = list(border_size = 0.7)
 )
 
@@ -138,16 +138,15 @@ p <- ggboxplot(alpha_hat, alpha_plot_opts) +
   theme(
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize-alpha-1.png", p)
+ggsave("../../doc/figure/visualize-alpha-1.pdf", p)
 
 ## ---- visualize-mu ----
 p <- ggboxplot(mu_hat, mu_plot_opts) +
   facet_grid(
-    time ~ cluster + Taxon_5,
+    time ~ topic + Taxon_5,
     scales = "free_x",
     space = "free_x"
   ) +
-  scale_y_continuous(limits = c(-3.5, 8), oob = scales::rescale_none) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   labs(
     "col" = "Taxonomic Family",
@@ -157,4 +156,4 @@ p <- ggboxplot(mu_hat, mu_plot_opts) +
     axis.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize-mu-1.png", p, width = 10, height = 8)
+ggsave("../../doc/figure/visualize-mu-1.pdf", p)

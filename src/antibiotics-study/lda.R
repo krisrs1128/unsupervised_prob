@@ -40,7 +40,7 @@ p <- ggplot(transformed_counts) +
   geom_histogram(aes(x = count)) +
   facet_grid(. ~ transformation, scale = "free_x") +
   min_theme(list(text_size = 8, subtitle_size = 12))
-ggsave("../../doc/figure/histograms-1.png", p)
+ggsave("../../doc/figure/histograms-1.pdf", p)
 
 ## ---- heatmaps ----
 y_order <- names(sort(taxa_sums(abt)))
@@ -56,10 +56,10 @@ ordered_map <- function(x) {
 }
 
 p <- ordered_map(get_taxa(abt)) + ggtitle("Raw")
-ggsave("../../doc/figure/heatmaps-1.png", p)
+ggsave("../../doc/figure/heatmaps-1.pdf", p)
 
 p <- ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
-ggsave("../../doc/figure/heatmaps-2.png", p)
+ggsave("../../doc/figure/heatmaps-2.pdf", p)
 
 ## ---- lda ----
 X <- t(get_taxa(abt))
@@ -147,7 +147,7 @@ p <- ggheatmap(
   as.data.frame(),
   plot_opts
 )
-ggsave("../../doc/figure/visualize_lda_theta_heatmap-1.png", p)
+ggsave("../../doc/figure/visualize_lda_theta_heatmap-1.pdf", p)
 
 ## ---- visualize_lda_theta_boxplot ----
 plot_opts <- list(
@@ -164,7 +164,7 @@ p <- ggboxplot(data.frame(theta_hat), plot_opts) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   labs(x = "Time") +
   theme(legend.position = "none")
-ggsave("../../doc/figure/visualize_lda_theta_boxplot-1.png", p)
+ggsave("../../doc/figure/visualize_lda_theta_boxplot-1.pdf", p)
 
 ## ---- visualize_lda_beta ----
 plot_opts <- list("x" = "rsv",
@@ -193,4 +193,4 @@ p <- ggboxplot(
     strip.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize_lda_beta-1.png", p, width = 10, height = 8)
+ggsave("../../doc/figure/visualize_lda_beta-1.pdf", p)
