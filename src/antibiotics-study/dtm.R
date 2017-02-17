@@ -22,7 +22,7 @@ options(mc.cores = parallel::detectCores())
 ## ---- get-data ----
 data(abt)
 abt <- abt %>%
-  filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
+  filter_taxa(function(x) sum(x != 0) > .9 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
 ## ---- prepare-data ----
@@ -92,7 +92,7 @@ plot_opts <- list(
 mu <- samples$mu
 for (k in seq_len(dim(mu)[3])) {
   for (i in seq_len(stan_data$K)) {
-    mu[i, k, ] <- mu[i, k, ] - mean(mu[i, k, ])
+    mu[i,, k, ] <- mu[i,, k, ] - mean(mu[i,, k, ])
   }
 }
 
