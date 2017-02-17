@@ -62,15 +62,17 @@ gamma_pois_data <- theta_fits %>%
 theta_plots <- scores_contours(gamma_pois_data, plot_opts)
 
 ## ---- visualizethetas ----
-theta_plots$grouped +
+p <- theta_plots$grouped +
   labs(
     "x" = expression(theta[1]),
     "y" = expression(theta[2])
   )
+ggsave(file.path("figure", "visualizethetas-prep-1.pdf"), p)
 
 ## ---- visualizethetashist ----
 mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
-error_histograms(mgamma_pois_data, plot_opts$facet_terms)
+p <- error_histograms(mgamma_pois_data, plot_opts$facet_terms)
+ggsave(file.path("figure", "visualizethetashist-1.pdf"), p)
 
 ## ---- visualizebetas ----
 beta_fits <- reshape_all_samples(
@@ -96,15 +98,17 @@ gamma_pois_data <- beta_fits %>%
   filter(zero_inf_prob == 0, method == "GaP")
 
 beta_plots <- scores_contours(gamma_pois_data, plot_opts)
-beta_plots$grouped +
+p <- beta_plots$grouped +
   labs(
     "x" = expression(beta[1]),
     "y" = expression(beta[2])
   )
+ggsave(file.path("figure", "visualizebetas-1.pdf"), p)
 
 ## ---- visualizebetashist ----
 mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
-error_histograms(mgamma_pois_data, plot_opts$facet_terms)
+p <- error_histograms(mgamma_pois_data, plot_opts$facet_terms)
+ggsave(file.path("figure", "visualizebetashist-1.pdf"), p)
 
 ## ---- visualize-zinf-thetas-prep ----
 zinf_data <- theta_fits %>%
@@ -114,17 +118,19 @@ plot_opts$group <- "i"
 
 ## ---- visualizezinfthetas ----
 theta_plots <- scores_contours(zinf_data, plot_opts)
-theta_plots$grouped +
+p <- theta_plots$grouped +
   facet_grid(inference ~ zero_inf_prob + method) +
   labs(
     "x" = expression(theta[1]),
     "y" = expression(theta[2])
   )
+ggsave(file.path("figure", "visualizezinfthetas-1.pdf"), p)
 
 ## ---- visualizezinfthetashist ----
 mzinf_data <- melt_reshaped_samples(zinf_data)
-error_histograms(mzinf_data, plot_opts$facet_terms) +
+p <- error_histograms(mzinf_data, plot_opts$facet_terms) +
   facet_grid(inference ~ zero_inf_prob + method)
+ggsave(file.path("figure", "visualizezinfthetashist-1.pdf"), p)
 
 ## ---- vis-zinf-betas-prep ----
 zinf_data <- beta_fits %>%
@@ -133,14 +139,16 @@ plot_opts$group <- "v"
 
 ## ---- visualizezinfbetas ----
 theta_plots <- scores_contours(zinf_data, plot_opts)
-theta_plots$grouped  + 
+p <- theta_plots$grouped  + 
   facet_grid(inference ~ zero_inf_prob + method) +
   labs(
     "x" = expression(beta[1]),
     "y" = expression(beta[2])
   )
+ggsave(file.path("figure", "visualizezinfbetas-1.pdf"), p)
 
 ## ---- visualizezinfbetashist ----
 mzinf_data <- melt_reshaped_samples(zinf_data)
-error_histograms(mzinf_data, plot_opts$facet_terms) +
+p <- error_histograms(mzinf_data, plot_opts$facet_terms) +
   facet_grid(inference ~ zero_inf_prob + method)
+ggsave(file.path("figure", "visualizezinfbetashist-1.pdf"), p)
