@@ -19,7 +19,6 @@ link-citations: yes
 library("knitr")
 chunk_opts <- list(
   out.width = "5in",
-  out.height = "3in",
   fig.align = "center",
   cache = FALSE,
   warning = FALSE,
@@ -325,6 +324,9 @@ For example, the NMF model can be implemented using essentially only the STAN
 code below\footnote{The complete code is available at
 \url{https://github.com/krisrs1128/readings/blob/master/nmf/src/nmf_gamma_poisson.stan}}.
 
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```python
 model{
   for(i in 1:D) {
@@ -342,6 +344,8 @@ model{
   }
 }
 ```
+\endgroup
+
 The sampling statements `~ gamma` and `~ poisson` tell STAN to increment the
 loglikelihood used to construct samplers.
 
@@ -413,7 +417,7 @@ batch scripts that run subsets of the experimental configurations.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r submit-jobs }
+```{r submit-jobs}
 ```
 \endgroup
 
@@ -425,7 +429,7 @@ single object, suitable for plotting.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r read-vis, eval = TRUE}
-read_chunk("../src/sim/nmf/nmf_visf.R")
+read_chunk("../src/sim/nmf/nmf_vis.R")
 ```
 \endgroup
 
@@ -486,7 +490,7 @@ is small but consistent, especially in Gibbs Sampling.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetasfigure, eval = TRUE, out.height = 4, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```{r visualizethetasfigure, eval = TRUE, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
 include_graphics("figure/visualizethetas-1.pdf")
 ```
 \endgroup
@@ -542,7 +546,7 @@ increases.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetasfigure, eval = TRUE, out.height = 4, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+```{r visualizebetasfigure, eval = TRUE, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
 include_graphics("figure/visualizebetas-1.pdf")
 ```
 \endgroup
@@ -610,8 +614,8 @@ modeling (Z-GaP vs. GaP) and the underlying zero inflation probability.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfthetasfigure, eval = TRUE, out.height = 8, out.width = 8, fig.cap = "Each panel displays the estimated scores for a different simulation setting, with a focus on the effect of zero inflation. Columns distinguish between different zero-inflation probabilities and modeling techniques."}
-include_graphics("figure/visualizezinfthetasfigure-1.pdf")
+```{r visualizezinfthetasfigure, eval = TRUE, out.width = "6.5in", fig.cap = "Each panel displays the estimated scores for a different simulation setting, with a focus on the effect of zero inflation. Columns distinguish between different zero-inflation probabilities and modeling techniques."}
+include_graphics("figure/visualizezinfthetas-1.pdf")
 ```
 \endgroup
 
@@ -638,7 +642,7 @@ it is.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfthetashistfigure, eval = TRUE, fig.cap = "For each simulation setting, we can compute the true estimation errors across samples."}
+```{r visualizezinfthetashistfigure, eval = TRUE, out.width = "6.5in", fig.cap = "For each simulation setting, we can compute the true estimation errors across samples."}
 include_graphics("figure/visualizezinfthetashist-1.pdf")
 ```
 \endgroup
@@ -660,7 +664,7 @@ Z-GaP models.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfbetasfigure, eval = TRUE, out.height = "6in", out.width = "6in", fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
+```{r visualizezinfbetasfigure, eval = TRUE, out.width = "6.5in", fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
 include_graphics("figure/visualizezinfbetas-1.pdf")
 ```
 \endgroup
@@ -675,7 +679,7 @@ include_graphics("figure/visualizezinfbetas-1.pdf")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfbetashist, eval = TRUE, fig.cap = "Across settings, we can explicitly compute estimation errors."}
+```{r visualizezinfbetashistfigure, eval = TRUE, fig.cap = "Across settings, we can explicitly compute estimation errors."}
 include_graphics("figure/visualizezinfbetashist-1.pdf")
 ```
 \endgroup
@@ -761,14 +765,14 @@ read_chunk("../src/sim/lda/vis_exper.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r libraries-boot-expers}
+```{r libraries-boot-expers, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r paths}
+```{r paths, eval = FALSE}
 ```
 \endgroup
 
@@ -784,14 +788,14 @@ topics, we align those with the next highest correlation, and so on.}.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-samples}
+```{r beta-samples, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-alignment}
+```{r beta-alignment, eval = FALSE}
 ```
 \endgroup
 
@@ -814,21 +818,37 @@ same way.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-contours-object}
+```{r beta-contours-object, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours1, out.width = 7, out.height = 4, fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10 features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
+```{r betacontours1, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betacontours2, out.width = 7, out.height = 4, fig.cap = "The analogous figure, with distributions over $V = 50$ instead of 10 features."}
+```{r betacontours1figure, eval = TRUE, out.width = "6.5in", fig.cap = "True and fitted parameters $K = 2$ topic distributions across $V = 10$ features. Different columns describe different $\\left(D, N\\right)$ combinations, while rows give alternative fitting approaches."}
+include_graphics("figure/betacontours1-1.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betacontours2, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betacontours2figure, eval = TRUE, out.width = "6.5in", fig.cap = "The analogous figure, with distributions over $V = 50$ instead of 10 features."}
+include_graphics("figure/betacontours2-1.pdf")
 ```
 \endgroup
 
@@ -836,7 +856,7 @@ A few comments are in order. As expected, when $D$ increases, i.e., more samples
 are made available, the posterior for $\beta$, whose dimension do not increase
 with $D$, begins to concentrate around its true value. It is unclear whether the
 rate of concentration when $V = 50$ is much different from the case where $V =
-"10in"$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
+10$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
 could result from their being more fitted parameter values being displayed in
 the same space, though see \@ref(fig:betahistograms) for more clarity on this
 point.
@@ -872,7 +892,15 @@ different $D$ (first row of labels) and $N$ (second row of labels).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r betahistograms, out.height = "6in", fig.cap = "Histograms of the difference between sampled topic parameters and their true values, across experimental configurations."}
+```{r betahistograms, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betahistogramsfigure, eval = TRUE, fig.cap = "Histograms of the difference between sampled topic parameters and their true values, across experimental configurations."}
+include_graphics("figure/betahistograms-1.pdf")
 ```
 \endgroup
 
@@ -900,19 +928,37 @@ given by a grey horizontal line.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r beta-boxplots-object}
+```{r beta-boxplots-object, eval = FALSE}
 ```
 \endgroup
 
-\blandscape
-```{r betaboxplot1, out.width = "10in", out.height = "6in", fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$.", echo = FALSE}
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betaboxplot1, eval = FALSE}
 ```
-\elandscape
+\endgroup
 
-\blandscape
-```{r betaboxplot2, out.width = "10in", out.height = "6in", fig.cap = "Boxplots of posterior samles, when $V = 50$.", echo = FALSE}
+\begingroup
+```{r betaboxplot1figure, eval = TRUE, fig.cap = "Boxplots of posterior samples for the $\\beta_{\\cdot k}$ across features, inferential techniques, and experimental configurations, when $V = 10$.", echo = FALSE}
+include_graphics("figure/betaboxplot1-1.pdf")
 ```
-\elandscape
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betaboxplot2, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r betaboxplot2figure, eval = TRUE, fig.cap = "Boxplots of posterior samles, when $V = 50$.", echo = FALSE}
+include_graphics("figure/betaboxplot2-1.pdf")
+```
+\endgroup
  
 Different columns index different features -- in Figure \@ref(fig:betaboxplot1),
 $V = "10in"$, while in Figure \@ref(fig:betaboxplot2), $V = 50$. Rows index
@@ -935,14 +981,14 @@ below.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r theta-samples}
+```{r theta-samples, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r theta-alignment}
+```{r theta-alignment, eval = FALSE}
 ```
 \endgroup
 
@@ -958,27 +1004,39 @@ these are in Figures \@ref(fig:thetaboxplot1) and \@ref(fig:thetaboxplot2).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r theta-boxplot-object}
+```{r theta-boxplot-object, eval = FALSE}
 ```
 \endgroup
 
-\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r thetaboxplot1, out.width = "10in", out.height = "6in", echo = FALSE, fig.cap = "Estimated and true proportions $\\theta_{i1}$ across samples, for simulations where $D = 20$."}
+```{r thetaboxplot1, eval = FALSE}
 ```
 \endgroup
-\elandscape
 
-\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r thetaboxplot2, out.width = "10in", out.height = "6in", echo = FALSE, fig.cap = "The analogous figure, when $D = 100"}
+```{r thetaboxplot1figure, eval = TRUE, echo = FALSE, fig.cap = "Estimated and true proportions $\\theta_{i1}$ across samples, for simulations where $D = 20$."}
+include_graphics("figure/thetaboxplot1-1.pdf")
 ```
 \endgroup
-\elandscape
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetaboxplot2, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetaboxplot2figure, eval = TRUE, echo = FALSE, fig.cap = "The analogous figure, when $D = 100$."}
+include_graphics("figure/thetaboxplot2-1.pdf")
+```
+\endgroup
 
 Here, each panel gives the posterior for $\theta_{i1}$, within an experimental
 configuration. The index $i$ is specified by the labels across columns. The
@@ -1031,7 +1089,15 @@ mean for each experimental configuration, so we cannot make this judgement.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r thetahistograms}
+```{r thetahistograms, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r thetahistogramsfigure, eval = TRUE}
+include_graphics("figure/thetahistograms-1.pdf")
 ```
 \endgroup
 
@@ -1111,7 +1177,7 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r histogramsfigure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon asinhl ransformation, the data are more regularly shaped, though still somewhat heavy tailed.", eval = TRUE}
+```{r histogramsfigure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon asinhl ransformation, the data are more regularly shaped, though still somewhat heavy tailed.", eval = TRUE, out.width = "2in"}
 include_graphics("figure/histograms-1.pdf")
 ```
 \endgroup
@@ -1119,14 +1185,14 @@ include_graphics("figure/histograms-1.pdf")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmaps}
+```{r heatmaps, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r heatmapsfigure, fig.show = "hold", fig.align = "left", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value.", eval = TRUE, out.height = "1.5in"}
+```{r heatmapsfigure, fig.show = "hold", fig.align = "left", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value.", eval = TRUE, out.width = "3in", eval = FALSE}
 include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf")) 
 ```
 \endgroup
@@ -1141,13 +1207,6 @@ the nearest integer -- the model here is really only a device, not a plausible
 data generating mechanism. In particular, uncertainty estimates for fitted
 parameters should be regarded skeptically.
 
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r rounding}
-```
-\endgroup
-
 #### Estimation ####
 
 We fit LDA with $K = 3$, chosen arbitrarily, but with the heuristic that a large
@@ -1159,7 +1218,7 @@ type of regularization.}.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r lda}
+```{r lda, eval = FALSE}
 ```
 
 Before visualizing the results, we need to extract posterior samples for each
@@ -1170,14 +1229,14 @@ reshapes $\beta$, the second reshapes $\theta$.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r extract_beta}
+```{r extract_beta, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r extract_theta}
+```{r extract_theta, eval = FALSE}
 ```
 \endgroup
 
@@ -1199,7 +1258,7 @@ $\theta_{ik}$, and the sum for any column is 1.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_lda_theta_heatmap}
+```{r visualize_lda_theta_heatmap, eval = FALSE}
 ```
 \endgroup
 
@@ -1238,15 +1297,13 @@ larger for parameters with larger values.
 ```
 \endgroup
 
-\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetaboxplotfigure, out.width = "10in", out.height = "6in", fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time.", echo = FALSE, eval = TRUE}
+```{r visualizethetaboxplotfigure, fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time.", echo = FALSE, eval = TRUE}
 include_graphics("figure/visualize_lda_theta_boxplot-1.pdf")
 ```
 \endgroup
-\elandscape
 
 To interpret these topics in terms of their microbial composition, we study
 the estimated topic distributions $\beta_{\cdot k}$, displayed in Figure
@@ -1264,15 +1321,14 @@ relatedness. Note that we have not displayed outliers, because they make the fig
 ```
 \endgroup
 
-\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetafigure, out.width = "10in", out.height = "6in", fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE, eval = TRUE}
+```{r visualizebetafigure, fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE, eval = TRUE}
 include_graphics("figure/visualize_lda_beta-1.pdf")
 ```
 \endgroup
-\elandscape
+
 
 In light of the mixture probabilities in Figure
 \@ref(fig:visualize_theta_boxplot), those microbes with large probabilities in
@@ -1315,7 +1371,7 @@ read_chunk("../src/antibiotics-study/unigram.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup}
+```{r setup, eval = FALSE}
 ```
 \endgroup
 
@@ -1325,7 +1381,7 @@ example of Section \@ref(sec:antibiotics-lda).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r get-data}
+```{r get-data, eval = FALSE}
 ```
 \endgroup
 
@@ -1336,7 +1392,7 @@ timepoints to the same $\beta_{t}$s.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r vis-times}
+```{r vis-times, eval = FALSE}
 ```
 \endgroup
 
@@ -1345,7 +1401,7 @@ The block below estimates the unigram model using VB.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r run-model}
+```{r run-model, eval = FALSE}
 ```
 \endgroup
 
@@ -1360,7 +1416,7 @@ proximity. These postprocessing steps are performed in the code block below.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-beta}
+```{r prepare-beta, eval = FALSE}
 ```
 \endgroup
 
@@ -1374,14 +1430,14 @@ centered -- this makes no difference in the associated probabilities.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramseries}
+```{r unigramseries, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramseriesfigure, fig.cap = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively.", eval = TRUE}
+```{r unigramseriesfigure, fig.cap = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively.", out.width = "3.5in", eval = TRUE}
 include_graphics("figure/unigramseries-1.pdf")
 ```
 \endgroup
@@ -1397,19 +1453,17 @@ microbes, many of the paths occlude one another. Figure
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramboxplots}
+```{r unigramboxplots, eval = FALSE}
 ```
 \endgroup
 
-\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramboxplotsfigure, out.width = "10in", out.height = "6in", echo = FALSE, fig.cap = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced.", eval = TRUE}
+```{r unigramboxplotsfigure, echo = FALSE, fig.cap = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced.", eval = TRUE}
 include_graphics("figure/unigramboxplots-1.pdf")
 ```
 \endgroup
-\elandscape
 
 In Figure \@ref(fig:unigramboxplotsfigure), each boxplot represent the posterior
 quantiles of $\beta_{kv}$ for a single microbe. Each row is associated with a
@@ -1460,75 +1514,73 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup}
+```{r setup, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r get-data}
+```{r get-data, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r vis-times}
+```{r vis-times, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r run-model}
+```{r run-model, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-alpha}
+```{r prepare-alpha, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r prepare-mu}
+```{r prepare-mu, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-alpha}
+```{r visualize-alpha, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-mu}
+```{r visualize-mu, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizealphafigure, eval = TRUE}
+```{r visualizealphafigure, eval = TRUE, out.width = "6.5in"}
 include_graphics("figure/visualize-alpha-1.pdf")
 ```
 \endgroup
 
-\blandscape
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizemufigure, out.width = "10in", out.height = "6in", echo = FALSE, eval = TRUE}
+```{r visualizemufigure, echo = FALSE, eval = TRUE, out.width = "6.5in"}
 include_graphics("figure/visualize-mu-1.pdf")
 ```
 \endgroup
-\elandscape
 
 ## References ##
