@@ -96,7 +96,7 @@ for (k in seq_len(dim(mu)[3])) {
   }
 }
 
-cur_times <- times %in% seq(10, 20, by = 3)
+cur_times <- times[times %in% seq(10, 20, by = 3)]
 mu_hat <- mu[, cur_times,, ] %>%
   melt(
     varnames = c("iteration", "time", "topic", "rsv_ix")
@@ -123,8 +123,8 @@ mu_plot_opts <- list(
   "col" = "Taxon_5",
   "fill" = "Taxon_5",
   "outlier.shape" = NA,
-  "fill_colors" = brewer.pal(3, "Set2"),
-  "col_colors" = brewer.pal(3, "Set2"),
+  "fill_colors" = brewer.pal(4, "Set2"),
+  "col_colors" = brewer.pal(4, "Set2"),
   "theme_opts" = list(border_size = 0.7)
 )
 

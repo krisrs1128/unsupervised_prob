@@ -43,12 +43,12 @@ p <- ggplot(transformed_counts) +
 ggsave("../../doc/figure/histograms-1.pdf", p)
 
 ## ---- heatmaps ----
-y_order <- names(sort(taxa_sums(abt)))
-x_order <- names(sort(sample_sums(abt)))
+x_order <- names(sort(taxa_sums(abt)))
+y_order <- names(sort(sample_sums(abt)))
 ordered_map <- function(x) {
   ggheatmap(
     x %>%
-    melt(value.name = "fill", varnames = c("y", "x")),
+    melt(value.name = "fill", varnames = c("x", "y")),
     list("x_order" = x_order, "y_order" = y_order)
   ) +
     min_theme(list(text_size = 0)) +
