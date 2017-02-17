@@ -425,21 +425,21 @@ single object, suitable for plotting.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r read-vis, eval = TRUE}
-read_chunk("../src/sim/nmf/nmf_vis.R")
+read_chunk("../src/sim/nmf/nmf_visf.R")
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r libraries-nmf-vis}
+```{r libraries-nmf-vis, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r theta-reshape}
+```{r theta-reshape, eval = FALSE}
 ```
 \endgroup
 
@@ -472,14 +472,22 @@ is small but consistent, especially in Gibbs Sampling.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas-prep}
+```{r visualizethetas-prep, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetas, out.height = 4, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+```{r visualizethetas, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizethetasfigure, eval = TRUE, out.height = 4, fig.cap = "Visualized scores from the NMF experiment, on data without any zero inflation."}
+include_graphics("figure/visualizethetas-1.pdf")
 ```
 \endgroup
 
@@ -506,7 +514,15 @@ seem to be systematically too large.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizethetashist, fig.cap = "Histograms of the differences between posterior sampled scores and their true values."}
+```{r visualizethetashist, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizethetashistfigure, fig.cap = "Histograms of the differences between posterior sampled scores and their true values.", eval = TRUE}
+include_graphics("figure/visualizethetashist-1.pdf")
 ```
 \endgroup
 
@@ -519,7 +535,15 @@ increases.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetas, out.height = 4, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+```{r visualizebetas, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizebetasfigure, eval = TRUE, out.height = 4, fig.cap = "Posteriors for the two-dimensional latent factors, across simulation settings."}
+include_graphics("figure/visualizebetas-1.pdf")
 ```
 \endgroup
 
@@ -538,7 +562,15 @@ access to the same number of samples across regimes.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizebetashist, fig.cap = "Histograms of the differences between posterior sampled factors and their true values."}
+```{r visualizebetashist, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizebetashistfigure, eval = TRUE, fig.cap = "Histograms of the differences between posterior sampled factors and their true values."}
+include_graphics("figure/visualizebetashist-1.pdf")
 ```
 \endgroup
 
@@ -564,14 +596,22 @@ modeling (Z-GaP vs. GaP) and the underlying zero inflation probability.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-zinf-thetas-prep}
+```{r visualize-zinf-thetas-prep, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfthetas, out.height = 8, out.width = 8, fig.cap = "Each panel displays the estimated scores for a different simulation setting, with a focus on the effect of zero inflation. Columns distinguish between different zero-inflation probabilities and modeling techniques."}
+```{r visualizezinfthetas, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfthetasfigure, eval = TRUE, out.height = 8, out.width = 8, fig.cap = "Each panel displays the estimated scores for a different simulation setting, with a focus on the effect of zero inflation. Columns distinguish between different zero-inflation probabilities and modeling techniques."}
+include_graphics("figure/visualizezinfthetasfigure-1.pdf")
 ```
 \endgroup
 
@@ -591,7 +631,15 @@ it is.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfthetashist, fig.cap = "For each simulation setting, we can compute the true estimation errors across samples."}
+```{r visualizezinfthetashist, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfthetashistfigure, eval = TRUE, fig.cap = "For each simulation setting, we can compute the true estimation errors across samples."}
+include_graphics("figure/visualizezinfthetashist-1.pdf")
 ```
 \endgroup
 
@@ -605,14 +653,30 @@ Z-GaP models.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfbetas, out.height = "6in", out.width = "6in", fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
+```{r visualizezinfbetas, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualizezinfbetashist, fig.cap = "Across settings, we can explicitly compute estimation errors."}
+```{r visualizezinfbetasfigure, eval = TRUE, out.height = "6in", out.width = "6in", fig.cap = "The analogous display for estimated latent factors, across zero-inflation regimes."}
+include_graphics("figure/visualizezinfbetas-1.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfbetashist, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualizezinfbetashist, eval = TRUE, fig.cap = "Across settings, we can explicitly compute estimation errors."}
+include_graphics("figure/visualizezinfbetashist-1.pdf")
 ```
 \endgroup
 
@@ -1010,7 +1074,7 @@ read_chunk("../src/antibiotics-study/lda.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r setup}
+```{r setup, eval = FALSE}
 ```
 \endgroup
 
@@ -1024,11 +1088,11 @@ the dimensionality from 2582 to 354.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r get-data}
+```{r get-data, eval = FALSE}
 ```
 \endgroup
 
-We next transform counts so that they are not so heavily skewed -- otherwise,
+We next transform co[<0;21;30m]unts so that they are not so heavily skewed -- otherwise,
 samples tend to be dominated by a few very highly abundant microbes. Since there
 are many zeros, but the counts are highly skewed, we apply an $\asinh$
 transformation, which behaves like $\log$ for large values, but is defined at 0.
@@ -1039,7 +1103,7 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r histograms}
+```{r histograms, eval = FALSE}
 ```
 \endgroup
 
@@ -1048,7 +1112,7 @@ the original data matrices are given in Figure \@ref(fig:heatmaps).
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r histogramsfigure, fig.cap = "Even after filtering, the data are very heavy tailed. Upon asinhl ransformation, the data are more regularly shaped, though still somewhat heavy tailed.", eval = TRUE}
-include_graphics("figure/histograms-1.png")
+include_graphics("figure/histograms-1.pdf")
 ```
 \endgroup
 
@@ -1063,7 +1127,7 @@ include_graphics("figure/histograms-1.png")
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r heatmapsfigure, fig.show = "hold", fig.align = "left", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value.", eval = TRUE, out.height = "1.5in"}
-include_graphics(c("figure/heatmaps-1.png", "figure/heatmaps-2.png")) 
+include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf")) 
 ```
 \endgroup
 
@@ -1143,7 +1207,7 @@ $\theta_{ik}$, and the sum for any column is 1.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualizeldathetaheatmapfigure, fig.cap = "Heatmap of the posterior means of LDA estimated mixture component values over time.", eval = TRUE}
-include_graphics("figure/visualize_lda_theta_heatmap-1.png")
+include_graphics("figure/visualize_lda_theta_heatmap-1.pdf")
 ```
 \endgroup
 
@@ -1179,7 +1243,7 @@ larger for parameters with larger values.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualizethetaboxplotfigure, out.width = "10in", out.height = "6in", fig.cap = "Boxplots of approximate posteriors for estimated mixture memberships, and their evolution over time.", echo = FALSE, eval = TRUE}
-include_graphics("figure/visualize_lda_theta_boxplot-1.png")
+include_graphics("figure/visualize_lda_theta_boxplot-1.pdf")
 ```
 \endgroup
 \elandscape
@@ -1205,7 +1269,7 @@ relatedness. Note that we have not displayed outliers, because they make the fig
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualizebetafigure, out.width = "10in", out.height = "6in", fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE, eval = TRUE}
-include_graphics("figure/visualize_lda_beta-1.png")
+include_graphics("figure/visualize_lda_beta-1.pdf")
 ```
 \endgroup
 \elandscape
@@ -1318,7 +1382,7 @@ centered -- this makes no difference in the associated probabilities.
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r unigramseriesfigure, fig.cap = "The evolution of per-microbe posterior means over time. The first and second antibiotics time courses are introduced at days 12 and 44, respectively.", eval = TRUE}
-include_graphics("figure/unigramseries-1.png")
+include_graphics("figure/unigramseries-1.pdf")
 ```
 \endgroup
 
@@ -1342,7 +1406,7 @@ microbes, many of the paths occlude one another. Figure
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r unigramboxplotsfigure, out.width = "10in", out.height = "6in", echo = FALSE, fig.cap = "The evolution of per-microbe posterior quantiles over time, as different antibiotics time courses are introduced.", eval = TRUE}
-include_graphics("figure/unigramboxplots-1.png")
+include_graphics("figure/unigramboxplots-1.pdf")
 ```
 \endgroup
 \elandscape
@@ -1453,7 +1517,7 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualizealphafigure, eval = TRUE}
-include_graphics("figure/visualize-alpha-1.png")
+include_graphics("figure/visualize-alpha-1.pdf")
 ```
 \endgroup
 
@@ -1462,7 +1526,7 @@ include_graphics("figure/visualize-alpha-1.png")
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r visualizemufigure, out.width = "10in", out.height = "6in", echo = FALSE, eval = TRUE}
-include_graphics("figure/visualize-mu-1.png")
+include_graphics("figure/visualize-mu-1.pdf")
 ```
 \endgroup
 \elandscape
