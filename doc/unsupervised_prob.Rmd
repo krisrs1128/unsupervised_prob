@@ -1255,7 +1255,7 @@ A view of the posterior means for the $g\left(\theta_{ik}\right)$ is given in Fi
 \@ref(fig:visualize_theta_heatmap). Here, the $k^{th}$ row corresponds to the
 $k^{th}$ topic, and the $i^{th}$ column gives the $i^{th}$ timepoint. That is,
 the $ki^{th}$ cell is shaded in according to the posterior mean for
-$g\left(\theta_{ik}right)$, and the sum for any column is 0, by definition of
+$g\left(\theta_{ik}\right)$, and the sum for any column is 0, by definition of
 the transformation $g$.
 
 \begingroup
