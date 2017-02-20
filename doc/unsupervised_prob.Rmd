@@ -229,7 +229,7 @@ scattered in the simplex without regard to time. Instead, the mixing
 probabilities $\theta_{d}$ are also thought to exhibit some inertia, being more
 similar among documents closer to each other in time.
 
-This is formulated more precisely as 
+This is formulated more precisely as
 \begin{align*}
 n_{d\cdot} \vert \mu_{t\left(d\right)}, \alpha_{\left(d\right)} &\sim \Mult\left(\sum_{v} n_{dv}, \sum_{k = 1}^{K} S\left(\alpha_{t\left(d\right)}\right) S\left(\mu_{t\left(d\right)}\right)\right) \\
 \alpha_{t} \vert \alpha_{t - 1} &\sim \Gsn\left(\alpha_{t - 1}, \delta^{2}I_{K}\right) \\
@@ -296,7 +296,7 @@ is a common feature of many microbiome data sets [@xu2015assessment;
 $p$ entries in $Y$ are sent to zero. That is, instead of of the Poisson
 likelihood,
 \begin{align*}
-\Parg{Y_{ij} = y_{ij} \vert \theta_{i}, \beta_{j \cdot}} = \frac{\exp{-\theta_{i}^{T}\beta_{j \cdot}} \left(\theta_{i}^{T}\beta_{j}\right)^{y_{ij}}}{y_{ij}!}, 
+\Parg{Y_{ij} = y_{ij} \vert \theta_{i}, \beta_{j \cdot}} = \frac{\exp{-\theta_{i}^{T}\beta_{j \cdot}} \left(\theta_{i}^{T}\beta_{j}\right)^{y_{ij}}}{y_{ij}!},
 \end{align*}
 we have
 \begin{align*}
@@ -350,7 +350,7 @@ The sampling statements `~ gamma` and `~ poisson` tell STAN to increment the
 loglikelihood used to construct samplers.
 
 Access to this interface for doing Bayesian inference simplifies the process of
-exploring alternative probabilistic models. Indeed, implementing samplers ``by-hand'' 
+exploring alternative probabilistic models. Indeed, implementing samplers ``by-hand''
 can be a time-consuming and error-prone process. All simulation and data
 analysis results described in this report have been implemented in STAN and are
 available at (todo: central repo).
@@ -423,7 +423,7 @@ batch scripts that run subsets of the experimental configurations.
 
 Once the experiments complete, we can visually assess the quality of the fits.
 First, we read in the fitted parameters across experiments and merge them into a
-single object, suitable for plotting. 
+single object, suitable for plotting.
 
 \begingroup
 \setstretch{1}
@@ -585,7 +585,7 @@ and $\beta_{v}$. Our interest revolves around two questions,
 
 * In the case that zero-inflation is present and the appropriate model, with
   known zero inflation probability, is used, how quickly do estimates
-  deterioriate as more and more entries are sent to zero? 
+  deterioriate as more and more entries are sent to zero?
 * What are the consequences for estimating latent scores and factors, in the
   case that zero-inflation exists but is not accounted for?
 
@@ -959,7 +959,7 @@ include_graphics("figure/betaboxplot1-1.pdf")
 include_graphics("figure/betaboxplot2-1.pdf")
 ```
 \endgroup
- 
+
 Different columns index different features -- in Figure \@ref(fig:betaboxplot1),
 $V = "10in"$, while in Figure \@ref(fig:betaboxplot2), $V = 50$. Rows index
 different topics and experimental configurations. From inside out, the $y$-axis
@@ -969,7 +969,7 @@ not the same across experimental configurations, due to the simulation setup.
 The takeaways from these views of the simulation experiment are consistent with
 all others so far. One pattern that is not obvious from the other displays is
 that MCMC sampling can lead to posteriors with high skewness in the case that a
-parameter is close to one of the endpoints of its domain (0 or 1, in this case). 
+parameter is close to one of the endpoints of its domain (0 or 1, in this case).
 
 #### Mixing Proportions $\theta_{i}$ ####
 
@@ -1193,7 +1193,7 @@ include_graphics("figure/histograms-1.pdf")
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r heatmapsfigure, fig.show = "hold", fig.align = "left", fig.cap = "Heatmaps of counts on the filtered data, before (left) and after (right) transformation, with microbes and samples sorted according to their average value.", eval = TRUE, out.width = "3in", eval = FALSE}
-include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf")) 
+include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf"))
 ```
 \endgroup
 
@@ -1501,12 +1501,13 @@ inferential stage of data modeling, where a particular model is posited and
 estimated, but omits the important stage of model revision and comparison, which
 we defer at this point.
 
-We first refresh our workspace and prepare the data to model.
+We first refresh our workspace and load the packages used in these experiments.
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r dtm_setup, eval = TRUE}
+rm(list = ls())
 read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
@@ -1518,6 +1519,9 @@ read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
 
+As in the previous experiments, we focus on Subject F and filter to those
+microbes that appear in at least 45\% of samples.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
@@ -1525,12 +1529,12 @@ read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
 
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r vis-times, eval = FALSE}
-```
-\endgroup
+We prepare data and specify hyperparameters for the DTM in the code below. We
+specify $K = 2$ not because we believe it will lead to the best
+fit\footnote{We're not \textit{that} naive.}, but because it allows more
+straightforwards interpretation. For a study with more substantial consequences,
+it would be worth comparing fits resulting from different $K$ and going through
+the effort of interpreting what amounts to $K$ parallel unigram models.
 
 \begingroup
 \setstretch{1}
@@ -1538,6 +1542,31 @@ read_chunk("../src/antibiotics-study/dtm.R")
 ```{r run-model, eval = FALSE}
 ```
 \endgroup
+
+Before evaluating the model more critically, we first provide a few alternative
+views of the fitted posterior distribution. The main advantage enjoyed by the
+DTM -- its ability to express rich mixture and time-varying structure
+-- ends up leading to some nontrivial visualization problems at the
+interpretation stage [@chuang2015topiccheck]. Here, we create views of the
+fitted $\alpha_{t\left(i\right)}$ (Figure \@ref(fig:visualizealphafigure)) and
+$\mu_{kt}$ (Figure \@ref(fig:visualizemufigure)) that parallel the earlier ones
+for LDA and the unigram model as closely as possible.
+
+Interpretation of Figure \@ref(fig:visualizealphafigure) is read in the same way
+as Figure \@ref(fig:visualizethetaboxplotfigure) -- the two rows of panels
+correspond to two topics and time increases from left to right. Unlike the
+estimates from the original LDA, there does not seem to be a noticeable
+antibiotic time course effect here -- the deviations observed during the 1st and
+2nd Cp seem to be on a comparable scale to those during Pre Cp and Interim. It
+seems that variation over time has been captured by evolution in the
+$\beta_{kt}$ rather than $\alpha_{t\left(i\right)}$. We note also the pattern
+that posterior variances seem to be larger for those times where the associated
+$\alpha_{t\left(i\right)}$ has large absolute margnitude. This is in contrast to
+all earlier displays, where uncertainty seemed low when estimated estimators
+were large, and where uncertainty was large for estimates at and below 0. At the
+moment, we have no explanation for this behavior.
+
+The code below prepares the model output for the visualization just described.
 
 \begingroup
 \setstretch{1}
@@ -1549,6 +1578,40 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
+```{r visualizealpha, eval = FALSE}
+```
+\endgroup
+
+Figure \@ref(fig:visualizemufigure) is the DTM $\left(\mu_{tk}\right)$ analog of
+Figure \@ref(fig:unigramboxplotsfigure) for the unigram $\left(\mu_{t}\right)$.
+For each topic, we have probabilities evolving as in the unigram model. This
+figure just stacks the different topics horizontally -- the top row of numbers
+along the figure display is a topic indicator. As before, we have chosen to
+display only a few time points among the estimated $\mu_{tk}$.
+
+The time course effect is clearly visible from this display. Further, at times
+16 and 19, the two topics seem to have diverged. The time course effect is seen
+the way boxplots transition from generally being larger than zero at the earlier
+timepoints to generally being much smaller than zero at and after time 16. This
+reflects a decrease in diversity -- more species have estimated probabilities
+closer to zero after logit transforming, and those boxplots above zero are the
+species resilient to the cleanout.
+
+The difference between the two topics seems to be that topic 1 is associated
+with a more immediate reduction in diversity, while topic 2 only takes longer to
+reach a comparable state (compare the panels for Ruminococcaceae, for example).
+Also, topic 2 seems to highlight a few of the Lachnospiraceae as being much more
+abundant than the others during the cleanout period.
+
+Confirming previous views of the data, the Lachnospiraceae and Ruminococcaceae
+seem more strongly affected by the time courses, in terms of the fraction of
+microbes with nonnegligible estimated probabilities during these time points.
+
+The code block below is used to prepare the display that we have just discussed.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
 ```{r prepare-mu, eval = FALSE}
 ```
 \endgroup
@@ -1556,14 +1619,7 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-alpha, eval = FALSE}
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r visualize-mu, eval = FALSE}
+```{r visualizemu, eval = FALSE}
 ```
 \endgroup
 
