@@ -25,20 +25,15 @@ abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
-## ---- prepare-data ----
+## ---- run-model ----
 times <- sample_data(abt)$time
 X <- t(get_taxa(abt))
 
-## ----  run-model ----
-N <- nrow(X)
-V <- ncol(X)
-T <- length(times)
-
 m <- stan_model("../stan/dtm.stan")
 stan_data <- list(
-  N = N,
-  V = V,
-  T = T,
+  N = nrow(X),
+  V = ncol(X),
+  T = length(times),
   K = 2,
   sigma_hyper = c(0.5, 0.5),
   delta_hyper = c(0.5, 0.5),
@@ -46,6 +41,8 @@ stan_data <- list(
   times_mapping = times,
   X = X
 )
+
+## Fit and save variational bayes model
 stan_fit <- vb(m, data = stan_data)
 save(
   stan_fit,
@@ -128,7 +125,7 @@ mu_plot_opts <- list(
   "theme_opts" = list(border_size = 0.7)
 )
 
-## ---- visualize-alpha ----
+## ---- visualizealpha ----
 p <- ggboxplot(alpha_hat, alpha_plot_opts) +
   labs(
     fill = "Topic",
@@ -140,7 +137,7 @@ p <- ggboxplot(alpha_hat, alpha_plot_opts) +
   )
 ggsave("../../doc/figure/visualize-alpha-1.pdf", p)
 
-## ---- visualize-mu ----
+## ---- visualizemu ----
 p <- ggboxplot(mu_hat, mu_plot_opts) +
   facet_grid(
     time ~ topic + Taxon_5,
