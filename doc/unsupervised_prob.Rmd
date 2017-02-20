@@ -1501,12 +1501,13 @@ inferential stage of data modeling, where a particular model is posited and
 estimated, but omits the important stage of model revision and comparison, which
 we defer at this point.
 
-We first refresh our workspace and prepare the data to model.
+We first refresh our workspace and load the packages used in these experiments.
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
 ```{r dtm_setup, eval = TRUE}
+rm(list = ls())
 read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
@@ -1518,6 +1519,9 @@ read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
 
+As in the previous experiments, we focus on Subject F and filter to those
+microbes that appear in at least 45\% of samples.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
@@ -1525,12 +1529,12 @@ read_chunk("../src/antibiotics-study/dtm.R")
 ```
 \endgroup
 
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r vis-times, eval = FALSE}
-```
-\endgroup
+We prepare data and specify hyperparameters for the DTM in the code below. We
+specify $K = 2$ not because we believe it will lead to the best
+fit\footnote{We're not \textit{that} naive.}, but because it allows more
+straightforwards interpretation. For a study with more substantial consequences,
+it would be worth comparing fits resulting from different $K$ and going through
+the effort of interpreting what amounts to $K$ parallel unigram models.
 
 \begingroup
 \setstretch{1}
@@ -1538,6 +1542,15 @@ read_chunk("../src/antibiotics-study/dtm.R")
 ```{r run-model, eval = FALSE}
 ```
 \endgroup
+
+Before evaluating the model more critically, we first provide a few alternative
+views of the fitted posterior distribution. The main advantage enjoyed by the
+DTM -- its ability to express rich mixture and time-varying structure
+-- ends up leading to some nontrivial visualization problems at the
+interpretation stage [@chuang2015topiccheck]. Here, we create views of the
+fitted $\alpha_{t\left(i\right)}$ (Figure \@ref(fig:visualizealpha)) and
+$\mu_{kt}$ (Figure \@ref(fig:visualizemu)) that parallel the earlier ones for
+LDA and the unigram model as closely as possible.
 
 \begingroup
 \setstretch{1}
@@ -1556,14 +1569,14 @@ read_chunk("../src/antibiotics-study/dtm.R")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-alpha, eval = FALSE}
+```{r visualizealpha, eval = FALSE}
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize-mu, eval = FALSE}
+```{r visualizemu, eval = FALSE}
 ```
 \endgroup
 
