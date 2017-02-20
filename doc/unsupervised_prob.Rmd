@@ -1158,13 +1158,22 @@ the dimensionality from 2582 to 354.
 ```
 \endgroup
 
-We next transform co[<0;21;30m]unts so that they are not so heavily skewed -- otherwise,
-samples tend to be dominated by a few very highly abundant microbes. Since there
-are many zeros, but the counts are highly skewed, we apply an $\asinh$
-transformation, which behaves like $\log$ for large values, but is defined at 0.
-The difference between the histograms across raw and transformed data is
-displayed in Figure \@ref(fig:histograms), and the corresponding heatmaps for
-the original data matrices are given in Figure \@ref(fig:heatmaps).
+We note that the samples tend to be dominated by a few very highly abundant
+microbes. Since there are many zeros, but the counts are highly skewed, it is
+common, especially when working with PCA-like methods, which have gaussian
+bilinear model analogs, to apply an $\asinh$ transformation, which behaves like
+$\log$ for large values, but is defined at 0. The difference between the
+histograms across raw and transformed data is displayed in Figure
+\@ref(fig:histograms), and the corresponding heatmaps for the original and
+transformed data matrices are given in Figure \@ref(fig:heatmaps). However, we
+continue to use the untransformed data when working with probabilistic models
+for count data, since the count models would make no sense on the real-valued
+transformations. While we make no changes in inference to protect against this
+skewness, we will visualize fitted parameters on a transformed scale, so that
+all microbes are visible. Further, we will assess the posterior predictive's
+ability to reproduce the skewness evident in the real data, to see whether this
+skewness cannot be captured by the space of models postited by our different
+methods.
 
 \begingroup
 \setstretch{1}
@@ -1197,23 +1206,15 @@ include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf"))
 ```
 \endgroup
 
-With these preprocessing steps out of the way, we can proceed with modeling.
+With these preliminary checks of global data properties complete, we proceed
+with modeling.
 
 ### LDA {#sec:antibiotics-lda}
 
-We first apply LDA directly. Note that, after the $\asinh$ transformation, the
-data are no longer actually counts. To make the model applicable, we round to
-the nearest integer -- the model here is really only a device, not a plausible
-data generating mechanism. In particular, uncertainty estimates for fitted
-parameters should be regarded skeptically.
-
-#### Estimation ####
-
-We fit LDA with $K = 3$, chosen arbitrarily, but with the heuristic that a large
-$K$ could be hard to interpret, considering there are only 5"6in" samples. We use
-VB, because MCMC seemed to produce degenerate fits\footnote{Most of the
-sampled $\theta_{ik}$ were nearly 0 or 1. Somehow, VB seems to be performing a
-type of regularization.}.
+We first fit LDA with $K = 4, chosen arbitrarily, but with the heuristic that a
+large $K$ could be hard to interpret, considering there are only 56 samples. We
+use VB, since it is an order of magnitude faster when working across all
+timepoints.
 
 \begingroup
 \setstretch{1}
@@ -1224,7 +1225,12 @@ type of regularization.}.
 Before visualizing the results, we need to extract posterior samples for each
 parameter and link them with descriptions about associated samples or microbes.
 This data reshaping work is performed in the two code blocks below. The first
-reshapes $\beta$, the second reshapes $\theta$.
+reshapes $\beta$, the second reshapes $\theta$. Note that we view the fitted
+probabilities on a logit scale -- for a raw vector of probabilities $\mathbf{p}
+= \left(p_{1}, \dots, p_{D}\right)$, we plot $g\left(\mathbf{p}\right) :=
+\left(\log p_{1} - \bar{\log \mathbf{p}}, \dots, \log p_{K} - \bar{\log
+\mathbf{p}}\right)$, which are like log-odds, but centered according to the
+average log probability, rather than any reference class.
 
 \begingroup
 \setstretch{1}
@@ -1240,20 +1246,17 @@ reshapes $\beta$, the second reshapes $\theta$.
 ```
 \endgroup
 
-#### Diagnostics ####
+The fitted parameter values are summarized in Figures
+\@ref(fig:visualizethetaheatmapfigure), \@ref(fig:visualizethetaboxplotfigure),
+and \@ref(fig:visualizebetafigure). We describe how to read each display and
+briefly interpret the underlying biological.
 
-#### Visualization and Interpretation ####
-
-The fitted parameter values are summarized in Figures \@ref(fig:visualize_beta),
-\@ref(fig:visualize_theta_heatmap) and \@ref(fig:visualize_theta_boxplot). We
-describe how to read each display and briefly interpret the underlying
-biological.
-
-A view of the posterior means for the $\theta_{ik}$ is given in Figure
+A view of the posterior means for the $g\left(\theta_{ik}\right)$ is given in Figure
 \@ref(fig:visualize_theta_heatmap). Here, the $k^{th}$ row corresponds to the
 $k^{th}$ topic, and the $i^{th}$ column gives the $i^{th}$ timepoint. That is,
 the $ki^{th}$ cell is shaded in according to the posterior mean for
-$\theta_{ik}$, and the sum for any column is 1.
+$g\left(\theta_{ik}right)$, and the sum for any column is 0, by definition of
+the transformation $g$.
 
 \begingroup
 \setstretch{1}
@@ -1474,13 +1477,15 @@ with the first time course of antibiotics. Individual microbes are sorted
 according to evolutionary relatedness, and colors / columns indicate different
 taxonomic families.
 
-We note as an aside that, while it is possible to plot the raw
+As in LDA, while it is possible to plot the raw
 probabilities\footnote{These are in fact a column of the \texttt{beta\_hat}
 data.frame in the code chunks above.} $p_{tk} =
 \frac{\exp{\beta_{tk}}}{\sum_{k^{\prime}} \exp{\beta_{tk^{\prime}}}}$, we find
 the $\beta_{tk}$s to be on a more useful scale, allowing comparison of slightly
-different small probabilities. This observation is in line with the discussion
-in Figure 23.8 of [@mackay2003information].
+different small probabilities. Indeed, in the unigram setting, we do not need to
+artificially introduce this reparameterization, as in LDA -- this
+parameterization built into the model's definition. This observation is in line
+with the discussion in Figure 23.8 of [@mackay2003information].
 
 ### DTM ###
 
@@ -1563,7 +1568,13 @@ $\beta_{kt}$ rather than $\alpha_{t\left(i\right)}$. We note also the pattern
 that posterior variances seem to be larger for those times where the associated
 $\alpha_{t\left(i\right)}$ has large absolute margnitude. This is in contrast to
 all earlier displays, where uncertainty seemed low when estimated estimators
-were large, and where uncertainty was large for estimates at and below 0. At the
+were large, and where uncertainty was large for estimates at and below 0. It may
+be the case that the wider boxplots in this display are those for timepoints
+with smaller counts overall. However, this does not explain why this pattern
+only appears among the estimated DTM $\alpha_{t\left(i\right)}$, and not the LDA
+$\theta_{i}$.
+
+At the
 moment, we have no explanation for this behavior.
 
 The code below prepares the model output for the visualization just described.
