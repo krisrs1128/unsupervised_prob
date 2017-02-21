@@ -63,11 +63,13 @@ ggsave("../../doc/figure/heatmaps-2.pdf", p)
 
 ## ---- lda ----
 X <- t(get_taxa(abt))
+test_ix <- c(10, 18, 25)
 stan_data <- list(
   K = 4,
   V = ncol(X),
-  D = nrow(X),
-  n = X,
+  D = nrow(X[-test_ix, ]),
+  D_test = length(test_ix),
+  n = X[-test_ix, ],
   alpha = rep(1, 4),
   gamma = rep(0.5, ncol(X))
 )
