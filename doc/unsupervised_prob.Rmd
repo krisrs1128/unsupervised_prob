@@ -1277,7 +1277,7 @@ A disadvantage of Figure \@ref(fig:visualizeldathetaheatmap) is that it displays
 posterior means without any sense of the variability of these estimates. An
 alternative which does describe uncertainty is given in Figure
 \@ref(fig:visualizeldathetaboxplot). The rows and columns of panels again
-represent topics and time, but now each cell includes a boxplot of 
+represent topics and time, but now each cell includes a boxplot of
 $g\left(\theta_{ik}\right)$ based on posterior samples of the $\theta_{ik}$.
 
 Both views draw attention to the two antibiotic time courses. Topic 1 becomes
@@ -1309,14 +1309,15 @@ include_graphics("figure/visualize_lda_theta_boxplot-1.pdf")
 ```
 \endgroup
 
-To interpret these topics in terms of their microbial composition, we study
-the estimated topic distributions $\beta_{\cdot k}$, displayed in Figure
-\@ref(fig:visualize_beta). The three major rows correspond to the $K = 3$
+To interpret these topics in terms of their microbial composition, we study the
+estimated topic distributions $\beta_{\cdot k}$. The transformed versions,
+$g\left(\beta_{\cdot k}\right)$ are displayed in Figure
+\@ref(fig:visualizebetafigure). The four major rows correspond to the $K = 4
 estimated topics. Each boxplot within a row is associated with posterior samples
 for a single microbe. Different colors identify different taxonomic families,
 and within these families, microbes are sorted according to evolutionary
-relatedness. Note that we have not displayed outliers, because they make the figure difficult to read.
-
+relatedness. Note that we have not displayed outliers from the posterior
+sampling, because they make the figure difficult to read.
 
 \begingroup
 \setstretch{1}
@@ -1333,21 +1334,21 @@ include_graphics("figure/visualize_lda_beta-1.pdf")
 ```
 \endgroup
 
-
 In light of the mixture probabilities in Figure
-\@ref(fig:visualize_theta_boxplot), those microbes with large probabilities in
-the third row in Figure \@ref(fig:visualize_beta) make up a large
-fraction of the samples taken during antibiotic time courses. This could be due to these microbes thriving during the
-regimen or other microbes being more negatively impacted -- viewing the raw data
-directly supports the latter scenario. The fact that these distribution is
-relatively more concentrated on a small subset of microbes with high
-probabilities reflects a decrease in community diversity during antibiotic time
-courses. It is interesting that the two time courses can be identified with
-different microbial signatures.
+\@ref(fig:visualizethetaboxplot), those microbes with large probabilities in the
+third and fourth rows in Figure \@ref(fig:visualizebeta) make up a large
+fraction of the samples taken during antibiotic time courses, reflecting those
+increasing rapidly and gradually at those points, respectively. This could be
+due to these microbes thriving during the regimen or other microbes being more
+negatively impacted -- viewing the raw data directly supports the latter
+scenario. These distributions are relatively more concentrated on a small subset
+of microbes with high probabilities, reflected by the drop in logitted
+probabilities far below zero. This corresponds to a decrease in community
+diversity during antibiotic time courses.
 
-We also note "bumps" of neighboring microbes with similarly elevated topic
+We also note ``bumps'' of neighboring microbes with similarly elevated topic
 probabilities. It is encouraging that, even without specifying smoothness along
-the tree in the prior for the $\beta_{\cdot k}$s, such smoothness arises in the
+the tree in the prior for the $\beta_{\cdot k}$s, such smoothness emerges in the
 fitted model.
 
 ### Unigram Model ###
@@ -1355,14 +1356,15 @@ fitted model.
 Next, we apply the unigram model to the same data. While we might generally
 suspect that gut microbiome profiles can change slightly over several days and
 that there might be an immediate antibiotic effect, we still choose to avoid
-explicitly setting $\sigma$. Instead, we use a hyperprior, $\sigma^{2} \sim \InvGam
-\left(\frac{1}{2}, \frac{1}{2}\right)$, which is flat on a log-scale. Further,
-since visualizing $\tilde 50$ $\beta_{t}$ is difficult, we group timepoints into
-windows of length four days, so that there are fewer $\beta_{t}$'s to display.
-A reasonable alternative would have been to display every fourth estimated
-$\beta_{t}$ (we would expect a more slowly evolving estimated $\sigma$).
+explicitly setting the topic evolution rate $\sigma$. Instead, we use a
+hyperprior, $\sigma^{2} \sim \InvGam \left(\frac{1}{2}, \frac{1}{2}\right)$,
+which is flat on a log-scale. Further, since visualizing $\tilde 50$ $\beta_{t}$
+is difficult, we group timepoints into windows of length four days, so that
+there are fewer $\beta_{t}$'s to display. A reasonable alternative would have
+been to display every fourth estimated $\beta_{t}$ (we would expect a more
+slowly evolving estimated $\sigma$).
 
-The code chunks below prime our environment for the subsequent analysis.
+The code chunks below prepare our environment for the subsequent analysis.
 
 \begingroup
 \setstretch{1}
