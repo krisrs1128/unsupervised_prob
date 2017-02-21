@@ -33,11 +33,9 @@ abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
-## ---- vis-times ----
+## ---- run-model ----
 times <- sample_data(abt)$time
 X <- t(get_taxa(abt))
-
-## ---- run-model ----
 stan_data <- list(
   N = nrow(X),
   V = ncol(X),
@@ -58,54 +56,54 @@ save(
 samples <- rstan::extract(stan_fit)
 rm(stan_fit)
 
-## ---- prepare-beta ----
+## ---- prepare-mu ----
 taxa <- data.table(
   rsv = rownames(tax_table(abt)),
   tax_table(abt)@.Data
 )
 taxa$Taxon_5[which(taxa$Taxon_5 == "")] <- taxa$Taxon_4[which(taxa$Taxon_5 == "")]
 
-## center the betas
-beta <- samples$beta
+## center the mus
+mu <- samples$mu
 for (i in seq_len(stan_data$T)) {
-  beta[, i,] <- beta[, i, ] - mean(beta[, i,])
+  mu[, i,] <- mu[, i, ] - mean(mu[, i,])
 }
 
-beta_hat <- samples$beta %>%
+mu_hat <- samples$mu %>%
   melt(
     varnames = c("iteration", "time", "rsv_ix"),
-    value.name = "beta"
+    value.name = "mu"
   )
 
-beta_hat$rsv <- rownames(otu_table(abt))[beta_hat$rsv_ix]
-beta_hat$time <- times[beta_hat$time]
-beta_hat <- beta_hat %>%
+mu_hat$rsv <- rownames(otu_table(abt))[mu_hat$rsv_ix]
+mu_hat$time <- times[mu_hat$time]
+mu_hat <- mu_hat %>%
   left_join(taxa) %>%
   left_join(sample_data(abt)[, c("time", "condition")]) %>%
   group_by(time) %>%
-  mutate(prob = softmax(beta))
+  mutate(prob = softmax(mu))
 
 group_order <- sort(table(taxa$Taxon_5), decreasing = TRUE)
-beta_hat$Taxon_5 <- factor(beta_hat$Taxon_5, levels = names(group_order))
-beta_hat$rsv <- factor(
-  taxa[beta_hat$rsv_ix]$rsv,
+mu_hat$Taxon_5 <- factor(mu_hat$Taxon_5, levels = names(group_order))
+mu_hat$rsv <- factor(
+  taxa[mu_hat$rsv_ix]$rsv,
   levels = rownames(tax_table(abt))
 )
 
 ## ---- unigramseries ----
 plot_opts <- list(
   "x" = "time",
-  "y" = "mean_beta",
+  "y" = "mean_mu",
   "col" = "Taxon_5",
   "facet_terms" = c("Taxon_5", "."),
   "alpha" = 0.4,
   "group" = "rsv"
 )
 p <- gglines(
-  beta_hat %>%
-  filter(Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4]) %>%
+  mu_hat %>%
+  filter(Taxon_5 %in% levels(mu_hat$Taxon_5)[1:4]) %>%
   group_by(rsv, time) %>%
-  summarise(mean_beta = mean(beta), Taxon_5 = Taxon_5[1]) %>%
+  summarise(mean_mu = mean(mu), Taxon_5 = Taxon_5[1]) %>%
   as.data.frame(),
   plot_opts
 ) +
@@ -120,7 +118,7 @@ ggsave("../../doc/figure/unigramseries-1.pdf", p)
 ## ---- unigramboxplots ----
 plot_opts <- list(
   "x" = "rsv",
-  "y" = "beta",
+  "y" = "mu",
   "fill" = "Taxon_5",
   "col" = "Taxon_5",
   "outlier.shape" = NA,
@@ -130,9 +128,9 @@ plot_opts <- list(
   "theme_opts" = list(border_size = 0.7)
 )
 p <- ggboxplot(
-  beta_hat %>%
+  mu_hat %>%
   filter(
-    Taxon_5 %in% levels(beta_hat$Taxon_5)[1:4],
+    Taxon_5 %in% levels(mu_hat$Taxon_5)[1:4],
     time %in% seq(10, 20, by = 3)
   ) %>%
   as.data.frame(),

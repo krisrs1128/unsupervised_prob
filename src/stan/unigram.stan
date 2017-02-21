@@ -19,7 +19,7 @@ data {
 }
 
 parameters {
-  vector[V] beta[T];
+  vector[V] mu[T];
   real<lower=0> sigma2;
 }
 
@@ -32,10 +32,10 @@ model {
   sigma2 ~ inv_gamma(a0, b0);
 
   for (i in 1:(T - 1)) {
-    beta[i + 1] ~ normal(beta[i], sqrt(times[i + 1] - times[i]) * sigma);
+    mu[i + 1] ~ normal(beta[i], sqrt(times[i + 1] - times[i]) * sigma);
   }
 
   for (i in 1:N) {
-    X[i] ~ multinomial(softmax(beta[times_mapping[i]]));
+    X[i] ~ multinomial(softmax(mu[times_mapping[i]]));
   }
 }

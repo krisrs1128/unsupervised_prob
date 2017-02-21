@@ -148,7 +148,7 @@ p <- ggheatmap(
   plot_opts
 ) +
   labs(fill = "g(theta)")
-ggsave("../../doc/figure/visualize_lda_theta_heatmap-1.pdf", p)
+ggsave("../../doc/figure/visualize_lda_theta_heatmap-1.pdf", p, width = 7, height = 0.9)
 
 ## ---- visualize_lda_theta_boxplot ----
 plot_opts <- list(

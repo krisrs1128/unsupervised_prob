@@ -1309,6 +1309,20 @@ include_graphics("figure/visualize_lda_theta_boxplot-1.pdf")
 ```
 \endgroup
 
+To interpret our estimates in terms of the taxonomic context associated with
+each microbe and sampling context associated with each time point, we merge our
+parameter estimates with external information. We impute missing taxonomic
+family labels with those available at the next higher (order) level and ensure
+microbes are ordered according to evolutionary proximity. These postprocessing
+steps are performed in the code block below.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r visualize_beta}
+```
+\endgroup
+
 To interpret these topics in terms of their microbial composition, we study the
 estimated topic distributions $\beta_{\cdot k}$. The transformed versions,
 $g\left(\beta_{\cdot k}\right)$ are displayed in Figure
@@ -1322,21 +1336,14 @@ sampling, because they make the figure difficult to read.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r visualize_beta}
-```
-\endgroup
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
 ```{r visualizebetafigure, fig.cap = "The distribution over microbes associated with each LDA topic.", echo = FALSE, eval = TRUE}
 include_graphics("figure/visualize_lda_beta-1.pdf")
 ```
 \endgroup
 
 In light of the mixture probabilities in Figure
-\@ref(fig:visualizethetaboxplot), those microbes with large probabilities in the
-third and fourth rows in Figure \@ref(fig:visualizebeta) make up a large
+\@ref(fig:visualizethetaboxplotfigure), those microbes with large probabilities in the
+third and fourth rows in Figure \@ref(fig:visualizebetafigure) make up a large
 fraction of the samples taken during antibiotic time courses, reflecting those
 increasing rapidly and gradually at those points, respectively. This could be
 due to these microbes thriving during the regimen or other microbes being more
@@ -1358,11 +1365,8 @@ suspect that gut microbiome profiles can change slightly over several days and
 that there might be an immediate antibiotic effect, we still choose to avoid
 explicitly setting the topic evolution rate $\sigma$. Instead, we use a
 hyperprior, $\sigma^{2} \sim \InvGam \left(\frac{1}{2}, \frac{1}{2}\right)$,
-which is flat on a log-scale. Further, since visualizing $\tilde 50$ $\beta_{t}$
-is difficult, we group timepoints into windows of length four days, so that
-there are fewer $\beta_{t}$'s to display. A reasonable alternative would have
-been to display every fourth estimated $\beta_{t}$ (we would expect a more
-slowly evolving estimated $\sigma$).
+which is flat on a log-scale. Further, since visualizing $\sim 50$ $\beta_{t}$
+is difficult, we display only a subset of the estimated $\mu_{t}$.
 
 The code chunks below prepare our environment for the subsequent analysis.
 
@@ -1391,17 +1395,6 @@ example of Section \@ref(sec:antibiotics-lda).
 ```
 \endgroup
 
-As before, we round the transformed data in order to accomodate a count-based
-probabilistic model. We further define the windows that pool neighboring
-timepoints to the same $\beta_{t}$s.
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r vis-times, eval = FALSE}
-```
-\endgroup
-
 The block below estimates the unigram model using VB.
 
 \begingroup
@@ -1411,13 +1404,16 @@ The block below estimates the unigram model using VB.
 ```
 \endgroup
 
-The only parameters to inspect for the unigram model are the sequence
-of $\beta_{t}$. To interpret our estimates in terms of the taxonomic context
-associated with each microbe and sampling context associated with each time
-point, we merge our parameter estimates with external information. As before, we
-impute missing taxonomic family labels with those available at the next higher
-(order) level and ensure microbes are ordered according to evolutionary
-proximity. These postprocessing steps are performed in the code block below.
+The only parameters to inspect for the unigram model are the sequence of
+$\mu_{t}$. As in LDA, while it is possible to plot the raw
+probabilities\footnote{These are in fact a column of the \texttt{beta\_hat}
+data.frame in the code chunks above.} $\beta_{tv} =
+\frac{\exp{\mu_{tv}}}{\sum_{v^{\prime}} \exp{\mu_{tv^{\prime}}}}$, we find the
+$\mu_{tv}$s to be on a more useful scale, allowing comparison of slightly
+different small probabilities. Indeed, in the unigram setting, we do not need to
+artificially introduce this reparameterization, as in LDA -- this
+parameterization built into the model's definition. This observation is in line
+with the discussion in Figure 23.8 of [@mackay2003information].
 
 \begingroup
 \setstretch{1}
@@ -1426,12 +1422,12 @@ proximity. These postprocessing steps are performed in the code block below.
 ```
 \endgroup
 
-Our first view of the $\beta_{t}$, given in Figure \@ref(fig:unigramseries),
+Our first view of the $\mu_{t}$, given in Figure \@ref(fig:unigramseries),
 tracks the time series of posterior means, grouped by taxonomic family. Here,
-each line represents the sequence $\left(\beta_{tk}\right)_{t}$ for a single
+each line represents the sequence $\left(\mu_{tk}\right)_{t}$ for a single
 microbe $k$. Each color / panel is associated with a taxonomic family, sorted
-from most to least prevalent. Note that the $\beta_{tk}$ have been globally
-centered -- this makes no difference in the associated probabilities.
+from most to least prevalent. Note that the $\mu_{tk}$ have been centered at
+each time.
 
 \begingroup
 \setstretch{1}
@@ -1439,6 +1435,12 @@ centered -- this makes no difference in the associated probabilities.
 ```{r unigramseries, eval = FALSE}
 ```
 \endgroup
+
+The antibiotic time course effects are visible as two U-shapes about one and two
+thirds of the way into sampling. The first time course seems to have a more
+prominent signature. Those microbes that never recover after the first time
+course are visible as lines dropping in the first U and remaining along the
+bottom for all subsequent times.
 
 \begingroup
 \setstretch{1}
@@ -1449,12 +1451,13 @@ include_graphics("figure/unigramseries-1.pdf")
 \endgroup
 
 While useful for building general intution about the fitted model, Figure
-\@ref(fig:unigramseries) is unsatisfactory for two reasons. First, it only
-displays point estimates -- the posterior mean -- for each $\beta_{kv}$, which
+\@ref(fig:unigramseriesfigure) is unsatisfactory for two reasons. First, it only
+displays point estimates -- the posterior mean -- for each $\mu_{tv}$, which
 leaves uncertainty in the estimate unknown. Second, in families with many
 microbes, many of the paths occlude one another. Figure
-\@ref(fig:unigramboxplots) is the time series version of Figure
-\@ref(fig:visualize_beta), and it is designed to overcome these limitations.
+\@ref(fig:unigramboxplotsfigure) is the boxplot version of Figure
+\@ref(fig:unigramseriesfigure), and it is designed to overcome these
+limitations.
 
 \begingroup
 \setstretch{1}
@@ -1472,23 +1475,21 @@ include_graphics("figure/unigramboxplots-1.pdf")
 \endgroup
 
 In Figure \@ref(fig:unigramboxplotsfigure), each boxplot represent the posterior
-quantiles of $\beta_{kv}$ for a single microbe. Each row is associated with a
-set of timepoints, according to the windowing strategy described in the data
-preparation phase. The labels on the far right describe the sampling condition
-at that timepoint -- e.g., 1st Cp (Cipriofloxacin) indicates samples associated
-with the first time course of antibiotics. Individual microbes are sorted
-according to evolutionary relatedness, and colors / columns indicate different
-taxonomic families.
+quantiles of $\mu_{tv}$ for a single microbe. To simplify interpretation, we
+have chosen to only display 4 of the 54 timepoints, each separated by a few days
+and all surrounding the first cleanout. The labels on the far right describe the
+sampling condition at that timepoint -- e.g., 1st Cp (Cipriofloxacin) indicates
+samples associated with the first time course of antibiotics. Individual
+microbes are sorted according to evolutionary relatedness, and colors / columns
+indicate different taxonomic families.
 
-As in LDA, while it is possible to plot the raw
-probabilities\footnote{These are in fact a column of the \texttt{beta\_hat}
-data.frame in the code chunks above.} $p_{tk} =
-\frac{\exp{\beta_{tk}}}{\sum_{k^{\prime}} \exp{\beta_{tk^{\prime}}}}$, we find
-the $\beta_{tk}$s to be on a more useful scale, allowing comparison of slightly
-different small probabilities. Indeed, in the unigram setting, we do not need to
-artificially introduce this reparameterization, as in LDA -- this
-parameterization built into the model's definition. This observation is in line
-with the discussion in Figure 23.8 of [@mackay2003information].
+The decrease in species diversity associated with the antibiotics time course is
+visible in the drop of many estimated $\mu_{tv}$ below 0 at and after time 16.
+Those microbes with boxplots that are much higher than the rest at these
+timepoints are those which are capable of surviving the treatment. Note that the
+taxonomic groups seem differentially affected by the antibiotics. For example,
+almost all Ruminococceae are affected while certain subsets of Lachnospiraceae
+and most Bacteroides seem relatively unaffected.
 
 ### DTM ###
 
