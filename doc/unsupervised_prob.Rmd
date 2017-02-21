@@ -1335,8 +1335,8 @@ include_graphics("figure/visualize_lda_beta-1.pdf")
 \endgroup
 
 In light of the mixture probabilities in Figure
-\@ref(fig:visualizethetaboxplot), those microbes with large probabilities in the
-third and fourth rows in Figure \@ref(fig:visualizebeta) make up a large
+\@ref(fig:visualizethetaboxplotfigure), those microbes with large probabilities in the
+third and fourth rows in Figure \@ref(fig:visualizebetafigure) make up a large
 fraction of the samples taken during antibiotic time courses, reflecting those
 increasing rapidly and gradually at those points, respectively. This could be
 due to these microbes thriving during the regimen or other microbes being more
@@ -1358,11 +1358,8 @@ suspect that gut microbiome profiles can change slightly over several days and
 that there might be an immediate antibiotic effect, we still choose to avoid
 explicitly setting the topic evolution rate $\sigma$. Instead, we use a
 hyperprior, $\sigma^{2} \sim \InvGam \left(\frac{1}{2}, \frac{1}{2}\right)$,
-which is flat on a log-scale. Further, since visualizing $\tilde 50$ $\beta_{t}$
-is difficult, we group timepoints into windows of length four days, so that
-there are fewer $\beta_{t}$'s to display. A reasonable alternative would have
-been to display every fourth estimated $\beta_{t}$ (we would expect a more
-slowly evolving estimated $\sigma$).
+which is flat on a log-scale. Further, since visualizing $\sim 50$ $\beta_{t}$
+is difficult, we display only a subset of the estimated $\mu_{t}$. 
 
 The code chunks below prepare our environment for the subsequent analysis.
 
@@ -1394,13 +1391,6 @@ example of Section \@ref(sec:antibiotics-lda).
 As before, we round the transformed data in order to accomodate a count-based
 probabilistic model. We further define the windows that pool neighboring
 timepoints to the same $\beta_{t}$s.
-
-\begingroup
-\setstretch{1}
-\fontsize{8pt}{8pt}
-```{r vis-times, eval = FALSE}
-```
-\endgroup
 
 The block below estimates the unigram model using VB.
 
