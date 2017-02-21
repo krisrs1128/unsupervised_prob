@@ -156,8 +156,8 @@ plot_opts <- list(
   "y" = "theta_logit",
   "fill" = "topic",
   "col" = "topic",
-  "fill_colors" = brewer.pal(stan_data$K, "Set2"),
-  "col_colors" = brewer.pal(stan_data$K, "Set2"),
+  "fill_colors" = brewer.pal(stan_data$K, "Set1"),
+  "col_colors" = brewer.pal(stan_data$K, "Set1"),
   "facet_terms" = c("topic", "."),
   "theme_opts" = list(border_size = 0.7)
 )
