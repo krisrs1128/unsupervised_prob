@@ -1273,25 +1273,26 @@ include_graphics("figure/visualize_lda_theta_heatmap-1.pdf")
 ```
 \endgroup
 
-A disadvantage of Figure \@ref(fig:visualize_lda_theta_heatmap) is that it displays
+A disadvantage of Figure \@ref(fig:visualizeldathetaheatmap) is that it displays
 posterior means without any sense of the variability of these estimates. An
 alternative which does describe uncertainty is given in Figure
-\@ref(fig:visualize_thtea_boxplot). The rows and columns of panels again
-represent topics and time, but now each cell includes a boxplot of posterior
-samples from $\theta_{ik}$.
+\@ref(fig:visualizeldathetaboxplot). The rows and columns of panels again
+represent topics and time, but now each cell includes a boxplot of 
+$g\left(\theta_{ik}\right)$ based on posterior samples of the $\theta_{ik}$.
 
-Both views draw attention to the two antibiotic time courses, at which point the
-mixture weights place most mass on Topic 3. Topic 2 becomes depressed during the
-time courses, suggesting that it summarizes the "ordinary" microbial community
-structure. Topic 1 seems relatively stable over time, though it increases
-somewhat in the second time course -- it might represent microbes that become
-prominent in the second time course, but not the first.
-
-Finally, even after the second peak is over, the relative contribution of Topic
-3 at the end of the sampling period is somewhat larger than it had been at the
-start. This perhaps reflects subtle longer term effects of antibiotics on
-microbial communities. Across all topics, we find that uncertainty is typically
-larger for parameters with larger values.
+Both views draw attention to the two antibiotic time courses. Topic 1 becomes
+depressed during the time courses, but recovers during the interim, suggesting
+that it summarizes the "ordinary" microbial community structure. Topic 2 seems
+to represent those microbes that were present initially but are eliminated
+during the first time course, though there is a hint of a recovery at the very
+end of sampling. This topic seems most closely related to the finding reported
+in [@dethlefsen2011incomplete] that Subject F experienced long-term antibiotic
+effects on microbial community composition. Topics 3 and 4 both seem to be
+overrepresented during the time courses. Topic 4 is elevated immediately after
+the cleanout, in contrast, topic 3 seems to become elevatd more gradually.
+Further, topic 3 appears to be more common in the samples across all timepoints,
+including those unassociated with the time courses. Across all topics, we find
+that uncertainty is typically smaller for parameters with larger values.
 
 \begingroup
 \setstretch{1}
