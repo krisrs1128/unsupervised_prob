@@ -146,7 +146,8 @@ p <- ggheatmap(
   summarise(mean_theta = mean(theta_logit, na.rm = TRUE)) %>%
   as.data.frame(),
   plot_opts
-)
+) +
+  labs(fill = "g(theta)")
 ggsave("../../doc/figure/visualize_lda_theta_heatmap-1.pdf", p)
 
 ## ---- visualize_lda_theta_boxplot ----
@@ -155,14 +156,14 @@ plot_opts <- list(
   "y" = "theta_logit",
   "fill" = "topic",
   "col" = "topic",
-  "fill_colors" = brewer.pal(stan_data$K, "Set2"),
-  "col_colors" = brewer.pal(stan_data$K, "Set2"),
+  "fill_colors" = brewer.pal(stan_data$K, "Set1"),
+  "col_colors" = brewer.pal(stan_data$K, "Set1"),
   "facet_terms" = c("topic", "."),
   "theme_opts" = list(border_size = 0.7)
 )
 p <- ggboxplot(data.frame(theta_hat), plot_opts) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
-  labs(x = "Time") +
+  labs(x = "Time", y = "g(theta)") +
   theme(legend.position = "none")
 ggsave("../../doc/figure/visualize_lda_theta_boxplot-1.pdf", p)
 
@@ -187,7 +188,7 @@ p <- ggboxplot(
 ) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   scale_y_continuous(breaks = scales::pretty_breaks(3)) +
-  labs(y = "beta", fill = "Family") +
+  labs(y = "g(beta)", fill = "Family") +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank(),
