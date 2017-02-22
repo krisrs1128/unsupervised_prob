@@ -63,24 +63,57 @@ ggsave("../../doc/figure/heatmaps-2.pdf", p)
 
 ## ---- lda ----
 X <- t(get_taxa(abt))
+test_ix <- c(10, 18, 25)
 stan_data <- list(
   K = 4,
   V = ncol(X),
-  D = nrow(X),
-  n = X,
+  D = nrow(X[-test_ix, ]),
+  D_test = length(test_ix),
+  n = X[-test_ix, ],
   alpha = rep(1, 4),
   gamma = rep(0.5, ncol(X))
 )
 
 m <- stan_model(file = "../stan/lda_counts.stan")
-n_iter <- 2000
-stan_fit <- vb(m, stan_data, iter = n_iter)
+n_iter <- 1000
+stan_fit <- vb(m, stan_data, iter = 2 * n_iter)
 save(
   stan_fit,
   file = sprintf("../../data/fits/lda-%s.rda", gsub("[:|| ||-]", "", Sys.time()))
 )
 samples <- rstan::extract(stan_fit)
 rm(stan_fit)
+
+## ---- sample-test ----
+i <- 100
+samples$beta[i,, ]
+samples$theta[i,, ]
+
+x_pred <- array(dim = c(length(test_ix), stan_data$V, n_iter))
+for (j in seq_along(test_ix)) {
+  for (i in seq_len(n_iter)) {
+    theta <- rgamma(4, 1)
+    theta <- theta / sum(theta)
+    n_j <- sum(X[test_ix[j], ])
+    x_pred[j, , i] <- rmultinom(1, size = n_j, prob = t(samples$beta[i,, ]) %*% theta)
+  }
+}
+
+dim(x_pred)
+rowSums(x_pred[,,1])
+rowSums(X[test_ix, ])
+hist(x_pred[1,1, ])
+
+x_err <- x_pred
+for (j in 1:1000) {
+  x_err[,, j] <- asinh(x_pred[,, j]) - asinh(X[test_ix, ])
+}
+
+hist(x_err)
+mean((x_err) ^ 2)
+mean((asinh(X[test_ix, ]) - mean(asinh(X[test_ix, ]))) ^ 2)
+
+dmultinom(c(1, 2, 3), 6, prob = rep(1, 3) / 3, log = TRUE)
 
 ## ---- extract_beta ----
 # underlying RSV distributions
