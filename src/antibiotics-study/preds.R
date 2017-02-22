@@ -64,3 +64,13 @@ lda_loglik_data <- function(N, beta, theta) {
   logliks
 }
 
+posterior_lda_loglik_sample <- function(n, beta_posterior, alpha) {
+  n_posterior <- nrow(beta_posterior)
+  logliks <- vector(length = n_posterior)
+  for (i in seq_len(n_posterior)) {
+    theta <- rdirichlet(alpha)
+    logliks[i] <- lda_loglik_sample(n, beta_posterior[i,, ], rdirichlet(alpha))
+  }
+  logliks
+}
+
