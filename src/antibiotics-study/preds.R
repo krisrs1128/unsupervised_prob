@@ -4,7 +4,7 @@ rdirichlet <- function(alpha) {
   x / sum(x)
 }
 
-#' Get LDA predictive distribution, when theta[i] is unknown
+#' Get LDA predictions, when theta[i] is unknown
 #'
 #' This generates predictions for a new sample using posterior beta values and
 #' also sampling new dirichlet theta[i]'s. I wouldn't expect this approach to do
@@ -16,9 +16,11 @@ rdirichlet <- function(alpha) {
 #'   predictions for.
 #' @param alpha [numeric vector] The alpha parameter used to simulate dirichlet
 #'   theta[i]'s.
+#' @return preds [n_samples x V matrix] A matrix whose columns are associated
+#'   with microbes are rows are predictions given different sampled betas.
 #' @examples
 #' lda_pred(samples$beta, sum(X[test_ix[1], ]), stan_data$alpha)
-lda_pred <- function(beta_samples, n, alpha) {
+lda_pred_sample <- function(beta_samples, n, alpha) {
   n_samples <- nrow(beta_samples)
   V <- dim(beta_samples)[3]
   preds <- matrix(0, n_samples, V)
@@ -26,6 +28,32 @@ lda_pred <- function(beta_samples, n, alpha) {
   for (i in seq_len(n_samples)) {
     theta <- rdirichlet(alpha)
     preds[i, ] <- rmultinom(1, n, prob = t(beta_samples[i,, ]) %*% theta)
+  }
+  preds
+}
+
+#' Get LDA predictions across all samples
+#'
+#' This wraps lda_pred_sample, giving predictions over multiple samples.
+#'
+#' @param beta_samples [n_samples x K x V array] An array containing posterior
+#'   samples of the beta topic distributions.
+#' @param ns [length n vector] The total counts across samples that we are
+#'   trying to make predictions for.
+#' @param alpha [numeric vector] The alpha parameter used to simulate dirichlet
+#'   theta[i]'s.
+#' @return preds [n_samples x n x V matrix] A matrix whose columns are
+#'   associated with microbes are rows are predictions given different sampled
+#'   betas.
+#' @examples
+#' preds <- lda_pred(samples$beta, rowSums(X[test_ix, ]), stan_data$alpha)
+#' preds[1,,] <- preds[1,, ] + runif(prod(dim(preds[1,,])), max = 0.5)
+#' X[test_ix,] <- X[test_ix, ] + runif(prod(dim(X[test_ix, ])), max = 0.5)
+#' plot(asinh(preds[1,,]), asinh(X[test_ix, ]))
+lda_pred <- function(beta_samples, ns, alpha) {
+  preds <- array(0, c(nrow(beta_samples), length(ns), dim(beta_samples)[3]))
+  for (j in seq_along(ns)) {
+    preds[, j, ] <- lda_pred_sample(beta_samples, ns[j], alpha)
   }
   preds
 }
@@ -88,4 +116,3 @@ posterior_lda_loglik <- function(N, beta_posterior, alpha) {
   }
   logliks
 }
-
