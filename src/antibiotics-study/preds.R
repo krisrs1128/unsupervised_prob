@@ -56,8 +56,8 @@ lda_loglik_sample <- function(n, beta, theta) {
 #' @param theta [length K vector] The topic mixture probabilities for the current document
 #' @return loglik_sample The loglikelihood for the current sample, with the
 #'   specified parameters.
-lda_loglik_data <- function(N, beta, theta) {
-  logliks <- seq_len(nrow(N))
+lda_loglik <- function(N, beta, theta) {
+  logliks <- vector(length = nrow(N))
   for (i in seq_len(nrow(N))) {
     logliks[i] <- lda_loglik_sample(N[i, ], beta, theta)
   }
@@ -70,6 +70,21 @@ posterior_lda_loglik_sample <- function(n, beta_posterior, alpha) {
   for (i in seq_len(n_posterior)) {
     theta <- rdirichlet(alpha)
     logliks[i] <- lda_loglik_sample(n, beta_posterior[i,, ], rdirichlet(alpha))
+  }
+  logliks
+}
+
+#' @examples
+#' logliks <- posterior_lda_loglik(
+#'   X[-test_ix, ],
+#'   aperm(samples$beta, c(1, 3, 2)),
+#'   stan_data$alpha
+#' )
+#' hist(logliks, 150)
+posterior_lda_loglik <- function(N, beta_posterior, alpha) {
+  logliks <- matrix(0, nrow(N), nrow(beta_posterior))
+  for (i in seq_len(nrow(N))) {
+    logliks[i, ] <- posterior_lda_loglik_sample(N[i, ], beta_posterior, alpha)
   }
   logliks
 }
