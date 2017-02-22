@@ -92,6 +92,15 @@ lda_loglik <- function(N, beta, theta) {
   logliks
 }
 
+#' Compute the loglikelihood across posterior samples, for a single data point
+#'
+#' @param n [integer vector] A vector of counts n[i] for the sample on which to
+#'   evaluate the loglikelihood.
+#' @param beta_posterior [n_samples x V x K array] The topic probabilities
+#'   distribution.
+#' @param alpha [length K vector] The hyperparameter in the underlying topics.
+#' @return logliks [length n_samples vector] The loglikelihood for the current
+#'   sample, across samples from beta.
 posterior_lda_loglik_sample <- function(n, beta_posterior, alpha) {
   n_posterior <- nrow(beta_posterior)
   logliks <- vector(length = n_posterior)
@@ -102,6 +111,18 @@ posterior_lda_loglik_sample <- function(n, beta_posterior, alpha) {
   logliks
 }
 
+#' Compute LDA likelihoods across samples
+#'
+#' This wraps posterior lda_loglik to evaluate likelihoods across posterior
+#' samples of beta, but across multiple data points.
+#'
+#' @param n [length n data points integer vector] A vector of counts n[i] for
+#'   the sample on which to evaluate the loglikelihood.
+#' @param beta_posterior [n_samples x V x K array] The topic probabilities
+#'   distribution.
+#' @param alpha [length K vector] The hyperparameter in the underlying topics.
+#' @return logliks [n_samples x n data points matrix] The loglikelihood for the
+#'   current sample, across samples from beta.
 #' @examples
 #' logliks <- posterior_lda_loglik(
 #'   X[-test_ix, ],
