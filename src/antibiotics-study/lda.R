@@ -19,6 +19,7 @@ library("RColorBrewer")
 library("ggscaffold")
 library("feather")
 set.seed(11242016)
+theme_set(min_theme())
 
 # Code Block -------------------------------------------------------------------
 ## ---- get-data ----
@@ -62,16 +63,15 @@ p <- ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
 ggsave("../../doc/figure/heatmaps-2.pdf", p)
 
 ## ---- lda ----
-X <- t(get_taxa(abt))
-test_ix <- c(10, 18, 25)
+x <- t(get_taxa(abt))
+dimnames(x) <- NULL
 stan_data <- list(
   K = 4,
-  V = ncol(X),
-  D = nrow(X[-test_ix, ]),
-  D_test = length(test_ix),
-  n = X[-test_ix, ],
+  V = ncol(x),
+  D = nrow(x),
+  n = x,
   alpha = rep(1, 4),
-  gamma = rep(0.5, ncol(X))
+  gamma = rep(0.5, ncol(x))
 )
 
 m <- stan_model(file = "../stan/lda_counts.stan")
@@ -157,7 +157,7 @@ theta_hat <- theta_logit %>%
     value.name = "theta_logit"
   )
 
-theta_hat$sample <- rownames(X)[theta_hat$sample]
+theta_hat$sample <- sample_names(abt)[theta_hat$sample]
 sample_info <- sample_data(abt)
 sample_info$sample <- rownames(sample_info)
 theta_hat$topic <- paste("Topic", theta_hat$topic)
@@ -228,3 +228,206 @@ p <- ggboxplot(
     legend.position = "bottom"
   )
 ggsave("../../doc/figure/visualize_lda_beta-1.pdf", p)
+
+## ---- posterior-data ----
+x_sim <- samples$n_sim %>%
+  melt(
+    varnames = c("iteration", "sample", "rsv"),
+    value.name = "sim_value"
+  ) %>%
+  as.data.table()
+
+mx <- x %>%
+  melt(
+    varnames = c("sample", "rsv"),
+    value.name = "truth"
+  ) %>%
+  as.data.table()
+
+## ---- posterior-hists ----
+overall_hists <- rbind(
+  cbind(
+    mx %>%
+    rename(value = truth),
+    iteration = NA,
+    type = "truth"
+  ),
+  cbind(
+    x_sim %>%
+    filter(iteration %in% round(seq(1, 1000, length.out = 4))) %>%
+    rename(value = sim_value),
+    type = "simulated"
+  )
+)
+
+ggplot(overall_hists) +
+  geom_histogram(aes(x = asinh(value), fill = type), bins = 100) +
+  facet_grid(iteration ~ .) +
+  scale_fill_manual(values = c("#377eb8", "#4daf4a")) +
+theme(
+  panel.border = element_rect(fill = "transparent", size = 0.5)
+)
+
+## ---- posterior-quantiles ----
+q_probs <- seq(0, 1, 0.01)
+quantiles_comp <- x_sim %>%
+  group_by(iteration) %>%
+  do(
+    data.frame(
+      type = "sim", 
+      q_ix = q_probs,
+      q = quantile(asinh(.$sim_value), q_probs)
+    )
+  )
+
+ggplot(quantiles_comp) +
+  geom_step(
+    aes(x = q, y = q_ix, group = iteration),
+    alpha = 0.1, position = position_jitter(h = 0.005),
+  ) +
+  geom_step(
+    data = data.frame(
+      q_ix = q_probs,
+      q = quantile(asinh(mx$truth), q_probs)
+    ),
+    aes(x = q, y = q_ix),
+    col = "#79B5B7",
+    size = 0.5
+  ) +
+  labs(
+    "x" = "x",
+    "y" = "Pr(asinh(count) < x)"
+  )
+
+## ---- col-margins ----
+rsv_totals <- mx %>%
+  group_by(rsv) %>%
+  summarise(rsv_total = sum(asinh(truth)))
+rsv_totals$rank <- rank(rsv_totals$rsv_total)
+
+sim_rsv_totals <- x_sim %>%
+  group_by(iteration, rsv) %>%
+  summarise(sim_total = sum(asinh(sim_value))) %>%
+  left_join(rsv_totals)
+
+p <- ggplot() +
+  geom_point(
+    data = sim_rsv_totals,
+    aes(y = rank, x = sim_total),
+    alpha = 0.1, size = 0.5
+  ) +
+  geom_step(
+    data = sim_rsv_totals %>% filter(iteration == 1),
+    aes(y = rank, x = rsv_total),
+    col = "#79B5B7"
+  ) +
+  labs(
+    "x" = "x",
+    "y" = "Prob(microbe sum < x)"
+  )
+
+p <- ggplot() +
+  geom_boxplot(
+    data = sim_rsv_totals,
+    aes(y = as.factor(rank), x = sim_total),
+    alpha = 0.1, size = 0.1
+  ) +
+  geom_step(
+    data = sim_rsv_totals %>% filter(iteration == 1),
+    aes(y = rank, x = rsv_total),
+    col = "#79B5B7"
+  ) +
+  labs(
+    "x" = "x",
+    "y" = "Prob(microbe sum < x)"
+  ) +
+  theme(
+    axis.text.y = element_blank()
+  )
+
+## ---- time-series ----
+mx_samples <- mx
+mx_samples$sample_id  <- sample_names(abt)[mx_samples$sample]
+mx_samples <- mx_samples %>%
+  left_join(
+    data.frame(
+      sample_id = sample_names(abt),
+      sample_data(abt)
+    )
+  ) %>%
+  filter(rsv %in% sample(seq_len(ntaxa(abt)), 12)) %>%
+  left_join(x_sim)
+
+ggplot() +
+  geom_point(
+    data = mx_samples,
+    aes(x = time, y = asinh(sim_value), group = interaction(iteration, rsv)),
+    alpha = 0.01, size = 0.1
+  ) +
+  geom_line(
+    data = mx_samples %>% filter(iteration == 1),
+    aes(x = time, y = asinh(truth), group = rsv),
+    size = 0.5, col = "#79B5B7"
+  ) +
+  facet_wrap(~rsv, scales = "free", ncol = 4)
+
+## ---- pca-data ----
+scores_list <- vector(
+  length = nrow(samples$n_sim) + 1 - 800,
+  mode = "list"
+)
+
+scores_list[[1]] <- data.frame(
+  type = "true",
+  iteration = NA,
+  rsv = 1:ntaxa(abt),
+  princomp(t(asinh(x)))$scores[, 1:2]
+) %>%
+  rename(
+    X1 = Comp.1,
+    X2 = Comp.2
+  )
+
+for (i in seq_along(scores_list)[-1]) {
+  if (i %% 50 == 0) { 
+    cat(sprintf("processing %s\n", i))
+  }
+
+  cur_scores <- princomp(t(asinh(samples$n_sim[i - 1,, ])))$scores[, 1:2]
+  cur_scores <- procrustes(scores_list[[1]][, 4:5], cur_scores)$Yrot
+
+  scores_list[[i]] <- data.frame(
+    type = "sim",
+    iteration = i,
+    rsv = 1:ntaxa(abt),
+    cur_scores
+  )
+}
+
+scores_list <- rbindlist(scores_list)
+
+## ---- pca-vis ----
+plot_opts <- list(
+  "x" = "X1",
+  "y" = "X2",
+  "group" = "rsv",
+  "h" = 1.5
+)
+
+ggcontours(
+  scores_list %>% filter(type != "true", iteration < 50),
+  plot_opts
+) +
+  geom_text(
+    data = scores_list %>%
+      filter(type != "true") %>%
+      group_by(rsv) %>%
+      summarise(X1 = mean(X1), X2 = mean(X2)),
+    aes(x = X1, y = X2, label = rsv),
+    size = 4
+  ) +
+  geom_text(
+    data = scores_list %>% filter(type == "true"),
+    aes(x = X1, y = X2, label = rsv),
+    col = "#79B5B7", size = 4
+  )
