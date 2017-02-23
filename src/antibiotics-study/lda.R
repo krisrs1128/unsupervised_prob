@@ -267,3 +267,34 @@ ggplot(overall_hists) +
 theme(
   panel.border = element_rect(fill = "transparent", size = 0.5)
 )
+
+## ---- posterior-quantiles ----
+q_probs <- seq(0, 1, 0.01)
+quantiles_comp <- x_sim %>%
+  group_by(iteration) %>%
+  do(
+    data.frame(
+      type = "sim", 
+      q_ix = q_probs,
+      q = quantile(asinh(.$sim_value), q_probs)
+    )
+  )
+
+ggplot(quantiles_comp) +
+  geom_step(
+    aes(x = q, y = q_ix, group = iteration),
+    alpha = 0.1, position = position_jitter(h = 0.005),
+  ) +
+  geom_step(
+    data = data.frame(
+      q_ix = q_probs,
+      q = quantile(asinh(mx$truth), q_probs)
+    ),
+    aes(x = q, y = q_ix),
+    col = "red",
+    size = 0.5
+  ) +
+  labs(
+    "x" = "x",
+    "y" = "Pr(asinh(count) < x)"
+  )
