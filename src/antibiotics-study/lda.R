@@ -46,7 +46,7 @@ ggsave("../../doc/figure/histograms-1.pdf", p)
 ## ---- heatmaps ----
 x_order <- names(sort(taxa_sums(abt)))
 y_order <- names(sort(sample_sums(abt)))
-orde#79B5B7_map <- function(x) {
+ordered_map <- function(x) {
   ggheatmap(
     x %>%
     melt(value.name = "fill", varnames = c("x", "y")),
@@ -56,10 +56,10 @@ orde#79B5B7_map <- function(x) {
     labs(x = "Sample", y = "Microbe")
 }
 
-p <- orde#79B5B7_map(get_taxa(abt)) + ggtitle("Raw")
+p <- ordered_map(get_taxa(abt)) + ggtitle("Raw")
 ggsave("../../doc/figure/heatmaps-1.pdf", p)
 
-p <- orde#79B5B7_map(asinh(get_taxa(abt))) + ggtitle("asinh")
+p <- ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
 ggsave("../../doc/figure/heatmaps-2.pdf", p)
 
 ## ---- lda ----
@@ -89,24 +89,24 @@ i <- 100
 samples$beta[i,, ]
 samples$theta[i,, ]
 
-x_p#79B5B7 <- array(dim = c(length(test_ix), stan_data$V, n_iter))
+x_pred <- array(dim = c(length(test_ix), stan_data$V, n_iter))
 for (j in seq_along(test_ix)) {
   for (i in seq_len(n_iter)) {
     theta <- rgamma(4, 1)
     theta <- theta / sum(theta)
     n_j <- sum(X[test_ix[j], ])
-    x_p#79B5B7[j, , i] <- rmultinom(1, size = n_j, prob = t(samples$beta[i,, ]) %*% theta)
+    x_pred[j, , i] <- rmultinom(1, size = n_j, prob = t(samples$beta[i,, ]) %*% theta)
   }
 }
 
-dim(x_p#79B5B7)
-rowSums(x_p#79B5B7[,,1])
+dim(x_pred)
+rowSums(x_pred[,,1])
 rowSums(X[test_ix, ])
-hist(x_p#79B5B7[1,1, ])
+hist(x_pred[1,1, ])
 
-x_err <- x_p#79B5B7
+x_err <- x_pred
 for (j in 1:1000) {
-  x_err[,, j] <- asinh(x_p#79B5B7[,, j]) - asinh(X[test_ix, ])
+  x_err[,, j] <- asinh(x_pred[,, j]) - asinh(X[test_ix, ])
 }
 
 hist(x_err)
@@ -370,3 +370,64 @@ ggplot() +
     size = 0.5, col = "#79B5B7"
   ) +
   facet_wrap(~rsv, scales = "free", ncol = 4)
+
+## ---- pca-data ----
+scores_list <- vector(
+  length = nrow(samples$n_sim) + 1 - 800,
+  mode = "list"
+)
+
+scores_list[[1]] <- data.frame(
+  type = "true",
+  iteration = NA,
+  rsv = 1:ntaxa(abt),
+  princomp(t(asinh(x)))$scores[, 1:2]
+) %>%
+  rename(
+    X1 = Comp.1,
+    X2 = Comp.2
+  )
+
+for (i in seq_along(scores_list)[-1]) {
+  if (i %% 50 == 0) { 
+    cat(sprintf("processing %s\n", i))
+  }
+
+  cur_scores <- princomp(t(asinh(samples$n_sim[i - 1,, ])))$scores[, 1:2]
+  cur_scores <- procrustes(scores_list[[1]][, 4:5], cur_scores)$Yrot
+
+  scores_list[[i]] <- data.frame(
+    type = "sim",
+    iteration = i,
+    rsv = 1:ntaxa(abt),
+    cur_scores
+  )
+}
+
+scores_list <- rbindlist(scores_list)
+
+## ---- pca-vis ----
+plot_opts <- list(
+  "x" = "X1",
+  "y" = "X2",
+  "group" = "rsv",
+  "h" = 1.5
+)
+
+ggcontours(
+  scores_list %>% filter(type != "true", iteration < 50),
+  plot_opts
+) +
+  geom_text(
+    data = scores_list %>%
+      filter(type != "true") %>%
+      group_by(rsv) %>%
+      summarise(X1 = mean(X1), X2 = mean(X2)),
+    aes(x = X1, y = X2, label = rsv),
+    size = 4
+  ) +
+  geom_text(
+    data = scores_list %>% filter(type == "true"),
+    aes(x = X1, y = X2, label = rsv),
+    col = "#79B5B7", size = 4
+  )
