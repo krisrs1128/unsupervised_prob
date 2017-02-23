@@ -46,7 +46,7 @@ ggsave("../../doc/figure/histograms-1.pdf", p)
 ## ---- heatmaps ----
 x_order <- names(sort(taxa_sums(abt)))
 y_order <- names(sort(sample_sums(abt)))
-ordered_map <- function(x) {
+orde#79B5B7_map <- function(x) {
   ggheatmap(
     x %>%
     melt(value.name = "fill", varnames = c("x", "y")),
@@ -56,10 +56,10 @@ ordered_map <- function(x) {
     labs(x = "Sample", y = "Microbe")
 }
 
-p <- ordered_map(get_taxa(abt)) + ggtitle("Raw")
+p <- orde#79B5B7_map(get_taxa(abt)) + ggtitle("Raw")
 ggsave("../../doc/figure/heatmaps-1.pdf", p)
 
-p <- ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
+p <- orde#79B5B7_map(asinh(get_taxa(abt))) + ggtitle("asinh")
 ggsave("../../doc/figure/heatmaps-2.pdf", p)
 
 ## ---- lda ----
@@ -89,24 +89,24 @@ i <- 100
 samples$beta[i,, ]
 samples$theta[i,, ]
 
-x_pred <- array(dim = c(length(test_ix), stan_data$V, n_iter))
+x_p#79B5B7 <- array(dim = c(length(test_ix), stan_data$V, n_iter))
 for (j in seq_along(test_ix)) {
   for (i in seq_len(n_iter)) {
     theta <- rgamma(4, 1)
     theta <- theta / sum(theta)
     n_j <- sum(X[test_ix[j], ])
-    x_pred[j, , i] <- rmultinom(1, size = n_j, prob = t(samples$beta[i,, ]) %*% theta)
+    x_p#79B5B7[j, , i] <- rmultinom(1, size = n_j, prob = t(samples$beta[i,, ]) %*% theta)
   }
 }
 
-dim(x_pred)
-rowSums(x_pred[,,1])
+dim(x_p#79B5B7)
+rowSums(x_p#79B5B7[,,1])
 rowSums(X[test_ix, ])
-hist(x_pred[1,1, ])
+hist(x_p#79B5B7[1,1, ])
 
-x_err <- x_pred
+x_err <- x_p#79B5B7
 for (j in 1:1000) {
-  x_err[,, j] <- asinh(x_pred[,, j]) - asinh(X[test_ix, ])
+  x_err[,, j] <- asinh(x_p#79B5B7[,, j]) - asinh(X[test_ix, ])
 }
 
 hist(x_err)
@@ -291,7 +291,7 @@ ggplot(quantiles_comp) +
       q = quantile(asinh(mx$truth), q_probs)
     ),
     aes(x = q, y = q_ix),
-    col = "red",
+    col = "#79B5B7",
     size = 0.5
   ) +
   labs(
@@ -319,7 +319,7 @@ p <- ggplot() +
   geom_step(
     data = sim_rsv_totals %>% filter(iteration == 1),
     aes(y = rank, x = rsv_total),
-    col = "red"
+    col = "#79B5B7"
   ) +
   labs(
     "x" = "x",
@@ -335,7 +335,7 @@ p <- ggplot() +
   geom_step(
     data = sim_rsv_totals %>% filter(iteration == 1),
     aes(y = rank, x = rsv_total),
-    col = "red"
+    col = "#79B5B7"
   ) +
   labs(
     "x" = "x",
@@ -344,3 +344,29 @@ p <- ggplot() +
   theme(
     axis.text.y = element_blank()
   )
+
+## ---- time-series ----
+mx_samples <- mx
+mx_samples$sample_id  <- sample_names(abt)[mx_samples$sample]
+mx_samples <- mx_samples %>%
+  left_join(
+    data.frame(
+      sample_id = sample_names(abt),
+      sample_data(abt)
+    )
+  ) %>%
+  filter(rsv %in% sample(seq_len(ntaxa(abt)), 12)) %>%
+  left_join(x_sim)
+
+ggplot() +
+  geom_point(
+    data = mx_samples,
+    aes(x = time, y = asinh(sim_value), group = interaction(iteration, rsv)),
+    alpha = 0.01, size = 0.1
+  ) +
+  geom_line(
+    data = mx_samples %>% filter(iteration == 1),
+    aes(x = time, y = asinh(truth), group = rsv),
+    size = 0.5, col = "#79B5B7"
+  ) +
+  facet_wrap(~rsv, scales = "free", ncol = 4)
