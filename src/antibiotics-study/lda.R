@@ -84,37 +84,6 @@ save(
 samples <- rstan::extract(stan_fit)
 rm(stan_fit)
 
-## ---- sample-test ----
-i <- 100
-samples$beta[i,, ]
-samples$theta[i,, ]
-
-x_pred <- array(dim = c(length(test_ix), stan_data$V, n_iter))
-for (j in seq_along(test_ix)) {
-  for (i in seq_len(n_iter)) {
-    theta <- rgamma(4, 1)
-    theta <- theta / sum(theta)
-    n_j <- sum(X[test_ix[j], ])
-    x_pred[j, , i] <- rmultinom(1, size = n_j, prob = t(samples$beta[i,, ]) %*% theta)
-  }
-}
-
-dim(x_pred)
-rowSums(x_pred[,,1])
-rowSums(X[test_ix, ])
-hist(x_pred[1,1, ])
-
-x_err <- x_pred
-for (j in 1:1000) {
-  x_err[,, j] <- asinh(x_pred[,, j]) - asinh(X[test_ix, ])
-}
-
-hist(x_err)
-mean((x_err) ^ 2)
-mean((asinh(X[test_ix, ]) - mean(asinh(X[test_ix, ]))) ^ 2)
-
-dmultinom(c(1, 2, 3), 6, prob = rep(1, 3) / 3, log = TRUE)
-
 ## ---- extract_beta ----
 # underlying RSV distributions
 beta_logit <- samples$beta
@@ -230,7 +199,7 @@ p <- ggboxplot(
 ggsave("../../doc/figure/visualize_lda_beta-1.pdf", p)
 
 ## ---- posterior-data ----
-x_sim <- samples$n_sim %>%
+m_sim <- samples$n_sim %>%
   melt(
     varnames = c("iteration", "sample", "rsv"),
     value.name = "sim_value"
@@ -245,36 +214,15 @@ mx <- x %>%
   as.data.table()
 
 ## ---- posterior-hists ----
-overall_hists <- rbind(
-  cbind(
-    mx %>%
-    rename(value = truth),
-    iteration = NA,
-    type = "truth"
-  ),
-  cbind(
-    x_sim %>%
-    filter(iteration %in% round(seq(1, 1000, length.out = 4))) %>%
-    rename(value = sim_value),
-    type = "simulated"
-  )
-)
-
-ggplot(overall_hists) +
-  geom_histogram(aes(x = asinh(value), fill = type), bins = 100) +
-  facet_grid(iteration ~ .) +
-  scale_fill_manual(values = c("#377eb8", "#4daf4a")) +
-theme(
-  panel.border = element_rect(fill = "transparent", size = 0.5)
-)
+compare_histograms(mx, m_sim)
 
 ## ---- posterior-quantiles ----
 q_probs <- seq(0, 1, 0.01)
-quantiles_comp <- x_sim %>%
+quantiles_comp <- m_sim %>%
   group_by(iteration) %>%
   do(
     data.frame(
-      type = "sim", 
+      type = "sim",
       q_ix = q_probs,
       q = quantile(asinh(.$sim_value), q_probs)
     )
@@ -305,7 +253,7 @@ rsv_totals <- mx %>%
   summarise(rsv_total = sum(asinh(truth)))
 rsv_totals$rank <- rank(rsv_totals$rsv_total)
 
-sim_rsv_totals <- x_sim %>%
+sim_rsv_totals <- m_sim %>%
   group_by(iteration, rsv) %>%
   summarise(sim_total = sum(asinh(sim_value))) %>%
   left_join(rsv_totals)
@@ -356,7 +304,7 @@ mx_samples <- mx_samples %>%
     )
   ) %>%
   filter(rsv %in% sample(seq_len(ntaxa(abt)), 12)) %>%
-  left_join(x_sim)
+  left_join(m_sim)
 
 ggplot() +
   geom_point(
@@ -389,7 +337,7 @@ scores_list[[1]] <- data.frame(
   )
 
 for (i in seq_along(scores_list)[-1]) {
-  if (i %% 50 == 0) { 
+  if (i %% 50 == 0) {
     cat(sprintf("processing %s\n", i))
   }
 
