@@ -298,3 +298,49 @@ ggplot(quantiles_comp) +
     "x" = "x",
     "y" = "Pr(asinh(count) < x)"
   )
+
+## ---- col-margins ----
+rsv_totals <- mx %>%
+  group_by(rsv) %>%
+  summarise(rsv_total = sum(asinh(truth)))
+rsv_totals$rank <- rank(rsv_totals$rsv_total)
+
+sim_rsv_totals <- x_sim %>%
+  group_by(iteration, rsv) %>%
+  summarise(sim_total = sum(asinh(sim_value))) %>%
+  left_join(rsv_totals)
+
+p <- ggplot() +
+  geom_point(
+    data = sim_rsv_totals,
+    aes(y = rank, x = sim_total),
+    alpha = 0.1, size = 0.5
+  ) +
+  geom_step(
+    data = sim_rsv_totals %>% filter(iteration == 1),
+    aes(y = rank, x = rsv_total),
+    col = "red"
+  ) +
+  labs(
+    "x" = "x",
+    "y" = "Prob(microbe sum < x)"
+  )
+
+p <- ggplot() +
+  geom_boxplot(
+    data = sim_rsv_totals,
+    aes(y = as.factor(rank), x = sim_total),
+    alpha = 0.1, size = 0.1
+  ) +
+  geom_step(
+    data = sim_rsv_totals %>% filter(iteration == 1),
+    aes(y = rank, x = rsv_total),
+    col = "red"
+  ) +
+  labs(
+    "x" = "x",
+    "y" = "Prob(microbe sum < x)"
+  ) +
+  theme(
+    axis.text.y = element_blank()
+  )
