@@ -40,3 +40,46 @@ compare_histograms <- function(mx, m_sim, n_vis = 4) {
       panel.border = element_rect(fill = "transparent", size = 0.5)
     )
 }
+
+#' Plot quantiles of true vs. simulated data
+#'
+#' @param mx [data.frame] A data.frame of the melted original counts data
+#' @param m_sim [data.frame] A data.frame of the melted simulation array.
+#'   Includes an extra column for the iteration number.
+#' @param n_vis [int] The number of simulated samples to show
+#' @return p [ggplot] A plot comparing the true quantiles in mx to those in the
+#'   simulations m_sim.
+compare_quantiles <- function(mx, m_sim, q_probs = NULL) {
+  if (is.null(q_probs)) {
+    q_probs <- seq(0, 1, 0.01)
+  }
+
+  quantiles_comp <- m_sim %>%
+    group_by(iteration) %>%
+    do(
+      data.frame(
+        type = "sim",
+        q_ix = q_probs,
+        q = quantile(asinh(.$sim_value), q_probs)
+      )
+    )
+
+  ggplot(quantiles_comp) +
+    geom_step(
+      aes(x = q, y = q_ix, group = iteration),
+      alpha = 0.1, position = position_jitter(h = 0.005),
+    ) +
+    geom_step(
+      data = data.frame(
+        q_ix = q_probs,
+        q = quantile(asinh(mx$truth), q_probs)
+      ),
+      aes(x = q, y = q_ix),
+      col = "#79B5B7",
+      size = 0.5
+    ) +
+    labs(
+      "x" = "x",
+      "y" = "Pr(asinh(count) < x)"
+    )
+}
