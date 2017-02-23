@@ -19,6 +19,7 @@ library("RColorBrewer")
 library("ggscaffold")
 library("feather")
 set.seed(11242016)
+theme_set(min_theme())
 
 # Code Block -------------------------------------------------------------------
 ## ---- get-data ----
@@ -62,16 +63,15 @@ p <- ordered_map(asinh(get_taxa(abt))) + ggtitle("asinh")
 ggsave("../../doc/figure/heatmaps-2.pdf", p)
 
 ## ---- lda ----
-X <- t(get_taxa(abt))
-test_ix <- c(10, 18, 25)
+x <- t(get_taxa(abt))
+dimnames(x) <- NULL
 stan_data <- list(
   K = 4,
-  V = ncol(X),
-  D = nrow(X[-test_ix, ]),
-  D_test = length(test_ix),
-  n = X[-test_ix, ],
+  V = ncol(x),
+  D = nrow(x),
+  n = x,
   alpha = rep(1, 4),
-  gamma = rep(0.5, ncol(X))
+  gamma = rep(0.5, ncol(x))
 )
 
 m <- stan_model(file = "../stan/lda_counts.stan")
@@ -157,7 +157,7 @@ theta_hat <- theta_logit %>%
     value.name = "theta_logit"
   )
 
-theta_hat$sample <- rownames(X)[theta_hat$sample]
+theta_hat$sample <- sample_names(abt)[theta_hat$sample]
 sample_info <- sample_data(abt)
 sample_info$sample <- rownames(sample_info)
 theta_hat$topic <- paste("Topic", theta_hat$topic)
@@ -228,3 +228,42 @@ p <- ggboxplot(
     legend.position = "bottom"
   )
 ggsave("../../doc/figure/visualize_lda_beta-1.pdf", p)
+
+## ---- posterior-data ----
+x_sim <- samples$n_sim %>%
+  melt(
+    varnames = c("iteration", "sample", "rsv"),
+    value.name = "sim_value"
+  ) %>%
+  as.data.table()
+
+mx <- x %>%
+  melt(
+    varnames = c("sample", "rsv"),
+    value.name = "truth"
+  ) %>%
+  as.data.table()
+
+## ---- posterior-hists ----
+overall_hists <- rbind(
+  cbind(
+    mx %>%
+    rename(value = truth),
+    iteration = NA,
+    type = "truth"
+  ),
+  cbind(
+    x_sim %>%
+    filter(iteration %in% round(seq(1, 1000, length.out = 4))) %>%
+    rename(value = sim_value),
+    type = "simulated"
+  )
+)
+
+ggplot(overall_hists) +
+  geom_histogram(aes(x = asinh(value), fill = type), bins = 100) +
+  facet_grid(iteration ~ .) +
+  scale_fill_manual(values = c("#377eb8", "#4daf4a")) +
+theme(
+  panel.border = element_rect(fill = "transparent", size = 0.5)
+)
