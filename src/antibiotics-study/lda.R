@@ -18,6 +18,7 @@ library("treelapse")
 library("RColorBrewer")
 library("ggscaffold")
 library("feather")
+source("./posterior_checks.R")
 set.seed(11242016)
 theme_set(min_theme())
 
@@ -88,7 +89,7 @@ rm(stan_fit)
 # underlying RSV distributions
 beta_logit <- samples$beta
 
-for (i in seq_len(n_iter / 2)) {
+for (i in seq_len(n_iter)) {
   for (k in seq_len(stan_data$K)) {
     beta_logit[i, k, ] <- log(beta_logit[i, k, ])
     beta_logit[i, k, ] <- beta_logit[i, k, ] - mean(beta_logit[i, k, ])
@@ -113,7 +114,7 @@ beta_hat$rsv <- factor(beta_hat$rsv, levels = taxa$rsv)
 
 ## ---- extract_theta ----
 theta_logit <- samples$theta
-for (i in seq_len(n_iter / 2)) {
+for (i in seq_len(n_iter)) {
   for (d in seq_len(stan_data$D)) {
     theta_logit[i, d, ] <- log(theta_logit[i, d, ])
     theta_logit[i, d, ] <- theta_logit[i, d, ] - mean(theta_logit[i, d, ])
@@ -199,4 +200,4 @@ p <- ggboxplot(
 ggsave("../../doc/figure/visualize_lda_beta-1.pdf", p)
 
 ## ---- posterior-checks ----
-counts_data_checker(x, samples$n_sim, "unigram_post_checks")
+counts_data_checker(x, samples$n_sim, "lda_post_checks")
