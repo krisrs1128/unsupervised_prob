@@ -217,52 +217,10 @@ mx <- x %>%
 compare_histograms(mx, m_sim)
 
 ## ---- posterior-quantiles ----
-q_probs <- seq(0, 1, 0.01)
+compare_quantiles(mx, m_sim)
+
 ## ---- col-margins ----
-rsv_totals <- mx %>%
-  group_by(rsv) %>%
-  summarise(rsv_total = sum(asinh(truth)))
-rsv_totals$rank <- rank(rsv_totals$rsv_total)
-
-sim_rsv_totals <- m_sim %>%
-  group_by(iteration, rsv) %>%
-  summarise(sim_total = sum(asinh(sim_value))) %>%
-  left_join(rsv_totals)
-
-p <- ggplot() +
-  geom_point(
-    data = sim_rsv_totals,
-    aes(y = rank, x = sim_total),
-    alpha = 0.1, size = 0.5
-  ) +
-  geom_step(
-    data = sim_rsv_totals %>% filter(iteration == 1),
-    aes(y = rank, x = rsv_total),
-    col = "#79B5B7"
-  ) +
-  labs(
-    "x" = "x",
-    "y" = "Prob(microbe sum < x)"
-  )
-
-p <- ggplot() +
-  geom_boxplot(
-    data = sim_rsv_totals,
-    aes(y = as.factor(rank), x = sim_total),
-    alpha = 0.1, size = 0.1
-  ) +
-  geom_step(
-    data = sim_rsv_totals %>% filter(iteration == 1),
-    aes(y = rank, x = rsv_total),
-    col = "#79B5B7"
-  ) +
-  labs(
-    "x" = "x",
-    "y" = "Prob(microbe sum < x)"
-  ) +
-  theme(
-    axis.text.y = element_blank()
-  )
+compare_margins(mx, m_sim, "rsv")
 
 ## ---- time-series ----
 mx_samples <- mx
@@ -291,62 +249,61 @@ ggplot() +
   facet_wrap(~rsv, scales = "free", ncol = 4)
 
 ## ---- pca-data ----
-scores_list <- vector(
-  length = nrow(samples$n_sim) + 1 - 800,
-  mode = "list"
+scores_data <- sample_summary_fun(
+  asinh(t(x)),
+  aperm(asinh(samples$n_sim), c(1, 3, 2)),
+  scores_summary,
+  list("K" = 2)
 )
 
-scores_list[[1]] <- data.frame(
-  type = "true",
-  iteration = NA,
-  rsv = 1:ntaxa(abt),
-  princomp(t(asinh(x)))$scores[, 1:2]
-) %>%
-  rename(
-    X1 = Comp.1,
-    X2 = Comp.2
-  )
+loadings_data <- sample_summary_fun(
+  asinh(t(x)),
+  aperm(asinh(samples$n_sim), c(1, 3, 2)),
+  loadings_summary,
+  list("K" = 2)
+)
 
-for (i in seq_along(scores_list)[-1]) {
-  if (i %% 50 == 0) {
-    cat(sprintf("processing %s\n", i))
-  }
-
-  cur_scores <- princomp(t(asinh(samples$n_sim[i - 1,, ])))$scores[, 1:2]
-  cur_scores <- procrustes(scores_list[[1]][, 4:5], cur_scores)$Yrot
-
-  scores_list[[i]] <- data.frame(
-    type = "sim",
-    iteration = i,
-    rsv = 1:ntaxa(abt),
-    cur_scores
-  )
-}
-
-scores_list <- rbindlist(scores_list)
+evals_data <- sample_summary_fun(
+  asinh(t(x)),
+  aperm(asinh(samples$n_sim), c(1, 3, 2)),
+  evals_summary,
+  list()
+)
 
 ## ---- pca-vis ----
 plot_opts <- list(
   "x" = "X1",
   "y" = "X2",
-  "group" = "rsv",
+  "group" = "row_ix",
   "h" = 1.5
 )
 
-ggcontours(
-  scores_list %>% filter(type != "true", iteration < 50),
-  plot_opts
-) +
-  geom_text(
-    data = scores_list %>%
-      filter(type != "true") %>%
-      group_by(rsv) %>%
-      summarise(X1 = mean(X1), X2 = mean(X2)),
-    aes(x = X1, y = X2, label = rsv),
-    size = 4
+summary_contours(scores_data, plot_opts) +
+  coord_fixed(0.5)
+
+plot_opts$h <- 0.01
+summary_contours(loadings_data, plot_opts) +
+  coord_fixed(0.5)
+
+ggplot() +
+  geom_boxplot(
+    data = evals_data %>%
+      filter(type == "sim"),
+    aes(x = as.factor(row_ix), y = evals),
+    outlier.size = 0.1, size = 0.1
   ) +
-  geom_text(
-    data = scores_list %>% filter(type == "true"),
-    aes(x = X1, y = X2, label = rsv),
-    col = "#79B5B7", size = 4
+  geom_point(
+    data = evals_data %>%
+      filter(type == "true"),
+    aes(x = as.factor(row_ix), y = evals),
+    col = "#79B5B7", size = 0.9
+  ) +
+  ylim(0, 11) +
+  scale_y_log10() +
+  theme(
+    axis.text.x = element_blank()
+  ) +
+  labs(
+    "x" = "Index",
+    "y" = "Eigenvalue"
   )

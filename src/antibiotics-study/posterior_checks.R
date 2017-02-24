@@ -83,3 +83,105 @@ compare_quantiles <- function(mx, m_sim, q_probs = NULL) {
       "y" = "Pr(asinh(count) < x)"
     )
 }
+
+compare_margins <- function(mx, m_sim, group_col) {
+  group_totals <- mx %>%
+    group_by_(group_col) %>%
+    summarise(group_total = sum(asinh(truth)))
+  group_totals$rank <- rank(group_totals$group_total)
+
+  sim_group_totals <- m_sim %>%
+    group_by_("iteration", group_col) %>%
+    summarise(sim_total = sum(asinh(sim_value))) %>%
+    left_join(group_totals)
+
+  ggplot() +
+    geom_boxplot(
+      data = sim_group_totals,
+      aes(y = as.factor(rank), x = sim_total),
+      alpha = 0.1, size = 0.1
+    ) +
+    geom_step(
+      data = sim_group_totals %>% filter(iteration == 1),
+      aes(y = rank, x = group_total),
+      col = "#79B5B7"
+    ) +
+    labs(
+      "x" = "x",
+      "y" = "Prob(microbe sum < x)"
+    ) +
+    theme(
+      axis.text.y = element_blank()
+    )
+}
+
+scores_summary <- function(data_list, supp_cols) {
+  library("vegan")
+  scores <- princomp(data_list$x_sim)$scores[, seq_len(data_list$K)]
+  aligned_scores <- procrustes(data_list$x[, seq_len(data_list$K)], scores)$Yrot
+  dimnames(aligned_scores) <- NULL
+
+  data.frame(aligned_scores, supp_cols)
+}
+
+loadings_summary <- function(data_list, supp_cols) {
+  library("vegan")
+  true_loadings <- princomp(data_list$x)$loadings[, seq_len(data_list$K)]
+  loadings <- princomp(data_list$x_sim)$loadings[, seq_len(data_list$K)]
+  aligned_loadings <- procrustes(true_loadings, loadings)$Yrot
+  dimnames(aligned_loadings) <- NULL
+
+  data.frame(aligned_loadings, supp_cols)
+}
+
+evals_summary <- function(data_list, supp_cols) {
+  evals <- princomp(data_list$x_sim)$sdev
+  data.frame(evals, supp_cols)
+}
+
+sample_summary_fun <- function(x, x_sim, summary_fun, data_opts) {
+  stat_list <- vector(
+    length = nrow(x_sim),
+    mode = "list"
+  )
+
+  stat_list[[1]] <- summary_fun(
+    c(list("x" = x, "x_sim" = x), data_opts),
+    list("iteration" = NA, "type" = "true")
+  )
+  stat_list[[1]]$row_ix <- seq_len(nrow(stat_list[[1]]))
+
+  for (i in seq_along(stat_list)[-1]) {
+    if (i %% 50 == 0) {
+      cat(sprintf("processing %s\n", i))
+    }
+
+    stat_list[[i]] <- summary_fun(
+      c(list("x" = x, "x_sim" = x_sim[i - 1,, ]), data_opts),
+      list("iteration" = i - 1, "type" = "sim")
+    )
+    stat_list[[i]]$row_ix <- seq_len(nrow(stat_list[[i]]))
+  }
+
+  rbindlist(stat_list)
+}
+
+summary_contours <- function(summary_data, plot_opts) {
+  ggcontours(
+    summary_data,
+    plot_opts
+  ) +
+    geom_text(
+      data = summary_data %>%
+        filter(type != "true") %>%
+        group_by(row_ix) %>%
+        summarise(X1 = mean(X1), X2 = mean(X2)),
+      aes(x = X1, y = X2, label = row_ix),
+      size = 4
+    ) +
+    geom_text(
+      data = summary_data %>% filter(type == "true"),
+      aes(x = X1, y = X2, label = row_ix),
+      col = "#79B5B7", size = 4
+    )
+}
