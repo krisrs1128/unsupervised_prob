@@ -73,6 +73,6 @@ generated quantities {
       gamma = gamma + beta[times_mapping[i], k] * theta[times_mapping[i]][k];
     }
 
-    x_sim[i] ~ multinomial_rng(gamma);
+    x_sim[i] = multinomial_rng(gamma, sum(x[i]));
   }
 }

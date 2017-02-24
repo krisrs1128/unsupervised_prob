@@ -263,8 +263,8 @@ counts_data_checker <- function(x, x_sim, output_dir = ".") {
   all_plots[["scores"]] <- summary_contours(scores_data, plot_opts) +
     coord_fixed(0.5)
 
-  all_plots[["loadings"]] <- plot_opts$h <- 0.01
-  summary_contours(loadings_data, plot_opts) +
+  plot_opts$h <- 0.01
+  all_plots[["loadings"]] <- summary_contours(loadings_data, plot_opts) +
     coord_fixed(0.5)
 
   all_plots[["evals"]] <- ggplot() +
@@ -290,11 +290,11 @@ counts_data_checker <- function(x, x_sim, output_dir = ".") {
       "y" = "Eigenvalue"
     )
 
-  for (i in seq_along(p)) {
+  for (i in seq_along(all_plots)) {
     dir.create(output_dir, recursive = TRUE)
     ggsave(
       file = sprintf("%s/figure-%s.pdf", output_dir, names(all_plots)[i]),
-      all_plots[i]
+      all_plots[[i]]
     )
   }
   all_plots
