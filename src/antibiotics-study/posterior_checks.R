@@ -185,3 +185,114 @@ summary_contours <- function(summary_data, plot_opts) {
       col = "#79B5B7", size = 4
     )
 }
+
+counts_data_checker <- function(x, x_sim, output_dir = ".") {
+  ## ---- posterior-data ----
+  m_sim <- x_sim %>%
+    melt(
+      varnames = c("iteration", "sample", "rsv"),
+      value.name = "sim_value"
+    ) %>%
+    as.data.table()
+
+  mx <- x %>%
+    melt(
+      varnames = c("sample", "rsv"),
+      value.name = "truth"
+    ) %>%
+    as.data.table()
+
+  all_plots <- list()
+  all_plots[["hists"]] <- compare_histograms(mx, m_sim)
+  all_plots[["quantiles"]] <- compare_quantiles(mx, m_sim)
+  all_plots[["margins"]] <- compare_margins(mx, m_sim, "rsv")
+
+  mx_samples <- mx
+  mx_samples$sample_id  <- sample_names(abt)[mx_samples$sample]
+  mx_samples <- mx_samples %>%
+    left_join(
+      data.frame(
+        sample_id = sample_names(abt),
+        sample_data(abt)
+      )
+    ) %>%
+    filter(rsv %in% sample(seq_len(ntaxa(abt)), 12)) %>%
+    left_join(m_sim)
+
+  all_plots[["ts"]] <- ggplot() +
+    geom_point(
+      data = mx_samples,
+      aes(x = time, y = asinh(sim_value), group = interaction(iteration, rsv)),
+      alpha = 0.01, size = 0.1
+    ) +
+    geom_line(
+      data = mx_samples %>% filter(iteration == 1),
+      aes(x = time, y = asinh(truth), group = rsv),
+      size = 0.5, col = "#79B5B7"
+    ) +
+    facet_wrap(~rsv, scales = "free", ncol = 4)
+
+  scores_data <- sample_summary_fun(
+    asinh(t(x)),
+    aperm(asinh(x_sim), c(1, 3, 2)),
+    scores_summary,
+    list("K" = 2)
+  )
+
+  loadings_data <- sample_summary_fun(
+    asinh(t(x)),
+    aperm(asinh(x_sim), c(1, 3, 2)),
+    loadings_summary,
+    list("K" = 2)
+  )
+
+  evals_data <- sample_summary_fun(
+    asinh(t(x)),
+    aperm(asinh(x_sim), c(1, 3, 2)),
+    evals_summary,
+    list()
+  )
+
+  plot_opts <- list(
+    "x" = "X1",
+    "y" = "X2",
+    "group" = "row_ix",
+    "h" = 1.5
+  )
+
+  p[["scores"]] <- summary_contours(scores_data, plot_opts) +
+    coord_fixed(0.5)
+
+  p[["loadings"]] <- plot_opts$h <- 0.01
+  summary_contours(loadings_data, plot_opts) +
+    coord_fixed(0.5)
+
+  p[["evals"]] <- ggplot() +
+    geom_boxplot(
+      data = evals_data %>%
+        filter(type == "sim"),
+      aes(x = as.factor(row_ix), y = evals),
+      outlier.size = 0.1, size = 0.1
+    ) +
+    geom_point(
+      data = evals_data %>%
+        filter(type == "true"),
+      aes(x = as.factor(row_ix), y = evals),
+      col = "#79B5B7", size = 0.9
+    ) +
+    ylim(0, 11) +
+    scale_y_log10() +
+    theme(
+      axis.text.x = element_blank()
+    ) +
+    labs(
+      "x" = "Index",
+      "y" = "Eigenvalue"
+    )
+
+  for (i in seq_along(p)) {
+    dir.create(output_dir)
+    ggsave(file = sprintf("%s/figure-%s.pdf", output_dir, i))
+  }
+  p
+}
