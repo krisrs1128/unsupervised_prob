@@ -15,7 +15,7 @@ data {
 
   real times[T]; // unique times
   int<lower=0> times_mapping[N]; // times associated to each sample
-  int<lower=0> X[N, V]; // word counts
+  int<lower=0> x[N, V]; // word counts
 }
 
 parameters {
@@ -32,10 +32,17 @@ model {
   sigma2 ~ inv_gamma(a0, b0);
 
   for (i in 1:(T - 1)) {
-    mu[i + 1] ~ normal(beta[i], sqrt(times[i + 1] - times[i]) * sigma);
+    mu[i + 1] ~ normal(mu[i], sqrt(times[i + 1] - times[i]) * sigma);
   }
 
   for (i in 1:N) {
-    X[i] ~ multinomial(softmax(mu[times_mapping[i]]));
+    x[i] ~ multinomial(softmax(mu[times_mapping[i]]));
+  }
+}
+
+generated quantities {
+  int<lower=0> x_sim[N, V]; // simulated word counts, for posterior checking
+  for (i in 1:N) {
+    x_sim[i] = multinomial_rng(softmax(mu[times_mapping[i]]), sum(x[i]));
   }
 }

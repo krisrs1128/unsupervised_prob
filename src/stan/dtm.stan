@@ -15,7 +15,7 @@ data {
 
   real times[T]; // unique times
   int<lower=0> times_mapping[N]; // times associated to each sample
-  int<lower=0> X[N, V]; // word counts
+  int<lower=0> x[N, V]; // word counts
 }
 
 parameters {
@@ -60,6 +60,19 @@ model {
       gamma = gamma + beta[times_mapping[i], k] * theta[times_mapping[i]][k];
     }
 
-    X[i] ~ multinomial(gamma);
+    x[i] ~ multinomial(gamma);
+  }
+}
+
+generated quantities {
+  int<lower=0> x_sim[N, V]; // simulated word counts, for posterior checking
+  for (i in 1:N) {
+    vector[V] gamma;
+    gamma = beta[times_mapping[i], 1] * theta[times_mapping[i]][1];
+    for (k in 2:K) {
+      gamma = gamma + beta[times_mapping[i], k] * theta[times_mapping[i]][k];
+    }
+
+    x_sim[i] = multinomial_rng(gamma, sum(x[i]));
   }
 }
