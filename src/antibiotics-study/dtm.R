@@ -27,19 +27,20 @@ abt <- abt %>%
 
 ## ---- run-model ----
 times <- sample_data(abt)$time
-X <- t(get_taxa(abt))
+x <- t(get_taxa(abt))
+dimnames(x) <- NULL
 
 m <- stan_model("../stan/dtm.stan")
 stan_data <- list(
-  N = nrow(X),
-  V = ncol(X),
+  N = nrow(x),
+  V = ncol(x),
   T = length(times),
   K = 2,
   sigma_hyper = c(0.5, 0.5),
   delta_hyper = c(0.5, 0.5),
   times = times,
   times_mapping = times,
-  X = X
+  x = x
 )
 
 ## Fit and save variational bayes model
@@ -154,3 +155,6 @@ p <- ggboxplot(mu_hat, mu_plot_opts) +
     legend.position = "bottom"
   )
 ggsave("../../doc/figure/visualize-mu-1.pdf", p)
+
+## ---- posterior-checks ----
+counts_data_checker(x, samples$n_sim, "dtm_post_checks")

@@ -149,4 +149,4 @@ p <- ggboxplot(
 ggsave("../../doc/figure/unigramboxplots-1.pdf", p)
 
 ## ---- posterior-checks ----
-counts_data_checker(x, samples$n_sim, "unigram_post_checks")
+counts_data_checker(x, samples$x_sim, "unigram_post_checks")
