@@ -157,4 +157,4 @@ p <- ggboxplot(mu_hat, mu_plot_opts) +
 ggsave("../../doc/figure/visualize-mu-1.pdf", p)
 
 ## ---- posterior-checks ----
-counts_data_checker(x, samples$n_sim, "../../doc/figure/dtm_post_checks")
+counts_data_checker(x, samples$x_sim, "../../doc/figure/dtm_post_checks")
