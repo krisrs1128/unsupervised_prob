@@ -108,7 +108,7 @@ compare_margins <- function(mx, m_sim, group_col) {
     ) +
     labs(
       "x" = "x",
-      "y" = "Prob(microbe sum < x)"
+      "y" = "Prob(transformed microbe sum < x)"
     ) +
     theme(
       axis.text.y = element_blank()
@@ -117,8 +117,12 @@ compare_margins <- function(mx, m_sim, group_col) {
 
 scores_summary <- function(data_list, supp_cols) {
   library("vegan")
-  scores <- princomp(data_list$x_sim)$scores[, seq_len(data_list$K)]
-  aligned_scores <- procrustes(data_list$x[, seq_len(data_list$K)], scores)$Yrot
+  get_scores <- function(x) {
+    princomp(scale(x, scale = FALSE))$scores[, seq_len(data_list$K)]
+  }
+  true_scores <- get_scores(data_list$x)
+  scores <- get_scores(data_list$x_sim)
+  aligned_scores <- procrustes(true_scores, scores)$Yrot
   dimnames(aligned_scores) <- NULL
 
   data.frame(aligned_scores, supp_cols)
@@ -126,8 +130,12 @@ scores_summary <- function(data_list, supp_cols) {
 
 loadings_summary <- function(data_list, supp_cols) {
   library("vegan")
-  true_loadings <- princomp(data_list$x)$loadings[, seq_len(data_list$K)]
-  loadings <- princomp(data_list$x_sim)$loadings[, seq_len(data_list$K)]
+  get_loadings <- function(x) {
+    princomp(scale(x, scale = FALSE))$loadings[, seq_len(data_list$K)]
+  }
+
+  true_loadings <- get_loadings(data_list$x)
+  loadings <- get_loadings(data_list$x_sim)
   aligned_loadings <- procrustes(true_loadings, loadings)$Yrot
   dimnames(aligned_loadings) <- NULL
 
@@ -135,7 +143,7 @@ loadings_summary <- function(data_list, supp_cols) {
 }
 
 evals_summary <- function(data_list, supp_cols) {
-  evals <- princomp(data_list$x_sim)$sdev
+  evals <- princomp(scale(data_list$x_sim, scale = FALSE))$sdev
   data.frame(evals, supp_cols)
 }
 
