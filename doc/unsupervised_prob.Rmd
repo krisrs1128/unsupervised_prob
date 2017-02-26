@@ -1209,7 +1209,9 @@ include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf"))
 With these preliminary checks of global data properties complete, we proceed
 with modeling.
 
-### LDA {#sec:antibiotics-lda}
+### Modeling Approaches ###
+
+#### LDA {#sec:antibiotics-lda}
 
 We first fit LDA with $K = 4, chosen arbitrarily, but with the heuristic that a
 large $K$ could be hard to interpret, considering there are only 56 samples. We
@@ -1326,7 +1328,7 @@ steps are performed in the code block below.
 To interpret these topics in terms of their microbial composition, we study the
 estimated topic distributions $\beta_{\cdot k}$. The transformed versions,
 $g\left(\beta_{\cdot k}\right)$ are displayed in Figure
-\@ref(fig:visualizebetafigure). The four major rows correspond to the $K = 4
+\@ref(fig:visualizebetafigure). The four major rows correspond to the $K = 4$
 estimated topics. Each boxplot within a row is associated with posterior samples
 for a single microbe. Different colors identify different taxonomic families,
 and within these families, microbes are sorted according to evolutionary
@@ -1358,7 +1360,7 @@ probabilities. It is encouraging that, even without specifying smoothness along
 the tree in the prior for the $\beta_{\cdot k}$s, such smoothness emerges in the
 fitted model.
 
-### Unigram Model ###
+#### Unigram Model ####
 
 Next, we apply the unigram model to the same data. While we might generally
 suspect that gut microbiome profiles can change slightly over several days and
@@ -1654,4 +1656,217 @@ include_graphics("figure/visualize-mu-1.pdf")
 ```
 \endgroup
 
+### Model Evaluation and Criticisim ###
+
+To this point, we have discussed the application of several probabilistic models
+to microbiome data. However, we have said little in terms of the relative merits
+of the different approaches in our particular application. In this section, we
+consider evaluating and criticizing the models of the previous one. This model
+assessment is important for qualifying interpretations; it can also guide
+refinements in subsequent analysis.
+
+We adopt two general techniques for this study: posterior-predictive checking
+and quality on out-of-sample data, as discussed in Section
+\@ref(sec:general_eval). We start with with several graphical posterior
+predictive checks, proceeding model by model, in Section
+\@ref(sec:postpred_antibiotic). Section \@ref(sec:predictive_antibiotic) applies
+the alternative held-out data approach instead.
+
+#### Antibiotics Case Study: Posterior Predictive Checks {#sec:postpred_antibiotic}
+
+We begin with posterior predictive checks for standad LDA. First, ignoring any
+row and column structure in the real data, we can ask how the histograms of
+posterior predictive counts compare to the observed ones. Histograms of the
+$\asinh$ transformed true and a few random samples of posterior predictive data
+is given in Figure \@ref(fig:unigram-hists). The green histograms correspond to
+posterior predictives at a few iterations (the iteration number is the label on
+the right). Apparently, with the current (relatively arbitrary) tuning, there
+seem to be too few zeros in the posterior predictive. Figure
+\@ref(fig:unigram-quantiles) confirms this suspicion, displaying the ECDF of the
+real data in blue and ECDFs for posterior predictives, across all posterior
+samples, in semitransparent black. The fact that the ECDF for the real data
+rises more quickly means that real data have more small counts than is modeled
+by LDA. This suggests perhaps using smaller hyperparameter in the Dirichlet
+prior for $\beta$, since smaller hyperparameters lead to sparser simulated
+probabilities.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r posterior-checks, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r lda-hists, eval = TRUE, fig.cap = "Posterior predictive histograms"}
+include_graphics("figure/lda_post_checks/figure-hists.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r lda-quantiles, eval = TRUE, fig.cap = "Posterior predictive quantiles"}
+include_graphics("figure/lda_post_checks/figure-quantiles.pdf")
+```
+\endgroup
+
+Instead of viewing histograms of raw counts, we can study the histograms of row
+and column margins. Since LDA conditions on sample totals, it is only
+interesting to study posterior predictives for microbe totals. This is displayed
+in Figure \@ref(fig:lda-margins).
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r lda-margins, eval = TRUE, fig.cap = "posterior predictive margins."}
+include_graphics("figure/lda_post_checks/figure-margins.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r lda-scores, eval = TRUE, fig.cap = "posterior predictive scores."}
+include_graphics("figure/lda_post_checks/figure-scores.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r lda-loadings, eval = TRUE, fig.cap = "Posterior predictive loadings."}
+include_graphics("figure/lda_post_checks/figure-loadings.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r lda-ts, eval = TRUE}
+include_graphics("figure/lda_post_checks/figure-ts.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r lda-evals, eval = TRUE}
+include_graphics("figure/lda_post_checks/figure-evals.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-hists, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-hists.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-quantiles, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-quantiles.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-margins, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-margins.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-scores, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-scores.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-loadings, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-loadings.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-ts, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-ts.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-evals, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-evals.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-hists, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-hists.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-quantiles, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-quantiles.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-margins, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-margins.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-scores, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-scores.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-loadings, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-loadings.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-ts, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-ts.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-evals, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-evals.pdf")
+```
+\endgroup
 ## References ##
