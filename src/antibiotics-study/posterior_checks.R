@@ -293,7 +293,7 @@ counts_data_checker <- function(x, x_sim, output_dir = ".") {
   for (i in seq_along(all_plots)) {
     dir.create(output_dir, recursive = TRUE)
     ggsave(
-      file = sprintf("%s/figure-%s.pdf", output_dir, names(all_plots)[i]),
+      file = sprintf("%s/figure-%s.png", output_dir, names(all_plots)[i]),
       all_plots[[i]]
     )
   }
