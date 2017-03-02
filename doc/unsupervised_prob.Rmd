@@ -1209,7 +1209,9 @@ include_graphics(c("figure/heatmaps-1.pdf", "figure/heatmaps-2.pdf"))
 With these preliminary checks of global data properties complete, we proceed
 with modeling.
 
-### LDA {#sec:antibiotics-lda}
+### Modeling Approaches ###
+
+#### LDA {#sec:antibiotics-lda}
 
 We first fit LDA with $K = 4, chosen arbitrarily, but with the heuristic that a
 large $K$ could be hard to interpret, considering there are only 56 samples. We
@@ -1326,7 +1328,7 @@ steps are performed in the code block below.
 To interpret these topics in terms of their microbial composition, we study the
 estimated topic distributions $\beta_{\cdot k}$. The transformed versions,
 $g\left(\beta_{\cdot k}\right)$ are displayed in Figure
-\@ref(fig:visualizebetafigure). The four major rows correspond to the $K = 4
+\@ref(fig:visualizebetafigure). The four major rows correspond to the $K = 4$
 estimated topics. Each boxplot within a row is associated with posterior samples
 for a single microbe. Different colors identify different taxonomic families,
 and within these families, microbes are sorted according to evolutionary
@@ -1358,7 +1360,7 @@ probabilities. It is encouraging that, even without specifying smoothness along
 the tree in the prior for the $\beta_{\cdot k}$s, such smoothness emerges in the
 fitted model.
 
-### Unigram Model ###
+#### Unigram Model ####
 
 Next, we apply the unigram model to the same data. While we might generally
 suspect that gut microbiome profiles can change slightly over several days and
@@ -1651,6 +1653,338 @@ include_graphics("figure/visualize-alpha-1.pdf")
 \fontsize{8pt}{8pt}
 ```{r visualizemufigure, echo = FALSE, eval = TRUE, out.width = "6.5in"}
 include_graphics("figure/visualize-mu-1.pdf")
+```
+\endgroup
+
+### Model Evaluation and Criticisim ###
+
+To this point, we have discussed the application of several probabilistic models
+to microbiome data. However, we have said little in terms of the relative merits
+of the different approaches in our particular application. In this section, we
+consider evaluating and criticizing the models of the previous one. This model
+assessment is important for qualifying interpretations; it can also guide
+refinements in subsequent analysis.
+
+We adopt two general techniques for this study: posterior-predictive checking
+and quality on out-of-sample data, as discussed in Section
+\@ref(sec:general_eval). We start with with several graphical posterior
+predictive checks, proceeding model by model, in Section
+\@ref(sec:postpred_antibiotic). Section \@ref(sec:predictive_antibiotic) applies
+the alternative held-out data approach instead.
+
+#### Antibiotics Case Study: Posterior Predictive Checks {#sec:postpred_antibiotic}
+
+We begin with posterior predictive checks for standad LDA. First, ignoring any
+row and column structure in the real data, we can ask how the histograms of
+posterior predictive counts compare to the observed ones. Histograms of the
+$\asinh$ transformed true and a few random samples of posterior predictive data
+is given in Figure \@ref(fig:unigram-hists). The green histograms correspond to
+posterior predictives at a few iterations (the iteration number is the label on
+the right). Apparently, with the current (relatively arbitrary) tuning, there
+seem to be too few zeros in the posterior predictive. Figure
+\@ref(fig:unigram-quantiles) confirms this suspicion, displaying the ECDF of the
+real data in blue and ECDFs for posterior predictives, across all posterior
+samples, in semitransparent black. The fact that the ECDF for the real data
+rises more quickly means that real data have more small counts than is modeled
+by LDA. This suggests perhaps using smaller hyperparameter in the Dirichlet
+prior for $\beta$, since smaller hyperparameters lead to sparser simulated
+probabilities.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r posterior-checks, eval = FALSE}
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r ldahists, eval = TRUE, fig.cap = "Comparing histogram of transformed counts in the original and LDA posterior predictive data reveals the model's failure to effectively capture the large fraction zero counts. On the other hand, the heavy tail does seem effectively matched."}
+include_graphics("figure/lda_post_checks/figure-hists.png")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r ldaquantiles, eval = TRUE, fig.cap = "Posterior predictive quantiles"}
+include_graphics("figure/lda_post_checks/figure-quantiles.png")
+```
+\endgroup
+
+Instead of viewing histograms of raw counts, we can study the histograms of row
+and column margins. Since LDA conditions on sample totals, it is only
+interesting to study posterior predictives for microbe totals. This is displayed
+in Figure \@ref(fig:ldamargins). Each horizontal boxplot represents the sum of
+of $\asinh$-transformed microbe abundance, over all timepoints, when drawing
+samples from the posterior predictive. from the posterior predictive. Since the
+microbes are sorted from most to least abundant, the figure can be read like an
+ECDF of microbe totals. The overlaid blue line gives the value of this ECDF in
+the observed data.
+
+Evidently, with the current hyperprior settings, LDA consistently overestimates
+the sum of microbe counts across timepoints -- the boxplots are generally to the
+right of the blue line. At first, it seems impossible for the boxplots to be so
+consistently larger than the blue line, since LDA conditions on the total count
+of each sample. However, note that we are displaying the sums of the $\asinh$
+transformed data, which is a nonlinear transformation. Indeed, while the overall
+mean of the posterior sampled and observed data are always equal, the posterior
+samples tend to have larger mean in the $\asinh$ transformed space. This
+reflects the tendency for LDA to prefer having more microbes with small counts
+and fewer with exact zeros.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r ldamargins, eval = TRUE, fig.cap = "posterior predictive margins."}
+include_graphics("figure/lda_post_checks/figure-margins.png")
+```
+\endgroup
+
+In Figure \@ref(fig:ldats), we plot observed time series for randomly selected
+microbes and contrast them with samples from the posterior predictive. Each
+subpanel corresponds to a single microbe. The blue line represents the observed
+time series -- note that the $y$-axis scales vary, since some microbes are much
+more abundant than others. Each black dot was a timepoint from a posterior
+predictive simulated time series.
+
+Generally, the time series seem to be on the appropriate scale, and most have
+approximately the correct shape. We observe two substantial types of departures
+between simulated and observed data. The first is unsurprising: for series with
+larger counts, the posterior predictive tends to oversmooth. For example, the
+drop to 0 in microbe 54 is not captured in any posterior samples. Similar
+oversmoothing is visible in series 177, 207, and 263. A more startling departure
+occurs in the second half of series 207. Here, the posterior is relatively
+confident that the microbe series returns to its initial abundance at the end of
+sampling when in reality the microbe vanishes during the second antibiotic time
+course, never to return. We conjecture that LDA is not able to capture this
+pattern because there are not enough highly abundant microbes that disappear
+after the second time course to be captured by the global LDA summary. This
+suggests a technique for highlighting outlier microbes: we can look at the
+average discrepancy between observed series and their posterior predictive
+samples. 
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r ldats, eval = TRUE}
+include_graphics("figure/lda_post_checks/figure-ts.png")
+```
+\endgroup
+
+An alternative posterior predictive check compares PCA scores and loadings in
+the true and posterior predictive data. Our motivation is that many microbiome
+studies base their findings on views generated by PCA, so it would be desirable
+if our less standard probabilistic summaries don't lead to dramatic
+discrepancies from the reductions produced by by PCA.
+
+Figures \ref@(fig:ldaevals), \@ref(fig:ldascores), \@ref(fig:ldaloadings)
+provide this comparison. Figure \@ref(fig:ldaevals) gives the PCA eigenvalues
+between the true and posterior predictive samples, after having
+$\asinh$-transformed both. As before, the boxplots summarize the posterior
+predictive. Note that the $y$-axis is on a log-scale. Apparently, the posterior
+predictive samples have comparable top four eigenvalues, but have a rapid
+drop-off between the fourth and fifth eigenvalues, while the true data have a
+more steady decline. This is likely a consequence of using $K = 4$ topics in the
+LDA model -- this would be consistent with the matrix factorization view of LDA
+presented in section \@ref(sec:ldafactorization). In light of these scree plots,
+it may be safe to increase $K$ in follow-up analysis.
+
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r ldaevals, eval = TRUE}
+include_graphics("figure/lda_post_checks/figure-evals.png")
+```
+\endgroup
+
+Figure \@ref(fig:ldaloadings) displays the coordinates of different microbes
+according to PCA. The blue numbers index microbes and are positioned according
+to the top two eigenvectors in the observed data. The purple clouds represent
+the analogous positions of eigenvectors in the posterior predictive. Note that,
+since PCA is only unique up to rotation, we have applied a Procrustes rotation
+to all posterior predictive eigenvectors, so that they align with the
+eigenvectors in the observed data. The black labels are located at the means
+of its associated cloud.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r ldaloadings, eval = TRUE, fig.cap = "Posterior predictive loadings."}
+include_graphics("figure/lda_post_checks/figure-loadings.png")
+```
+\endgroup
+
+We observe that the posterior predictive eigenvectors tend to be relatively
+close to the observed data eigenvectors, though they are somewhat shrunk towards
+zero. In light of our earlier simulations studies, which reinforced the idea
+that variational bayes tends to underestimate uncertainty, it unclear whether
+the failure of the observed microbe positions to lie near simulated counterparts
+reflects a true departure from the posited model or approximation error
+introduced during inference.
+
+The analogous sample scores are displayed in Figure \@ref(fig:ldascores).
+Qualitatively, there is a larger departure between simulated and observed
+scores, compared to loadings. While the the simulated and observed scores are
+generally not very close together, the overall ordering and pairwise distances
+between points seem preserved in the posterior simulations, at least at a high
+level. These views suggest that, while we LDA may be losing some detail in the
+counts matrices, most of the global variation in the data is appropriately
+summarized.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r ldascores, eval = TRUE, fig.cap = "posterior predictive scores."}
+include_graphics("figure/lda_post_checks/figure-scores.pdf")
+```
+\endgroup
+
+We next consider these same posterior checks for the dynamic unigram model
+instead. The comparison of histograms of overall counts is displayed in Figure
+\@ref(fig:unigramhists). For this model, the differences in these histograms are
+barely detectable. Figure \@ref(fig:unigramquantiles) reinforces this claim, as
+the quantiles seem to match consistently. In light of these two assessments, we
+are not surprised by the fact that the microbe sums match each other -- see
+Figure \@ref(fig:unigrammargins). Moreover, the randomly selected series in
+\@ref(fig:unigramts) are closely reproduced in the posterior samples.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigramhists, eval = TRUE, fig.cap = "Histogram of overall counts, for posterior predictive and observed data."}
+include_graphics("figure/unigram_post_checks/figure-hists.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigramquantiles, eval = TRUE, fig.cap = "Unigram posterior predictive quantiles almost exactly match those in the observed data."}
+include_graphics("figure/unigram_post_checks/figure-quantiles.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigrammargins, eval = TRUE, fig.cap = "Simulated microbe sums from the unigram model closely match those observed in the observed data."}
+include_graphics("figure/unigram_post_checks/figure-margins.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigramts, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-ts.pdf")
+```
+\endgroup
+
+Usually, we would be delighted if the posterior predictive samples closely match
+the observed data. However, here, this is a reason for concern -- the unigram
+model doesn't seem to be doing much more than fitting empirical microbe
+proportions at each timepoint. There seems to be considerable potential to
+produce more succinct summaries that still capture the essential structure of
+the data. That is, we seem to have overshot. While LDA was easier to
+interpret, it seemed to fail to capture meaningful structure in the data,
+judging from the posterior predictive checks above. On the other hand, the
+unigram model seems overparameterized, basically memorizing the input data,
+which is not useful for discerning the fundamental structure in the data. While
+we might have initially suspected that this might be the result of fitting these
+models of different flexibility, the posterior predictive checks have helped
+evaluate the degree of this over and underfitting, and they could be useful for
+attempting to identify an effective intermediate.
+
+With this in mind, we interpret the unigram posterior predictive PCA results,
+given in Figures \@ref(fig:unigramscores), \@ref(unigramloadings), and
+\@ref(unigramevals). That the scores and loadings from the posterior predictive
+are close to those from the observed data is expected. However, it is actually
+somewhat interesting to consider the scree plot in Figure \@ref(unigramevals).
+Apparently, variance in the posterior predictive samples is more spread out
+across eigenvectors, compared to the observed data. Though the $y$-axis is on a
+log-scale, and the discrepancies are small, this kind of check could be a useful
+diagnostic for whether an unsupervised probabilistic model has been overfit.
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigram-evals, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-evals.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigramscores, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-scores.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r unigramloadings, eval = TRUE}
+include_graphics("figure/unigram_post_checks/figure-loadings.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-hists, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-hists.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-quantiles, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-quantiles.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-margins, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-margins.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-scores, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-scores.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-loadings, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-loadings.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-ts, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-ts.pdf")
+```
+\endgroup
+
+\begingroup
+\setstretch{1}
+\fontsize{8pt}{8pt}
+```{r dtm-evals, eval = TRUE}
+include_graphics("figure/dtm_post_checks/figure-evals.pdf")
 ```
 \endgroup
 
