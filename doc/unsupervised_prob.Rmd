@@ -1878,7 +1878,7 @@ include_graphics("figure/unigram_post_checks/figure-margins.pdf")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramts, eval = TRUE}
+```{r unigramts, eval = TRUE, fig.cap = "Randomly selected time series, and their associated unigram posterior predictive samples."}
 include_graphics("figure/unigram_post_checks/figure-ts.pdf")
 ```
 \endgroup
@@ -1900,8 +1900,11 @@ attempting to identify an effective intermediate.
 
 With this in mind, we interpret the unigram posterior predictive PCA results,
 given in Figures \@ref(fig:unigramscores), \@ref(unigramloadings), and
-\@ref(unigramevals). That the scores and loadings from the posterior predictive
-are close to those from the observed data is expected. However, it is actually
+\@ref(unigramevals). Note that the scores and loadings from the posterior
+predictive are close but not exactly overlapping with the observed data scores.
+In particular, the posterior predictive scores seem to have been shrunken
+towards zero in many cases. It is surprising that this effect is present even
+when the simulated samples so closely match the observed ones. It is also
 somewhat interesting to consider the scree plot in Figure \@ref(unigramevals).
 Apparently, variance in the posterior predictive samples is more spread out
 across eigenvectors, compared to the observed data. Though the $y$-axis is on a
@@ -1911,7 +1914,7 @@ diagnostic for whether an unsupervised probabilistic model has been overfit.
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigram-evals, eval = TRUE}
+```{r unigramevals, eval = TRUE, fig.cap = "Eigenvalues from the unigram posterior predictives."}
 include_graphics("figure/unigram_post_checks/figure-evals.pdf")
 ```
 \endgroup
@@ -1919,7 +1922,7 @@ include_graphics("figure/unigram_post_checks/figure-evals.pdf")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramscores, eval = TRUE}
+```{r unigramscores, eval = TRUE, fig.cap = "Scores from the unigram posterior predictives."}
 include_graphics("figure/unigram_post_checks/figure-scores.pdf")
 ```
 \endgroup
@@ -1927,65 +1930,85 @@ include_graphics("figure/unigram_post_checks/figure-scores.pdf")
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r unigramloadings, eval = TRUE}
+```{r unigramloadings, eval = TRUE, fig.cap = "Loadings from the unigram posterior predictives."}
 include_graphics("figure/unigram_post_checks/figure-loadings.pdf")
 ```
 \endgroup
 
+We next consider the same posterior predictive checks for the DTM. Considering
+that the DTM has strictly more parameters than the unigram model, we expect that
+the posterior predictive checks would reflect a similar pattern of overfitting
+to the observed samples. This generally seems to be the case, upon studying
+Figures \@ref(fig:dtmts) to \@ref(fig:dtmloadings). In particular, the simulated
+data continue to spread mass across too many eigenvectors. However, this
+interpretation is partially complicated by the description of marginal counts in
+Figures \@ref(fig:dtmhists), \@ref(fig:dtmquantiles), and \@ref(fig:dtmmargins).
+Here, we find that the DTM, unlike either LDA or the unigram model, tends to
+*overestimate* the proportion of zeros in the data. Further, the boxplots of
+simulated microbe sums in Figure \@ref(fig:dtmmargins) shows that the sum of
+$\asinh$ transformed counts for microbes in the simulated data tends to be
+smaller than the corresponding sum in the observed data, which is the opposite
+of the relationship observed in LDA. It is unclear how the DTM could both be
+overly sparse\footnote{This could potentially be fixed with an alternative
+hyperprior on the evolving $\mu_{t}$.}, as suggested in these last few figures,
+and continue to very closely replicated the observed samples in both the sampled
+time series and the PCAs.
+
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm-hists, eval = TRUE}
-include_graphics("figure/dtm_post_checks/figure-hists.pdf")
+```{r dtmhists, eval = TRUE, fig.cap = "Histogram of DTM counts. "}
+include_graphics("figure/dtm_post_checks/figure-hists.png")
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm-quantiles, eval = TRUE}
-include_graphics("figure/dtm_post_checks/figure-quantiles.pdf")
+```{r dtmquantiles, eval = TRUE, fig.cap = "Empirical quantiles for DTM counts."}
+include_graphics("figure/dtm_post_checks/figure-quantiles.png")
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm-margins, eval = TRUE}
-include_graphics("figure/dtm_post_checks/figure-margins.pdf")
+```{r dtmmargins, eval = TRUE, fig.cap = "Sum of transformed counts, per microbe."}
+include_graphics("figure/dtm_post_checks/figure-margins.png")
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm-scores, eval = TRUE}
-include_graphics("figure/dtm_post_checks/figure-scores.pdf")
+```{r dtmts, eval = TRUE, fig.cap = "Randomly selected microbe time series, and their associated posterior predictives."}
+include_graphics("figure/dtm_post_checks/figure-ts.png")
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm-loadings, eval = TRUE}
-include_graphics("figure/dtm_post_checks/figure-loadings.pdf")
+```{r dtmevals, eval = TRUE, fig.cap = "Eigenvalues for the DTM posterior predictive."}
+include_graphics("figure/dtm_post_checks/figure-evals.png")
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm-ts, eval = TRUE}
-include_graphics("figure/dtm_post_checks/figure-ts.pdf")
+```{r dtmscores, eval = TRUE, fig.cap = "PCA scores for the DTM posterior predictive."}
+include_graphics("figure/dtm_post_checks/figure-scores.png")
 ```
 \endgroup
 
 \begingroup
 \setstretch{1}
 \fontsize{8pt}{8pt}
-```{r dtm-evals, eval = TRUE}
-include_graphics("figure/dtm_post_checks/figure-evals.pdf")
+```{r dtmloadings, eval = TRUE, fig.cap = "PCA loadings for the DTM posterior predictive."}
+include_graphics("figure/dtm_post_checks/figure-loadings.png")
 ```
 \endgroup
+
 
 ## References ##
