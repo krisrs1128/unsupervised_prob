@@ -15,9 +15,11 @@ library("feather")
 library("phyloseq")
 library("treelapse")
 library("ggscaffold")
+source("./posterior_checks.R")
 set.seed(11242016)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
+theme_set(min_theme())
 
 ## ---- get-data ----
 data(abt)
