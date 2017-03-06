@@ -14,7 +14,7 @@ library("nmfSim")
 
 ## ---- configuration ----
 ## create the configuration JSON file
-base_dir <- "~/Desktop/unsupervised_prob/"
+base_dir <- "/scratch/users/kriss1/writing/research/unsupervised_prob/src/sim/nmf"
 nmf_dir <- file.path(base_dir, "src", "sim", "nmf")
 config_path <- file.path(nmf_dir, "config.json")
 stan_path <- file.path(.libPaths(), "nmfSim", "extdata")
