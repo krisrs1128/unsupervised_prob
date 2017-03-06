@@ -49,8 +49,8 @@ write_configs(
 configs <- fromJSON(config_path, simplifyVector = FALSE)
 batches <- sapply(configs, function(x) { x$batch })
 
+rscript_file <- file.path(nmf_dir, "nmf_script.R")
 for (i in seq_along(unique(batches))) {
-  rscript_file <- file.path(nmf_dir, "nmf_script.R")
   rscript_cmd <- paste("Rscript", rscript_file, config_path, i)
   system(paste(rscript_cmd, "&"))
 }
