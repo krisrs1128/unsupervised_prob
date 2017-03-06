@@ -8,8 +8,8 @@
 ## author: kriss1@stanford.edu
 
 ## ---- libraries ----
-suppressMessage(library("jsonlite"))
-source("/scratch/users/kriss1/programming/readings/nmf/src/nmf_utils.R")
+library("jsonlite")
+library("nmfSim")
 
 ## ---- parse-args ----
 args <- commandArgs(trailingOnly = TRUE)
