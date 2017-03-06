@@ -10,18 +10,18 @@
 
 ## ---- libraries-nmf-expers ----
 library("jsonlite")
-library("SLURMHelpers")
-base_dir <- "../src/sim/nmf"
-source(file.path(base_dir, "nmf_utils.R"))
-submit_batch <- FALSE ## so we can recompile the knitr document without submitting cluster jobs
+library("nmfSim")
 
 ## ---- configuration ----
 ## create the configuration JSON file
-config_path <- file.path(base_dir, "config.json")
-batch_dir <- file.path(base_dir, "batch")
-fits_dir = file.path(base_dir, "..", "..", "..", "data", "fits", "nmf-sim")
-dir.create(batch_dir)
-dir.create(fits_dir)
+base_dir <- "~/Desktop/unsupervised_prob/"
+nmf_dir <- file.path(base_dir, "src", "sim", "nmf")
+config_path <- file.path(nmf_dir, "config.json")
+stan_path <- file.path(.libPaths(), "nmfSim", "extdata")
+batch_dir <- file.path(nmf_dir, "batch")
+fits_dir = file.path(nmf_dir, "data", "fits", "nmf-sim")
+dir.create(batch_dir, recursive = TRUE)
+dir.create(fits_dir, recursive = TRUE)
 
 sim_factors <- list(
   "N" = c(100),
@@ -31,8 +31,8 @@ sim_factors <- list(
 model_factors <- list(
   "inference" = c("gibbs", "vb"),
   "method" = c(
-    file.path(base_dir, "..", "..", "stan", "nmf_gamma_poisson.stan"),
-    file.path(base_dir, "..", "..",  "stan", "nmf_gamma_poisson_zero.stan")
+    file.path(stan_path, "nmf_gamma_poisson.stan"),
+    file.path(stan_path, "nmf_gamma_poisson_zero.stan")
   )
 )
 
@@ -48,23 +48,9 @@ write_configs(
 ## loop over unique values in the "batch" field of the json file
 configs <- fromJSON(config_path, simplifyVector = FALSE)
 batches <- sapply(configs, function(x) { x$batch })
-batch_opts <- list("mem_alloc" = 6000)
 
 for (i in seq_along(unique(batches))) {
-  if (!submit_batch) {
-    warning("submit_job == FALSE, not running batch.")
-    next
-  }
-
-  batch_script <- file.path(batch_dir, paste0("batch-", i, ".sbatch"))
-  rscript_file <- file.path(base_dir, "src", "nmf_script.R")
+  rscript_file <- file.path(nmf_dir, "nmf_script.R")
   rscript_cmd <- paste("Rscript", rscript_file, config_path, i)
-
-  create_job(
-    batch_script,
-    paste0("nmf-", i),
-    rscript_cmd,
-    batch_opts
-  )
-  system(paste("sbatch", batch_script))
+  system(paste(rscript_cmd, "&"))
 }
