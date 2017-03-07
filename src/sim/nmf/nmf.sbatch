@@ -13,7 +13,7 @@
 #################
 #time you think you need; default is 2 hours
 #format could be dd-hh:mm:ss, hh:mm:ss, mm:ss, or mm
-#SBATCH --time=05:00
+#SBATCH --time=60:00
 #################
 #Quality of Service (QOS); think of it as job priority, there is also --qos=long for with a max job length of 7 days, qos normal is 48 hours.
 # REMOVE "normal" and set to "long" if you want your job to run longer than 48 hours,
@@ -36,6 +36,13 @@
 # Remember to change this to your email
 #SBATCH --mail-user=kriss1@stanford.edu
 
+ml git
+ml gcc/4.9.1
+ml R/3.3.0
+ml python/3.3.2
+ml unload intel/2015
 ml load R/3.3.0
+
 source /scratch/users/kriss1/writing/research/unsupervised_prob/.env
 Rscript /scratch/users/kriss1/writing/research/unsupervised_prob/src/sim/nmf/nmf_expers.R
+R -q -e 'Sys.sleep(3400)'
