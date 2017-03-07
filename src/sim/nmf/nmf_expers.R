@@ -14,13 +14,11 @@ library("nmfSim")
 
 ## ---- configuration ----
 ## create the configuration JSON file
-base_dir <- "/scratch/users/kriss1/writing/research/unsupervised_prob/src/sim/nmf"
+base_dir <- Sys.getenv("UNSUPERVISED_PROB_DIR")
 nmf_dir <- file.path(base_dir, "src", "sim", "nmf")
 config_path <- file.path(nmf_dir, "config.json")
-stan_path <- file.path(.libPaths(), "nmfSim", "extdata")
-batch_dir <- file.path(nmf_dir, "batch")
-fits_dir = file.path(nmf_dir, "data", "fits", "nmf-sim")
-dir.create(batch_dir, recursive = TRUE)
+stan_path <- file.path(.libPaths()[1], "nmfSim", "extdata")
+fits_dir = file.path(nmf_dir, "fits")
 dir.create(fits_dir, recursive = TRUE)
 
 sim_factors <- list(
