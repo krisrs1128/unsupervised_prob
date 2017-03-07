@@ -68,12 +68,12 @@ p <- theta_plots$grouped +
     "x" = expression(theta[1]),
     "y" = expression(theta[2])
   )
-ggsave(file.path("figure", "visualizethetas-1.png"), p)
+ggsave(file.path(base_dir, "figure", "visualizethetas-1.png"), p)
 
 ## ---- visualizethetashist ----
 mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
 p <- error_histograms(mgamma_pois_data, plot_opts$facet_terms)
-ggsave(file.path("figure", "visualizethetashist-1.png"), p)
+ggsave(file.path(base_dir, "figure", "visualizethetashist-1.png"), p)
 
 ## ---- visualizebetas ----
 beta_fits <- reshape_all_samples(
@@ -103,12 +103,12 @@ p <- beta_plots$grouped +
     "x" = expression(beta[1]),
     "y" = expression(beta[2])
   )
-ggsave(file.path("figure", "visualizebetas-1.png"), p)
+ggsave(file.path(base_dir, "figure", "visualizebetas-1.png"), p)
 
 ## ---- visualizebetashist ----
 mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
 p <- error_histograms(mgamma_pois_data, plot_opts$facet_terms)
-ggsave(file.path("figure", "visualizebetashist-1.png"), p)
+ggsave(file.path(base_dir, "figure", "visualizebetashist-1.png"), p)
 
 ## ---- visualize-zinf-thetas-prep ----
 zinf_data <- theta_fits %>%
@@ -124,13 +124,13 @@ p <- theta_plots$grouped +
     "x" = expression(theta[1]),
     "y" = expression(theta[2])
   )
-ggsave(file.path("figure", "visualizezinfthetas-1.png"), p)
+ggsave(file.path(base_dir, "figure", "visualizezinfthetas-1.png"), p)
 
 ## ---- visualizezinfthetashist ----
 mzinf_data <- melt_reshaped_samples(zinf_data)
 p <- error_histograms(mzinf_data, plot_opts$facet_terms) +
   facet_grid(inference ~ zero_inf_prob + method)
-ggsave(file.path("figure", "visualizezinfthetashist-1.png"), p)
+ggsave(file.path(base_dir, "figure", "visualizezinfthetashist-1.png"), p)
 
 ## ---- vis-zinf-betas-prep ----
 zinf_data <- beta_fits %>%
@@ -145,10 +145,10 @@ p <- theta_plots$grouped  +
     "x" = expression(beta[1]),
     "y" = expression(beta[2])
   )
-ggsave(file.path("figure", "visualizezinfbetas-1.png"), p)
+ggsave(file.path(base_dir, "figure", "visualizezinfbetas-1.png"), p)
 
 ## ---- visualizezinfbetashist ----
 mzinf_data <- melt_reshaped_samples(zinf_data)
 p <- error_histograms(mzinf_data, plot_opts$facet_terms) +
   facet_grid(inference ~ zero_inf_prob + method)
-ggsave(file.path("figure", "visualizezinfbetashist-1.png"), p)
+ggsave(file.path(base_dir, "figure", "visualizezinfbetashist-1.png"), p)
