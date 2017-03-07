@@ -14,7 +14,7 @@ library("nmfSim")
 
 ## ---- theta-reshape ----
 ## extract theta information from the fits
-base_dir <- "/scratch/users/kriss1/writing/research/unsupervised_prob/src/sim/nmf"
+base_dir <- Sys.getenv("UNSUPERVISED_PROB_DIR")
 nmf_dir <- file.path(base_dir, "src", "sim", "nmf")
 fits_dir <- file.path(nmf_dir, "data", "fits", "nmf-sim")
 fits <- list.files(fits_dir, "fit-*", full.names = TRUE)
