@@ -17,11 +17,12 @@ library("tidyr")
 library("rstan")
 library("ggplot2")
 library("ggscaffold")
-source("../src/sim/lda/vis_utils.R")
-base_dir <- "../src/sim/lda"
+library("ldaSim")
+base_dir <- Sys.getenv("UNSUPERVISED_PROB_DIR")
+lda_dir <- file.path(base_dir, "src", "sim", "lda")
 
 ## ---- paths ----
-output_path <- file.path(base_dir, "..", "..", "..", "data", "fits", "lda-sim")
+output_path <- file.path(lda_dir, "..", "..", "..", "data", "fits", "lda-sim")
 metadata <- fread(file.path(output_path, "metadata.csv")) %>%
   unique()
 
@@ -56,14 +57,14 @@ for (i in seq_along(unique_V)) {
 }
 
 ## ---- betacontours1 ----
-ggsave("figure/betacontours1-1.pdf", p[[1]])
+ggsave(base_dir, "figure/betacontours1-1.pdf", p[[1]])
 
 ## ---- betacontours2 ----
-ggsave("figure/betacontours2-1.pdf", p[[2]])
+ggsave(base_dir, "figure/betacontours2-1.pdf", p[[2]])
 
 ## ---- betahistograms ----
 p <- error_histograms(mcombined, c("V + method", "D + N"))
-ggsave("figure/betahistograms-1.pdf", p)
+ggsave(base_dir, "figure/betahistograms-1.pdf", p)
 
 ## ---- beta-boxplots-object ----
 p <- list()
@@ -75,10 +76,10 @@ for (i in seq_along(unique_V)) {
 }
 
 ## ---- betaboxplot1 ----
-ggsave("figure/betaboxplot1-1.pdf", p[[1]])
+ggsave(base_dir, "figure/betaboxplot1-1.pdf", p[[1]])
 
 ## ---- betaboxplot2 ----
-ggsave("figure/betaboxplot2-1.pdf", p[[2]])
+ggsave(base_dir, "figure/betaboxplot2-1.pdf", p[[2]])
 
 ## ---- theta-samples ----
 theta <- get_truth_data(metadata, "theta", "i") %>%
@@ -114,11 +115,11 @@ for (i in seq_along(unique_D)) {
 }
 
 ## ---- thetaboxplot1 ----
-ggsave("figure/thetaboxplot1-1.pdf", p[[1]])
+ggsave(base_dir, "figure/thetaboxplot1-1.pdf", p[[1]])
 
 ## ---- thetaboxplot2 ----
-ggsave("figure/thetaboxplot2-1.pdf", p[[2]])
+ggsave(base_dir, "figure/thetaboxplot2-1.pdf", p[[2]])
 
 ## ---- thetahistograms ----
 p <- error_histograms(mcombined, c("D + method", "V + N"))
-ggsave("figure/thetahistograms-1.pdf", p)
+ggsave(base_dir, "figure/thetahistograms-1.pdf", p)
