@@ -9,14 +9,21 @@
 ## ---- libraries-nmf-vis ----
 ## assumed running from NMF directory
 library("data.table")
+library("jsonlite")
 library("ggplot2")
 library("nmfSim")
+library("plyr")
+library("dplyr")
+dev.new(width = 4, height = 2)
 
 ## ---- theta-reshape ----
 ## extract theta information from the fits
-base_dir <- Sys.getenv("UNSUPERVISED_PROB_DIR")
+base_dir <- Sys.getenv("MICROBIOME_PLVM_DIR")
 nmf_dir <- file.path(base_dir, "src", "sim", "nmf")
-fits_dir <- file.path(nmf_dir, "data", "fits", "nmf-sim")
+fits_dir <- file.path(nmf_dir, "fits")
+figure_dir <- file.path(base_dir, "doc", "figure")
+dir.create(figure_dir, recursive = TRUE)
+
 fits <- list.files(fits_dir, "fit-*", full.names = TRUE)
 expers <- fromJSON(
   file.path(nmf_dir, "config.json"),
@@ -52,7 +59,7 @@ plot_opts <- list(
   "mean_col" = "#e34a33",
   "x_lim" = c(0, 4),
   "y_lim" = c(0, 5),
-  "text_size" = 2,
+  "text_size" = 4,
   "panel_border" = 0.1
 )
 
@@ -68,17 +75,17 @@ p <- theta_plots$grouped +
     "x" = expression(theta[1]),
     "y" = expression(theta[2])
   )
-ggsave(file.path(base_dir, "figure", "visualizethetas-1.png"), p)
+ggsave(file.path(figure_dir, "visualizethetas-1.pdf"), p)
 
 ## ---- visualizethetashist ----
 mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
 p <- error_histograms(mgamma_pois_data, plot_opts$facet_terms)
-ggsave(file.path(base_dir, "figure", "visualizethetashist-1.png"), p)
+ggsave(file.path(figure_dir, "visualizethetashist-1.pdf"), p)
 
 ## ---- visualizebetas ----
 beta_fits <- reshape_all_samples(
   fits,
-  file.path(base_dir, "config.json"),
+  file.path(nmf_dir, "config.json"),
   "beta",
   c("v", "k")
 )
@@ -103,12 +110,12 @@ p <- beta_plots$grouped +
     "x" = expression(beta[1]),
     "y" = expression(beta[2])
   )
-ggsave(file.path(base_dir, "figure", "visualizebetas-1.png"), p)
+ggsave(file.path(figure_dir, "visualizebetas-1.pdf"), p)
 
 ## ---- visualizebetashist ----
 mgamma_pois_data <- melt_reshaped_samples(gamma_pois_data)
 p <- error_histograms(mgamma_pois_data, plot_opts$facet_terms)
-ggsave(file.path(base_dir, "figure", "visualizebetashist-1.png"), p)
+ggsave(file.path(figure_dir, "visualizebetashist-1.pdf"), p)
 
 ## ---- visualize-zinf-thetas-prep ----
 zinf_data <- theta_fits %>%
@@ -124,13 +131,13 @@ p <- theta_plots$grouped +
     "x" = expression(theta[1]),
     "y" = expression(theta[2])
   )
-ggsave(file.path(base_dir, "figure", "visualizezinfthetas-1.png"), p)
+ggsave(file.path(figure_dir, "visualizezinfthetas-1.pdf"), p)
 
 ## ---- visualizezinfthetashist ----
 mzinf_data <- melt_reshaped_samples(zinf_data)
 p <- error_histograms(mzinf_data, plot_opts$facet_terms) +
   facet_grid(inference ~ zero_inf_prob + method)
-ggsave(file.path(base_dir, "figure", "visualizezinfthetashist-1.png"), p)
+ggsave(file.path(figure_dir, "visualizezinfthetashist-1.pdf"), p)
 
 ## ---- vis-zinf-betas-prep ----
 zinf_data <- beta_fits %>%
@@ -139,16 +146,16 @@ plot_opts$group <- "v"
 
 ## ---- visualizezinfbetas ----
 theta_plots <- scores_contours(zinf_data, plot_opts)
-p <- theta_plots$grouped  + 
+p <- theta_plots$grouped  +
   facet_grid(inference ~ zero_inf_prob + method) +
   labs(
     "x" = expression(beta[1]),
     "y" = expression(beta[2])
   )
-ggsave(file.path(base_dir, "figure", "visualizezinfbetas-1.png"), p)
+ggsave(file.path(figure_dir, "visualizezinfbetas-1.pdf"), p)
 
 ## ---- visualizezinfbetashist ----
 mzinf_data <- melt_reshaped_samples(zinf_data)
 p <- error_histograms(mzinf_data, plot_opts$facet_terms) +
   facet_grid(inference ~ zero_inf_prob + method)
-ggsave(file.path(base_dir, "figure", "visualizezinfbetashist-1.png"), p)
+ggsave(file.path(figure_dir, "visualizezinfbetashist-1.pdf"), p)

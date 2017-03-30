@@ -34,28 +34,25 @@ opts_chunk$set(chunk_opts)
 
 Generally, microbiome studies attempt to characterize variation in microbial
 abundance profiles across different experimental conditions
-[@human2012structure] For example, it can be scientifically meaningful to
-describe differences in microbial communities between treatment and control
-groups. Alternatively, a study may attempt to describe changes in microbial
-abundances after deliberately induced perturbations
-[@dethlefsen2011incomplete].
+[@human2012structure]. For example, a study may attempt to describe differences
+in microbial commuities between diseased and healthy states or after
+deliberately induced perturbations [@dethlefsen2011incomplete].
 
 In the process, there tend to be two complementary difficulties. First, the data
 are often high dimensional, measured over several hundreds or thousands of
 microbes. Studying patterns at the level of individual microbes is typically
 infeasible. Second, it can be important to study microbial abundances in context
-of known biological information. For example, if a collection of evolutionarily
-related microbes all change in sync with each other, the scientific conclusion
-would be different compared to if those microbes were not related to one
+of known biological information. For example, it is scientifically meaningful
+when a collection of evolutionarily related microbes change in sync with one
 another. Further, metagenomic or proteomic data can often supplement raw
 microbial abundance data, providing functional context.
 
 ### Data Description ###
 
-In this study, we focus on 1"6in"S sequencing data, one of the original approaches
+In this study, we focus on 16S sequencing data, one of the original approaches
 to quantifying microbial abundances, and still one of the most common protocols
 for describing microbial ecology. Briefly, this procedure relies on the fact
-that the 1"6in"S gene is conserved across most bacterial species, but is variable
+that the 16S gene is conserved across most bacterial species, but is variable
 enough to differ across different strains. Hence, by counting number of
 occurrences of different versions of this gene, it is possible to measure the
 numbers of different species present in a sample, without attempting the
@@ -82,9 +79,9 @@ We now review a few of the statistical modeling techniques that we believe can
 be useful building blocks when performing microbiome analysis. Many of these
 techniques have been borrowed from text analysis, thinking of the samples by
 microbes matrix as a biological analog of the usual document-term matrix. The
-idea of transferring these techniques to the microbiome is not new, but the
-methods have still yet to be widely adopted [@shafiei2015biomico;
-@chen2012estimating; @holmes2012dirichlet;  @chen2013variable].
+idea of transferring these techniques to the microbiome is not new, though it
+has only been developed to a relatively limited extent [@shafiei2015biomico;
+@chen2012estimating; @holmes2012dirichlet; @chen2013variable].
 
 We include this review because we hope for this text to be self-contained.
 Further, we expect these methods to only be the starting point for more
@@ -266,7 +263,7 @@ the nonnegative matrix $N$ by the product of low rank matrices, $N \approx
 \Theta B^{T}$, where now the only constraints on $\Theta$ and $B$ are that
 $\Theta \in \reals_{+}^{D \times K}$ and $B \in \reals_{+}^{V \times K}$. This
 is the starting point for a variety of algorithms in the Nonnegative Matrix
-Factorization (NMF) literature [@wang2013nonnegative; @berry2007algorithms,
+Factorization (NMF) literature [@wang2013nonnegative; @berry2007algorithms;
 @lee2001algorithms].
 
 Here, we will consider a Gamma-Poisson factorization model (GaP)
