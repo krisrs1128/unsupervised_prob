@@ -124,7 +124,11 @@ taxa$rsv <- rownames(tax_table(abt))
 taxa$Taxon_5[which(taxa$Taxon_5 == "")] <- taxa$Taxon_4[which(taxa$Taxon_5 == "")]
 
 beta_hat <- beta_hat %>%
-  left_join(taxa)
+  left_join(taxa) %>%
+  mutate(
+    topic = paste("Topic", topic),
+    Taxon_5 = stringr::str_extract(Taxon_5, "[^_]+")
+  )
 
 sorted_taxa <- names(sort(table(beta_hat$Taxon_5), decreasing = TRUE))
 beta_hat$Taxon_5 <- factor(beta_hat$Taxon_5, levels = sorted_taxa)
@@ -172,24 +176,22 @@ p <- ggheatmap(
 ggsave("../../doc/figure/visualize_lda_theta_heatmap-1.pdf", p, width = 7, height = 0.9)
 
 ## ---- visualize_lda_theta_boxplot ----
-plot_opts <- list(
-  "x" = "as.factor(time)",
-  "y" = "theta_logit",
-  "fill" = "topic",
-  "col" = "topic",
-  "fill_colors" = brewer.pal(stan_data$K, "Set1"),
-  "col_colors" = brewer.pal(stan_data$K, "Set1"),
-  "facet_terms" = c("topic", "condition"),
-  "facet_scales" = "free_x",
-  "facet_space" = "free_x",
-  "theme_opts" = list(border_size = 0.7, text_size = 10, subtitle_size = 12)
-)
-p <- ggboxplot(data.frame(theta_hat), plot_opts) +
+p <- ggplot(theta_hat) +
+  geom_boxplot(
+    aes(x = as.factor(time), y = theta_logit),
+    fill = "#C9C9C9",
+    outlier.size = 0.05,
+    size = 0.1,
+    notchwidth = 0.1
+  ) +
+scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+  min_theme(list(border_size = 0.7, text_size = 10, subtitle_size = 11)) +
+  facet_grid(topic ~ condition, scales = "free_x", space = "free_x") +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   labs(x = "Time", y = expression(paste("g(", theta[k], ")"))) +
   theme(legend.position = "none") +
   scale_x_discrete(breaks = seq(1, 60, by = 10) - 1)
-ggsave("../../doc/figure/visualize_lda_theta_boxplot-1.pdf", p, width = 6, height = 2.7)
+ggsave("../../doc/figure/visualize_lda_theta_boxplot-1.pdf", p, width = 6, height = 2.9)
 
 ## ---- visualize_lda_beta ----
 plot_opts <- list("x" = "rsv",
@@ -201,8 +203,10 @@ plot_opts <- list("x" = "rsv",
   "facet_space" = "free_x",
   "fill_colors" = brewer.pal(stan_data$K, "Set2"),
   "col_colors" = brewer.pal(stan_data$K, "Set2"),
-  "theme_opts" = list(border_size = 0.7, text_size = 12, subtitle_size = 14),
-  "outlier.shape" = NA
+  "theme_opts" = list(border_size = 0.7, text_size = 10, subtitle_size = 11),
+  "outlier.shape" = NA,
+  "alpha" = 1,
+  "size" = 0.4
 )
 p <- ggboxplot(
   beta_hat %>%
@@ -211,14 +215,14 @@ p <- ggboxplot(
   plot_opts
 ) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
-  scale_y_continuous(breaks = scales::pretty_breaks(3)) +
-  labs(y = expression(paste("g(", beta, ")") fill = "Family") +
+  scale_y_continuous(breaks = scales::pretty_breaks(3), limits = c(-9, 7)) +
+  labs(x = "Species", y = expression(paste("g(", beta[k], ")")), fill = "Family") +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank(),
     legend.position = "bottom"
   )
-ggsave("../../doc/figure/visualize_lda_beta-1.pdf", p)
+ggsave("../../doc/figure/visualize_lda_beta-1.pdf", p, width = 6, height = 3.5)
 
 ## ---- posterior-checks ----
 counts_data_checker(x, samples$n_sim, "lda_post_checks")
