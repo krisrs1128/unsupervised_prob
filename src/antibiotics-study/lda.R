@@ -29,6 +29,24 @@ abt <- abt %>%
   filter_taxa(function(x) sum(x != 0) > .45 * nsamples(abt), prune = TRUE) %>%
   subset_samples(ind == "F")
 
+releveled_sample_data <- abt %>%
+  sample_data %>%
+  mutate(
+    condition = revalue(
+      condition,
+      c("Pre Cp" = "Pre",
+        "1st Cp" = "1st Course",
+        "1st WPC" = "1st Course",
+        "2nd Cp" = "2nd Course",
+        "2nd WPC" = "2nd Course",
+        "Post Cp" = "Post")
+    )
+  )
+rownames(releveled_sample_data) <- abt %>%
+  sample_data %>%
+  rownames
+sample_data(abt) <- releveled_sample_data
+
 ## ---- histograms ---
 transformed_counts <- data.frame(
   count = c(get_taxa(abt), asinh(get_taxa(abt))),
@@ -161,14 +179,17 @@ plot_opts <- list(
   "col" = "topic",
   "fill_colors" = brewer.pal(stan_data$K, "Set1"),
   "col_colors" = brewer.pal(stan_data$K, "Set1"),
-  "facet_terms" = c("topic", "."),
-  "theme_opts" = list(border_size = 0.7)
+  "facet_terms" = c("topic", "condition"),
+  "facet_scales" = "free_x",
+  "facet_space" = "free_x",
+  "theme_opts" = list(border_size = 0.7, text_size = 10, subtitle_size = 12)
 )
 p <- ggboxplot(data.frame(theta_hat), plot_opts) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
-  labs(x = "Time", y = "g(theta)") +
-  theme(legend.position = "none")
-ggsave("../../doc/figure/visualize_lda_theta_boxplot-1.pdf", p)
+  labs(x = "Time", y = expression(paste("g(", theta[k], ")"))) +
+  theme(legend.position = "none") +
+  scale_x_discrete(breaks = seq(1, 60, by = 10) - 1)
+ggsave("../../doc/figure/visualize_lda_theta_boxplot-1.pdf", p, width = 6, height = 2.7)
 
 ## ---- visualize_lda_beta ----
 plot_opts <- list("x" = "rsv",
@@ -180,7 +201,7 @@ plot_opts <- list("x" = "rsv",
   "facet_space" = "free_x",
   "fill_colors" = brewer.pal(stan_data$K, "Set2"),
   "col_colors" = brewer.pal(stan_data$K, "Set2"),
-  "theme_opts" = list(border_size = 0.7),
+  "theme_opts" = list(border_size = 0.7, text_size = 12, subtitle_size = 14),
   "outlier.shape" = NA
 )
 p <- ggboxplot(
@@ -191,7 +212,7 @@ p <- ggboxplot(
 ) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
   scale_y_continuous(breaks = scales::pretty_breaks(3)) +
-  labs(y = "g(beta)", fill = "Family") +
+  labs(y = expression(paste("g(", beta, ")") fill = "Family") +
   theme(
     axis.text.x = element_blank(),
     strip.text.x = element_blank(),
