@@ -1290,19 +1290,20 @@ alternative which does describe uncertainty is given in Figure
 represent topics and time, but now each cell includes a boxplot of
 $g\left(\theta_{ik}\right)$ based on posterior samples of the $\theta_{ik}$.
 
-Both views draw attention to the two antibiotic time courses. Topic 1 becomes
-depressed during the time courses, but recovers during the interim, suggesting
-that it summarizes the "ordinary" microbial community structure. Topic 2 seems
-to represent those microbes that were present initially but are eliminated
-during the first time course, though there is a hint of a recovery at the very
-end of sampling. This topic seems most closely related to the finding reported
-in [@dethlefsen2011incomplete] that Subject F experienced long-term antibiotic
-effects on microbial community composition. Topics 3 and 4 both seem to be
-overrepresented during the time courses. Topic 4 is elevated immediately after
-the cleanout, in contrast, topic 3 seems to become elevatd more gradually.
-Further, topic 3 appears to be more common in the samples across all timepoints,
-including those unassociated with the time courses. Across all topics, we find
-that uncertainty is typically smaller for parameters with larger values.
+Both views draw attention to the two antibiotic time courses, which took place
+between days 12-23 and 41-51. Topic 1 becomes depressed during the time courses,
+but recovers during the interim, suggesting that it reflects typical bacterial
+community structure. Topic 2 seems to represent those bacteria that were present
+initially but are eliminated during the first time course, though there is a
+hint of a recovery at the end of sampling. This topic seems most closely related
+to the finding reported in [@dethlefsen2011incomplete] that Subject F
+experienced long-term antibiotic effects on bacterial community composition.
+Topics 3 and 4 both seem to be overrepresented during the antibiotic treatments.
+Topic 4 is elevated immediately after the cleanout, in contrast, topic 3 seems
+to become elevated more gradually. Further, topic 3 appears to be more common in
+the samples across all timepoints, including those unassociated with the time
+courses. Across all topics, we find that uncertainty is typically smaller for
+parameters with larger values.
 
 \begingroup
 \setstretch{1}
