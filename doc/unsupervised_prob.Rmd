@@ -406,7 +406,7 @@ latent factors at 2. We set the dimension to either 75 or 125. We alternate
 fitting using Gibbs sampling and Variational Bayes. We vary the zero inflation
 probability across $\{0, 0.2\}$, and fit using either the zero-inflation
 likelihood with known zero inflation probability or using the GaP model which is
-unaware of zero-inflation. In all, there are 1"6in" configurations. These simulation
+unaware of zero-inflation. In all, there are 16 configurations. These simulation
 parameters are set up in the configuration \texttt{data.frame} below, which is
 output to \texttt{config.json} so that it can be read by the batch script, which
 is used to parallelize the simulation.
@@ -419,7 +419,7 @@ is used to parallelize the simulation.
 \endgroup
 
 Now that the simulation settings have been set, we send them off to our computer
-topic, and wait for the results to get written. The code below creates the
+cluster, and wait for the results to get written. The code below creates the
 batch scripts that run subsets of the experimental configurations.
 
 \begingroup
@@ -702,7 +702,7 @@ model. We again consider several data generation regimes, varying
 * $N$: The total count within each sample.
 
 We do not vary the total number of topics or the Dirichlet hyperparameter
-strength. Further, we always assume the model is corretly specified before doing
+strength. Further, we always assume the model is correctly specified before doing
 inference. Nonetheless, even in this relatively restricted setting, we find
 certain observations worth sharing.
 
@@ -717,7 +717,7 @@ to parallelize than bootstrapping. The hope then would be that bootstrapping
 offers the best of both world -- the speed of VB with the accuracy of MCMC. We
 discuss whether our simulation study substantiats this idea below.
 
-We take $D \in \{20, "10in"0\}$, $V \in \{"10in", 50\}$ and $N \in \{20, 50, "10in"0\}$ and
+We take $D \in \{20, 100\}$, $V \in \{10, 50\}$ and $N \in \{20, 50,  100\}$ and
 then simulate under all 12 combinations of these three parameters. Throughout,
 we fix $\alpha_{0} = \gamma_{0} = 1$ and $K = 2$. With these parameters, we aim
 to characterize performance of different inferential techniques under different
@@ -808,7 +808,7 @@ topics, we align those with the next highest correlation, and so on.}.
 \endgroup
 
 Figure \@ref(betacountours1) displays the true and posterior $\beta_{k}$ for the
-experiments with $V = "10in"$ features, while other simulation characteristics are
+experiments with $V = 10$ features, while other simulation characteristics are
 varied. As before, each panel represents a single experimental configuration,
 with two axes associated with the two underlying topics. Each black number $v$
 is the true value of feature $v$ across topics: $\left(\beta_{v1},
@@ -861,7 +861,7 @@ include_graphics("figure/betacontours2-1.pdf")
 \endgroup
 
 A few comments are in order. As expected, when $D$ increases, i.e., more samples
-are made available, the posterior for $\beta$, whose dimension do not increase
+are made available, the posterior for $\beta$, whose dimension does not increase
 with $D$, begins to concentrate around its true value. It is unclear whether the
 rate of concentration when $V = 50$ is much different from the case where $V =
 10$, because the absolute sizes of the clouds in Figure \@ref(fig:betacontours2)
@@ -1180,7 +1180,7 @@ transformations. While we make no changes in inference to protect against this
 skewness, we will visualize fitted parameters on a transformed scale, so that
 all microbes are visible. Further, we will assess the posterior predictive's
 ability to reproduce the skewness evident in the real data, to see whether this
-skewness cannot be captured by the space of models postited by our different
+skewness cannot be captured by the space of models posited by our different
 methods.
 
 \begingroup
@@ -1221,7 +1221,7 @@ with modeling.
 
 #### LDA {#sec:antibiotics-lda}
 
-We first fit LDA with $K = 4, chosen arbitrarily, but with the heuristic that a
+We first fit LDA with $K = 4$, chosen arbitrarily, but with the heuristic that a
 large $K$ could be hard to interpret, considering there are only 56 samples. We
 use VB, since it is an order of magnitude faster when working across all
 timepoints.
@@ -1259,7 +1259,7 @@ average log probability, rather than any reference class.
 The fitted parameter values are summarized in Figures
 \@ref(fig:visualizethetaheatmapfigure), \@ref(fig:visualizethetaboxplotfigure),
 and \@ref(fig:visualizebetafigure). We describe how to read each display and
-briefly interpret the underlying biological.
+briefly interpret the underlying biological implications.
 
 A view of the posterior means for the $g\left(\theta_{ik}\right)$ is given in Figure
 \@ref(fig:visualize_theta_heatmap). Here, the $k^{th}$ row corresponds to the
