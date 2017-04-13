@@ -135,7 +135,8 @@ plot_opts <- list(
   "fill" = "Taxon_5",
   "col" = "Taxon_5",
   "outlier.shape" = NA,
-  "alpha" = 0.4,
+  "alpha" = 1,
+  "size" = 0.4,
   "col_colors" = brewer.pal(8, "Set2"),
   "fill_colors" = brewer.pal(8, "Set2"),
   "theme_opts" = list(border_size = 0.7, text_size = 10, subtitle_size = 10)
