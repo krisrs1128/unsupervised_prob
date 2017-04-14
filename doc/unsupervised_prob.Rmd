@@ -1683,7 +1683,7 @@ the alternative held-out data approach instead.
 
 #### Antibiotics Case Study: Posterior Predictive Checks {#sec:postpred_antibiotic}
 
-We begin with posterior predictive checks for standad LDA. First, ignoring any
+We begin with posterior predictive checks for standard LDA. First, ignoring any
 row and column structure in the real data, we can ask how the histograms of
 posterior predictive counts compare to the observed ones. Histograms of the
 $\asinh$ transformed true and a few random samples of posterior predictive data
