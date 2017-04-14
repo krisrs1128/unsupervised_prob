@@ -64,6 +64,8 @@ taxa <- data.table(
   tax_table(abt)@.Data
 )
 taxa$Taxon_5[which(taxa$Taxon_5 == "")] <- taxa$Taxon_4[which(taxa$Taxon_5 == "")]
+taxa$Taxon_5 <- taxa$Taxon_5 %>%
+  revalue(c("Bacteroidaceae_Bacteroides" = "Bacteroides"))
 
 ## center the mus
 mu <- samples$mu
@@ -151,16 +153,16 @@ p <- ggboxplot(
   plot_opts
 ) +
   geom_hline(yintercept = 0, alpha = 0.4, size = 0.5, col = "#999999") +
-  scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(3), limits = c(-9, 7)) +
   facet_grid(condition + time ~ Taxon_5, scales = "free_x", space = "free_x") +
-  labs(y = expression(mu[t]), fill = "Taxonomic Family") +
+  labs(y = expression(mu[t]), fill = "Family") +
   theme(
     strip.text.x = element_blank(),
     axis.text.x = element_blank(),
     axis.title = element_text(size = 11),
     legend.position = "bottom",
   )
-ggsave("../../doc/figure/antibiotics_unigram_mu.pdf", p, width = 6, height = 3.8)
+ggsave("../../doc/figure/antibiotics_unigram_mu.pdf", p, width = 6, height = 3.5)
 
 ## ---- posterior-checks ----
 counts_data_checker(x, samples$x_sim, "../../doc/figure/unigram_post_checks")
